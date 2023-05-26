@@ -11,7 +11,6 @@ namespace StardewTravelSkill
     internal class TravelSkill : SpaceCore.Skills.Skill
     {
         public const string TravelSkillID = "Achtuur.Travelling";
-        public const float ExpPerStep = 0.05f;
 
 
         /// <summary>
@@ -57,6 +56,7 @@ namespace StardewTravelSkill
             this.ExperienceBarColor = new Microsoft.Xna.Framework.Color(123, 123, 123);
 
             // Level 5 professions
+
             TravelSkill.ProfessionMovespeed = new TravelProfession(skill: this, id: "Movespeed", name: I18n.Movespeed_Name, desc: I18n.Movespeed_Desc, path_to_icon: "assets/professions/movespeed.png");
             this.Professions.Add(TravelSkill.ProfessionMovespeed);
 

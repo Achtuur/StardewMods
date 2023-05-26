@@ -26,6 +26,11 @@ namespace StardewTravelSkill
 
 
         /// <summary>
+        /// Number of steps to walk before getting sprint bonus
+        /// </summary>
+        public static int SprintSteps { get; set; }
+
+        /// <summary>
         /// Bonus multiplier to movespeed that is applied by sprinting
         /// </summary>
         public static float SprintMovespeedBonus { get; set; }
@@ -35,8 +40,12 @@ namespace StardewTravelSkill
         /// </summary>
         public static float TotemUseChance { get; set; }
 
-
+        /// <summary>
+        /// Number of steps to walk before getting 1 Exp
+        /// </summary>
         public static int StepsPerExp { get; set; }
+
+        
 
         public ModConfig()
         {
@@ -44,6 +53,7 @@ namespace StardewTravelSkill
             ModConfig.RestoreStaminaPercentage = 0.01f;
             ModConfig.LevelMovespeedBonus = 0.01f;
             ModConfig.SprintMovespeedBonus = 0.15f;
+            ModConfig.SprintSteps = 5;
             ModConfig.TotemUseChance = 0.5f;
             ModConfig.StepsPerExp = 25;
         }
@@ -64,6 +74,13 @@ namespace StardewTravelSkill
                 mod: instance.ModManifest,
                 reset: () => instance.Config = new ModConfig(),
                 save: () => instance.Helper.WriteConfig(instance.Config)
+            );
+
+            /// General travel skill settings header
+            configMenu.AddSectionTitle(
+                mod: instance.ModManifest,
+                text: I18n.CfgSection_Travelskill,
+                tooltip: null
             );
 
             // Steps per Exp
@@ -89,6 +106,13 @@ namespace StardewTravelSkill
                 interval: 0.05f / 100f,
                 formatValue: displayAsPercentage
              );
+
+            /// profession settings header
+            configMenu.AddSectionTitle(
+                mod: instance.ModManifest,
+                text: I18n.CfgSection_Professions,
+                tooltip: null
+            );
 
             // Movespeed profession bonus
             configMenu.AddNumberOption(
@@ -145,7 +169,7 @@ namespace StardewTravelSkill
             // TODO add options for cheap recipes/obelisks
         }
 
-        private string displayExpGainValues(string expgain_option)
+        private static string displayExpGainValues(string expgain_option)
         {
             switch (expgain_option)
             {
@@ -157,7 +181,7 @@ namespace StardewTravelSkill
             return "Something went wrong... :(";
         }
 
-        private string displayAsPercentage(float value)
+        public static string displayAsPercentage(float value)
         {
             return Math.Round(100f * value, 2).ToString() + "%";
         }

@@ -12,6 +12,9 @@ namespace StardewTravelSkill
     {
         private Func<string> m_professionName;
         private Func<string> m_professionDescription;
+
+
+        // name and desc func that no argument
         public TravelProfession(Skills.Skill skill, string id, Func<string> name, Func<string> desc, string path_to_icon) : base(skill, id)
         {
             this.Icon = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(path_to_icon);

@@ -109,18 +109,12 @@ namespace StardewTravelSkill
             helper.Events.GameLoop.SaveCreated += this.OnSaveCreate;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChanged;
-            helper.Events.GameLoop.DayStarted += this.onDayStarted;
             helper.Events.Input.ButtonReleased += this.OnButtonReleased;
-            helper.Events.GameLoop.OneSecondUpdateTicked += this.OneSecondUpdateTicked;
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
 
             ConsoleCommands.Initialize(helper);
         }
 
-        private void onDayStarted(object sender, DayStartedEventArgs e)
-        {
-            
-        }
 
         /*********
         ** Private methods
@@ -134,18 +128,10 @@ namespace StardewTravelSkill
             this.Config.createMenu(this);
         }
 
-        private void OneSecondUpdateTicked(object sender, EventArgs e)
-        {
-            if (!Context.IsWorldReady)
-                return;
-
-            //Monitor.Log($"{Game1.player.Name} has a movespeed of {Game1.player.getMovementSpeed()}", LogLevel.Debug);
-            
-        }
-
         private void OnUpdateTicked(object sender, EventArgs e)
         {
-            CheckSprintActive();
+            if (Game1.player.HasCustomProfession(TravelSkill.ProfessionSprint))
+                CheckSprintActive();
         }
 
         private void OnSaveCreate(object sender, EventArgs e)
@@ -247,7 +233,7 @@ namespace StardewTravelSkill
 
             uint step_diff = Game1.player.stats.stepsTaken - this.m_consecutiveSteps;
             
-            if (step_diff > 3 && !ModEntry.SprintActive)
+            if (step_diff > ModConfig.SprintSteps && !ModEntry.SprintActive)
             {
                 this.Monitor.Log("Now sprinting", LogLevel.Debug);
                 ModEntry.SprintActive = true;

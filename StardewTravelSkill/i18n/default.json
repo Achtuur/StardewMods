@@ -6,7 +6,7 @@
 
     /** Professions **/
     "movespeed.name": "Movespeed",
-    "movespeed.desc": "Gain 5% additional movespeed",
+    "movespeed.desc": "Gain additional movespeed",
     "restorestamine.name": "Restore Stamina",
     "restorestamina.desc": "Restore stamina passively",
     "sprint.name": "Sprint",
@@ -17,7 +17,7 @@
     "cheapobelisk.name": "Obelisk Builder",
     "cheapobelisk.desc": "Obelisks cost 50% less gold",
     "totemreuse.name": "Totem Preserver",
-    "totemreuse.desc": "Warp totems have a 50% chance of not being used",
+    "totemreuse.desc": "Warp totems have a chance of not being used",
 
     /** Console commands **/
     // Set level
@@ -37,22 +37,25 @@
 
 
     /** Config Menu **/
+    "cfg_section.travelskill": "General Skill settings",
+    "cfg_section.professions": "Profession settings",
+
     "cfg_expgain.name": "Number of steps per XP",
     "cfg_expgain.desc": "Number of steps to walk before gaining 1 xp point in Travelling",
 
-    "cfg_levelmovespeed.name": "%Movespeed bonus per level",
-    "cfg_levelmovespeed.desc": "Set %movespeed bonus in percentage per level of Travelling skill",
+    "cfg_levelmovespeed.name": "% Movespeed bonus per level",
+    "cfg_levelmovespeed.desc": "% Movespeed bonus in percentage per level of Travelling skill",
 
-    "cfg_movespeedbonus.name": "%Movespeed profession bonus",
-    "cfg_movespeedbonus.desc": "%Movespeed gained from movespeed profession",
+    "cfg_movespeedbonus.name": "% Movespeed profession bonus",
+    "cfg_movespeedbonus.desc": "% Movespeed gained from movespeed profession",
 
     "cfg_sprintbonus.name": "Sprint movespeed bonus",
-    "cfg_sprintbonus.desc": "Set movespeed bonus gained from sprinting, requires profession",
+    "cfg_sprintbonus.desc": "Set movespeed bonus gained from sprinting profession",
 
     "cfg_restorestamina.name": "Stamina restoration",
-    "cfg_restorestamina.desc": "% of total stamina recovered every 10 in game min, requires profession",
+    "cfg_restorestamina.desc": "% Total Stamina recovered every 10 in game min by profession",
 
     "cfg_totemreuse.name": "Totem use chance",
-    "cfg_totemreuse.desc": "Use chance of totem in %, requires profession"
+    "cfg_totemreuse.desc": "Use chance of totem in % for profession"
 
 }
