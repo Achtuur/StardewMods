@@ -2,11 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-	  <GamePath>D:\SteamLibrary\steamapps\common\Stardew Valley</GamePath>
+    <GamePath>D:\SteamLibrary\steamapps\common\Stardew Valley</GamePath>
+    <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
+    <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
+	<Reference Include="ContentPatcher" HintPath="$(GameModsPath)\ContentPatcher\ContentPatcher.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ContentPatcher">
+      <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Mods\ContentPatcher\ContentPatcher.dll</HintPath>
+    </Reference>
+    <Reference Include="SpaceCore">
+      <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Mods\SpaceCore\SpaceCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

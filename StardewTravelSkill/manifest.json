@@ -6,5 +6,15 @@
     "UniqueID": "Achtuur.StardewTravelSkill",
     "EntryDll": "StardewTravelSkill.dll",
     "MinimumApiVersion": "3.0.0",
+    "dependencies": [
+        {
+            "UniqueID": "spacechase0.SpaceCore",
+            "MinimumVersion": "1.13.0"
+        },
+        {
+            "UniqueID": "Pathoschild.ContentPatcher",
+            "MinimumVersion": "1.29.0",
+        }
+    ],
     "UpdateKeys": []
 }
