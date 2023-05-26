@@ -1,0 +1,64 @@
+{
+    "Format": "1.29.0",
+    "Changes": [
+        {
+            "LogName": "WarpTotemRecipes",
+            "Action": "EditData",
+            "Target": "Data/CraftingRecipes",
+            "Fields": {
+                //"Warp Totem: Island": {
+                //    // Change to ??
+                //    "0": "1 5",
+                //},
+                "Warp Totem: Farm": {
+                    // Change to 5 wood, 5 hay, 10 fiber
+                    "0": "388 5 178 5 771 10"
+                },
+                "Warp Totem: Mountains": {
+                    // Change to 5 wood, 1 copper bar, 10 stone
+                    "0": "388 5 334 1 390 10"
+                },
+                "Warp Totem: Desert": {
+                    // Change to 10 wood, coconut, 1 gold bar
+                    "0": "388 10 88 1 336 1"
+                },
+                "Warp Totem: Beach": {
+                    // Change to 5 wood, 5 fiber, any 2 fish
+                    "0": "388 5 771 5 -4 2"
+                }
+            },
+            "When": {
+                "hasMod": "Achtuur.StardewTravelSkill",
+                "Query: {{Achtuur.StardewTravelSkill/hasCheaperWarpTotems}}": true
+            }
+        },
+        {
+            "LogName": "ObeliskPriceChange",
+            "Action": "EditData",
+            "Target": "Data/Blueprints",
+            "Fields": {
+                "Earth Obelisk": {
+                    // Price change to 50% of original
+                    "17": 250000
+                },
+                "Water Obelisk": {
+                    // Price change to 50% of original
+                    "17": 250000
+                },
+                "Desert Obelisk": {
+                    // Price change to 50% of original
+                    "17": 500000
+                },
+                "Island Obelisk": {
+                    // Price change to 50% of original
+                    "17": 500000
+                }
+            },
+            "When": {
+                "hasMod": "Achtuur.StardewTravelSkill",
+                "Query: {{Achtuur.StardewTravelSkill/hasCheaperObelisks}}": true
+            }
+        },
+    ]
+
+}
