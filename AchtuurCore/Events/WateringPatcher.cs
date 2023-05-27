@@ -34,7 +34,7 @@ namespace AchtuurCore.Events
         // performToolAction called on HoeDirt with Tool = watering can
         // If HoeDirt.state.Value changed to 1 -> soil has been watered
 
-        private static bool prefix_performToolAction(Tool t, HoeDirt __instance, out WateringInfo __state)
+        private static void prefix_performToolAction(Tool t, HoeDirt __instance, out WateringInfo __state)
         {
             __state = new WateringInfo();
             try
@@ -46,8 +46,6 @@ namespace AchtuurCore.Events
             {
                 ModEntry.Instance.Monitor.Log($"Something went wrong when prefix patching performToolAction (WateringPatcher):\n{e}", LogLevel.Error);
             }
-            return true; //Always run original function
-            
         }
 
         private static void postfix_performToolAction(ref HoeDirt __instance, WateringInfo __state)
