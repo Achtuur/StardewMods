@@ -9,17 +9,11 @@
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
-    <ProjectReference Include="..\StardewMods\AchtuurCore.csproj" />
+    <ProjectReference Include="..\[CP] StardewTravelSkill\[CP] StardewTravelSkill.csproj" />
+	<Reference Include="AchtuurCore" HintPath="$(GameModsPath)\AchtuurCore\AchtuurCore.dll" Private="False" />
 	<Reference Include="ContentPatcher" HintPath="$(GameModsPath)\ContentPatcher\ContentPatcher.dll" Private="False" />
+	<Reference Include="SpaceCore" HintPath="$(GameModsPath)\SpaceCore\SpaceCore.dll" Private="False" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ContentPatcher">
-      <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Mods\ContentPatcher\ContentPatcher.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceCore">
-      <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Mods\SpaceCore\SpaceCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>
