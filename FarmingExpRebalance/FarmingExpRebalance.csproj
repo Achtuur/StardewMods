@@ -3,19 +3,18 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<GamePath>D:\SteamLibrary\steamapps\common\Stardew Valley</GamePath>
+		<EnableHarmony>true</EnableHarmony>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
+		<PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="content.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="manifest.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<Reference Include="SpaceCore">
+			<HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Mods\SpaceCore\SpaceCore.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>

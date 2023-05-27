@@ -6,20 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
+using AchtuurCore.Patches;
+using HarmonyLib;
 
 namespace StardewTravelSkill.Patches
 {
-    internal class ReduceActiveItemPatch
+    internal class ReduceActiveItemPatch : GenericPatcher
     {
         private static IMonitor Monitor;
 
-        // call this method from your Entry class
-        internal static void Initialize(IMonitor monitor)
+        public override void Patch(Harmony harmony, IMonitor monitor)
         {
             Monitor = monitor;
+            harmony.Patch(
+                original: this.getOriginalMethod<Farmer>(nameof(Farmer.reduceActiveItemByOne)),
+                prefix: this.getHarmonyMethod(nameof(this.Prefix_ReduceActiveItemByOne))
+            ); ;
         }
+
+
         /// <summary>
-        /// Postfix patch to <see cref="StardewValley.Game1.warpFarmer"/>.
+        /// Postfix patch to <see cref="StardewValley.Farmer.reduceActiveItemByOne"/>.
         /// </summary>
         /// <param name="__result"></param>
         internal static bool Prefix_ReduceActiveItemByOne()

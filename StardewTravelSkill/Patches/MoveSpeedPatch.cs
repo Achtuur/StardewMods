@@ -1,4 +1,6 @@
-﻿using StardewModdingAPI;
+﻿using AchtuurCore.Patches;
+using HarmonyLib;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -9,14 +11,17 @@ using System.Threading.Tasks;
 
 namespace StardewTravelSkill.Patches
 {
-    internal class MoveSpeedPatch
+    internal class MoveSpeedPatch : GenericPatcher
     {
         private static IMonitor Monitor;
 
-        // call this method from your Entry class
-        internal static void Initialize(IMonitor monitor)
+        public override void Patch(Harmony harmony, IMonitor monitor)
         {
             Monitor = monitor;
+            harmony.Patch(
+                original: this.getOriginalMethod<Farmer>(nameof(Farmer.getMovementSpeed)),
+                postfix: this.getHarmonyMethod(nameof(Postfix_GetMoveSpeed))
+            );
         }
         /// <summary>
         /// Postfix patch to <see cref="StardewValley.Farmer.getMovementSpeed"/>. Multiplies result of that method by <see cref="ModEntry.GetMovespeedMultiplier"/>, which is based on <see cref="TravelSkill"/> level.
@@ -33,5 +38,7 @@ namespace StardewTravelSkill.Patches
                 Monitor.Log($"Failed in {nameof(Postfix_GetMoveSpeed)}:\n{ex}", LogLevel.Error);
             }
         }
+
+        
     }
 }

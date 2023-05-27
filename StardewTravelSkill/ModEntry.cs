@@ -14,6 +14,7 @@ using StardewValley.Menus;
 using ContentPatcher.Framework;
 using ContentPatcher;
 using Pathoschild.Stardew.Common.Integrations.GenericModConfigMenu;
+using AchtuurCore.Patches;
 
 namespace StardewTravelSkill
 {
@@ -79,20 +80,9 @@ namespace StardewTravelSkill
         /// <param name="helper">Simplified API for writing mods</param>
         public override void Entry(IModHelper helper)
         {
-            // Apply harmony patch
-            var harmony = new Harmony(this.ModManifest.UniqueID);
-
-            MoveSpeedPatch.Initialize(this.Monitor);
-            ReduceActiveItemPatch.Initialize(this.Monitor);
-
-            harmony.Patch(
-               original: AccessTools.Method(typeof(Farmer), nameof(Farmer.getMovementSpeed)),
-               postfix: new HarmonyMethod(typeof(MoveSpeedPatch), nameof(MoveSpeedPatch.Postfix_GetMoveSpeed))
-            );
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(Farmer), nameof(Farmer.reduceActiveItemByOne)),
-                prefix: new HarmonyMethod(typeof(ReduceActiveItemPatch), nameof(ReduceActiveItemPatch.Prefix_ReduceActiveItemByOne))
+            HarmonyPatcher.ApplyPatches(this,
+                new MoveSpeedPatch(),
+                new ReduceActiveItemPatch()
             );
 
             // Init references to mod api
@@ -105,7 +95,6 @@ namespace StardewTravelSkill
 
 
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
-
             helper.Events.GameLoop.SaveCreated += this.OnSaveCreate;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChanged;
