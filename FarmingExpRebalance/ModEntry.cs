@@ -8,11 +8,13 @@ namespace FarmingExpRebalance
     public class ModEntry : Mod
     {
         public static ModEntry Instance;
+
         public override void Entry(IModHelper helper)
         {
             ModEntry.Instance = this;
 
             AchtuurCore.Events.EventPublisher.onFinishedWateringSoil += onFinishedWateringSoil;
+
         }
 
         private void onFinishedWateringSoil(object sender, WateringFinishedArgs e)

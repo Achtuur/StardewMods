@@ -8,5 +8,5 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 <!-- ### (unreleased) Changes made:
 
-* WateringPatcher now uses pass-through prefix method (thanks to Shokah)
+* WateringPatcher now uses pass-through prefix method (thanks to Shockah)
 * Removed leftover watering debug message -->

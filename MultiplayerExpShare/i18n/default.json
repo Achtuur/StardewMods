@@ -1,0 +1,5 @@
+﻿{
+    "placeholder":  "placeholder",
+    "cfg_nearbyplayertilerange.name": "Nearby player tile range",
+    "cfg_nearbyplayertilerange.desc": "Range of tiles around you where other players will share exp",
+}
