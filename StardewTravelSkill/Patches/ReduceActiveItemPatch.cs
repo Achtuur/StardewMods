@@ -21,7 +21,7 @@ namespace StardewTravelSkill.Patches
             harmony.Patch(
                 original: this.getOriginalMethod<Farmer>(nameof(Farmer.reduceActiveItemByOne)),
                 prefix: this.getHarmonyMethod(nameof(this.Prefix_ReduceActiveItemByOne))
-            ); ;
+            );
         }
 
 
@@ -29,7 +29,7 @@ namespace StardewTravelSkill.Patches
         /// Postfix patch to <see cref="StardewValley.Farmer.reduceActiveItemByOne"/>.
         /// </summary>
         /// <param name="__result"></param>
-        internal static bool Prefix_ReduceActiveItemByOne()
+        private static bool Prefix_ReduceActiveItemByOne()
         {
             try
             {
@@ -56,7 +56,7 @@ namespace StardewTravelSkill.Patches
         }
 
 
-        static bool isTotem(int item_id)
+        private static bool isTotem(int item_id)
         {
             switch (item_id)
             {

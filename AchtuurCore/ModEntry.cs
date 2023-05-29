@@ -26,7 +26,7 @@ namespace AchtuurCore
 
         private void test_wateringevent(object sender, WateringFinishedArgs e)
         {
-            Instance.Monitor.Log($"{e.farmer} just watered {e.target}", LogLevel.Debug);
+            Instance.Monitor.Log($"{e.farmer} just watered {e.target}", LogLevel.Trace);
         }
         
     }
