@@ -24,8 +24,8 @@ Apart from SMAPI (god bless Pathoschild), this mod relies heavily on the [SpaceC
 - SpaceCore based skill mods
   - [Cooking skill](https://www.nexusmods.com/stardewvalley/mods/522)
   - [Luck Skill](https://www.nexusmods.com/stardewvalley/mods/521)
-- Experience bars
-- Generic Configuration Menu (try out the settings!)
+- [Experience bars](https://www.nexusmods.com/stardewvalley/mods/509)
+- [Generic Configuration Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (try out the settings!)
 
 <!-- ### Changes for next update: -->
 <!--  -->
