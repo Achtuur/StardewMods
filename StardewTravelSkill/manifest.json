@@ -1,7 +1,7 @@
 {
     "Name": "StardewTravelSkill",
     "Author": "Achtuur",
-    "Version": "1.0.0",
+    "Version": "1.0.2",
     "Description": "Adds a new travel skill that makes all the moving you do more rewarding.",
     "UniqueID": "Achtuur.StardewTravelSkill",
     "EntryDll": "StardewTravelSkill.dll",

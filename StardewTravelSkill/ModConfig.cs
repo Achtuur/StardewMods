@@ -10,7 +10,7 @@ namespace StardewTravelSkill
     internal class ModConfig
     {
         /// <summary>
-        /// Bonus multiplier to total movespeed per level of Travelling skill. Defaults to 1%.
+        /// Exp gained for watering a single tile
         /// </summary>
         public static float LevelMovespeedBonus { get; set; }
 
@@ -49,9 +49,9 @@ namespace StardewTravelSkill
 
         public ModConfig()
         {
+            ModConfig.LevelMovespeedBonus = 0.01f;
             ModConfig.MovespeedProfessionBonus = 0.05f;
             ModConfig.RestoreStaminaPercentage = 0.01f;
-            ModConfig.LevelMovespeedBonus = 0.01f;
             ModConfig.SprintMovespeedBonus = 0.15f;
             ModConfig.SprintSteps = 5;
             ModConfig.TotemUseChance = 0.5f;

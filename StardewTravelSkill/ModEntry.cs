@@ -13,7 +13,6 @@ using StardewTravelSkill.Patches;
 using StardewValley.Menus;
 using ContentPatcher.Framework;
 using ContentPatcher;
-using Pathoschild.Stardew.Common.Integrations.GenericModConfigMenu;
 using AchtuurCore.Patches;
 
 namespace StardewTravelSkill

@@ -5,12 +5,12 @@
 
 
     /** Professions **/
-    "movespeed.name": "Movespeed",
+    "movespeed.name": "Sprinter",
     "movespeed.desc": "Gain additional movespeed",
-    "restorestamine.name": "Restore Stamina",
+    "restorestamine.name": "Marathon Runner",
     "restorestamina.desc": "Restore stamina passively",
-    "sprint.name": "Sprint",
-    "sprint.desc": "Walking for a longer period of time causes you to sprint",
+    "sprint.name": "Champion Runner",
+    "sprint.desc": "Walking for a longer period of time causes you to run even faster",
 
     "cheapwarptotem.name": "Warp Enjoyer",
     "cheapwarptotem.desc": "Warp totems are cheaper to craft",

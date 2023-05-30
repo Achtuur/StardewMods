@@ -10,7 +10,7 @@ using StardewModdingAPI.Events;
 
 namespace AchtuurCore
 {
-    internal sealed class ModEntry : Mod
+    internal class ModEntry : Mod
     {
         public static ModEntry Instance;
         public override void Entry(IModHelper helper)
