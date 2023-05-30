@@ -25,17 +25,6 @@
     "cmd_setlevel.desc": "Sets the player's level in the Travelling skill.\n\nUsage: travelskill_setlevel <level>\n- level: level between 1 and 10",
     "cmd_setlevel.errormsg": "'{{input}}' is an invalid input, please input a number between 1 and 10",
 
-    // Set movespeed per lvl
-    "cmd_setmovespeed.name": "travelskill_setmovespeedbonus",
-    "cmd_setmovespeed.desc": "Sets the movespeed bonus per level in the Travelling skill.\n\nUsage: travelskill_setmovespeedbonus <value>\n- value: float amount",
-    "cmd_setmovespeed.errormsg": "'{{input}}' is an invalid input, please input a float (example: 0.01)",
-
-    // Set sprint bonus
-    "cmd_setsprintspeed.name": "travelskill_setsprintbonus",
-    "cmd_setsprintspeed.desc": "Sets the sprint bonus per level in the Travelling skill.\n\nUsage: travelskill_setsprintspeedbonus <value>\n- value: float amount",
-    "cmd_setsprintspeed.errormsg": "'{{input}}' is an invalid input, please input a float (example: 0.01)",
-
-
     /** Config Menu **/
     "cfg_section.travelskill": "General Skill settings",
     "cfg_section.professions": "Profession settings",

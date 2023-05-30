@@ -24,7 +24,6 @@ namespace StardewTravelSkill
         /// </summary>
         public static float RestoreStaminaPercentage { get; set; }
 
-
         /// <summary>
         /// Number of steps to walk before getting sprint bonus
         /// </summary>
@@ -49,13 +48,16 @@ namespace StardewTravelSkill
 
         public ModConfig()
         {
+            // Changable by player
             ModConfig.LevelMovespeedBonus = 0.01f;
             ModConfig.MovespeedProfessionBonus = 0.05f;
             ModConfig.RestoreStaminaPercentage = 0.01f;
             ModConfig.SprintMovespeedBonus = 0.15f;
-            ModConfig.SprintSteps = 5;
             ModConfig.TotemUseChance = 0.5f;
             ModConfig.StepsPerExp = 25;
+
+            // Unchangable by player
+            ModConfig.SprintSteps = 5;
         }
 
         /// <summary>
@@ -90,7 +92,7 @@ namespace StardewTravelSkill
                 tooltip: I18n.CfgExpgain_Desc,
                 getValue: () => StepsPerExp.ToString(),
                 setValue: value => StepsPerExp = int.Parse(value),
-                allowedValues: new string[] {"10", "25", "50", "100"},
+                allowedValues: new string[] {"5", "10", "25", "50", "100"},
                 formatAllowedValue: displayExpGainValues
              );
 
@@ -173,20 +175,23 @@ namespace StardewTravelSkill
         {
             switch (expgain_option)
             {
+                case "5": return "5 (Very Fast)";
                 case "10": return "10 (Fast)";
                 case "25": return "25 (Normal)";
                 case "50": return "50 (Slow)";
                 case "100": return "100 (Very Slow)";
             }
+            // should be unreachable, if this ever appears then you made a mistake sir programmer
             return "Something went wrong... :(";
         }
 
+        /// <summary>
+        /// Displays <paramref name="value"/> as a percentage, rounded to two decimals.
+        /// <c>ModConfig.displayAsPercentage(0.02542); // returns 2.54%</c>
+        /// </summary>
         public static string displayAsPercentage(float value)
         {
             return Math.Round(100f * value, 2).ToString() + "%";
         }
-
-        
-
     }
 }

@@ -36,6 +36,9 @@ namespace StardewTravelSkill
         /// </summary>
         private uint m_consecutiveSteps;
 
+        /// <summary>
+        /// Whether player is currently under effects of sprint profession
+        /// </summary>
         public static bool SprintActive { get; set; }
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace StardewTravelSkill
         /// </summary>
         /// <returns>
         /// <c>
-        ///     <see cref="TravelSkill.LevelMovespeedBonus"/> * level + [<see cref="TravelSkill.MovespeedProfessionBonus"/>]
+        ///     <see cref="TravelSkill.LevelMovespeedBonus"/> * level + [<see cref="ModConfig.MovespeedProfessionBonus"/>] + [<see cref="ModConfig.SprintMovespeedBonus"/>]
         /// </c>
         /// </returns>
         public static float GetMovespeedMultiplier()
@@ -183,7 +186,6 @@ namespace StardewTravelSkill
         /// Returns true if <paramref name="button"/> is a movement control button
         /// </summary>
         /// <param name="button">Button to check</param>
-        /// <returns></returns>
         private bool isMovementButton(SButton button)
         {
             InputButton b_equiv;
@@ -194,11 +196,18 @@ namespace StardewTravelSkill
                 Game1.options.moveRightButton.Any(b => b.Equals(b_equiv));
         }
 
+        /// <summary>
+        /// Returns true if a button corresponding to movement is held
+        /// </summary>
         private bool MovementButtonHeld()
         {
             return ButtonHeld(SButton.W) || ButtonHeld(SButton.S) || ButtonHeld(SButton.A) || ButtonHeld(SButton.D);
         }
 
+        /// <summary>
+        /// Checks whether <paramref name="button"/> is held this tick
+        /// </summary>
+        /// <param name="button">Button to check</param> 
         private bool ButtonHeld(SButton button)
         {
             SButtonState state = this.Helper.Input.GetState(button);
@@ -206,7 +215,7 @@ namespace StardewTravelSkill
         }
 
         /// <summary>
-        /// <para>Counts consecutive steps and activates sprint while walking and having at least 3 consecutive steps.</para>
+        /// <para>Counts consecutive steps and activates sprint while walking and having at least x consecutive steps.</para>
         /// <para>Should be called every tick</para>
         /// </summary>
         private void CheckSprintActive()

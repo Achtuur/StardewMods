@@ -15,8 +15,6 @@ namespace StardewTravelSkill
         internal static void Initialize(IModHelper helper)
         {
             helper.ConsoleCommands.Add(I18n.CmdSetlvl_Name(), I18n.CmdSetlevel_Desc(), StardewTravelSkill.ConsoleCommands.setLevel);
-            helper.ConsoleCommands.Add(I18n.CmdSetmovespeed_Name(), I18n.CmdSetmovespeed_Desc(), StardewTravelSkill.ConsoleCommands.setLevelMovespeedBonus);
-            helper.ConsoleCommands.Add(I18n.CmdSetsprintspeed_Name(), I18n.CmdSetsprintspeed_Desc(), StardewTravelSkill.ConsoleCommands.setSprintBonus);
         }
         public static void setLevel(string command, string[] args)
         {
@@ -37,32 +35,6 @@ namespace StardewTravelSkill
             catch(Exception e)
             {
                 ModEntry.Instance.Monitor.Log(I18n.CmdSetlevel_Errormsg(args[0]), LogLevel.Error);
-            }
-        }
-
-        public static void setLevelMovespeedBonus(string command, string[] args)
-        {
-            try
-            {
-                float val = float.Parse(args[0]);
-                ModConfig.LevelMovespeedBonus = val;
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log(I18n.CmdSetmovespeed_Errormsg(args[0]), LogLevel.Error);
-            }
-        }
-
-        public static void setSprintBonus(string command, string[] args)
-        {
-            try
-            {
-                float val = float.Parse(args[0]);
-                ModConfig.SprintMovespeedBonus = val;
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log(I18n.CmdSetsprintspeed_Errormsg(args[0]), LogLevel.Error);
             }
         }
     }

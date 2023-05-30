@@ -53,7 +53,7 @@ namespace StardewTravelSkill
             this.SkillsPageIcon = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/skillpageicon.png");
 
             this.ExperienceCurve = new[] { 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 };
-            this.ExperienceBarColor = new Microsoft.Xna.Framework.Color(123, 123, 123);
+            this.ExperienceBarColor = new Microsoft.Xna.Framework.Color(100, 189, 132); // blueish green from skill icon
 
             // Level 5 professions
 
