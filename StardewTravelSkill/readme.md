@@ -3,23 +3,7 @@
 Travel skill for Stardew Valley, available on [NexusMods](https://www.nexusmods.com/stardewvalley/mods/16820/). The skill is leveled by walking around and requires about 300.000 steps to fully max.
 
 
-# Changelog
-
-
-## 1.0.3 (Planned)
-* Rename movespeed profession to "Sprinter"
-* Rename restore stamina profession to "Marathon Runner"
-* Rename sprinting profession to "Champion Runner"
-## 1.0.2
-* Fixed versioning
-## 1.0.1
- * Fixed release archive
-## 1.0.0
-* Initial release
-* Contains
-Apart from SMAPI (god bless Pathoschild), this mod relies heavily on the [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/521) library, so a huge thanks to spacechase01 for making this possible.
-
-## Features
+# Features
 
 - Adds new skill to the game using SpaceCore, meaning it is compatible with Cooking skill and Luck skill mods.
     - Skill levels up based on steps taken by player
@@ -31,6 +15,28 @@ Apart from SMAPI (god bless Pathoschild), this mod relies heavily on the [SpaceC
   - **Warp Enjoyer** - Makes warp totems cheaper to craft
     - **Obelisk Builde** - Makes obelisks 50% cheaper to build (gold cost only)
     - **Totem reuser** - 50% chance to keep totem after use
+
+
+
+# Changelog
+
+## 1.1.0 (Planned)
+* Rename movespeed profession to "Sprinter"
+* Rename restore stamina profession to "Marathon Runner"
+* Rename sprinting profession to "Champion Runner"
+* Changed color of experience bar to a blue-ish green
+* Remove movespeed per level and movespeed profession bonus console commands, as those are handled by settings
+* Added option for very fast exp gain (every 5 steps)
+* rework mod to use AssetRequested event
+## 1.0.2
+* Fixed versioning
+## 1.0.1
+ * Fixed release archive
+## 1.0.0
+* Initial release
+* Contains
+Apart from SMAPI (god bless Pathoschild), this mod relies heavily on the [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/521) library, so a huge thanks to spacechase01 for making this possible.
+
 
 
 
