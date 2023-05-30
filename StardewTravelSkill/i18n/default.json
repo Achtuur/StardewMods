@@ -5,7 +5,7 @@
 
 
     /** Professions **/
-    "movespeed.name": "Sprinter",
+    "movespeed.name": "Seasoned Runner",
     "movespeed.desc": "Gain additional movespeed",
     "restorestamine.name": "Marathon Runner",
     "restorestamina.desc": "Restore stamina passively",

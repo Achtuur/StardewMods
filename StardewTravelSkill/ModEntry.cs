@@ -230,9 +230,14 @@ namespace StardewTravelSkill
             }
         }
 
+        /// <summary>
+        /// Updates totem recipe based on profession, listens to <see cref="IContentEvents.AssetRequested"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void updateTotemRecipe(object sender, AssetRequestedEventArgs e)
         {
-            if (!e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
+            if (!e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes") || !Game1.player.HasCustomProfession(TravelSkill.ProfessionCheapWarpTotem))
                 return;
 
             
@@ -261,9 +266,14 @@ namespace StardewTravelSkill
             Instance.Helper.Events.Content.AssetRequested -= updateTotemRecipe;
         }
 
+        /// <summary>
+        /// Update obelisk recipe based on profession, listens to <see cref="IContentEvents.AssetRequested"/>
+        /// </summary>
+        /// <param name="sender"><inheritdoc/></param>
+        /// <param name="e"><inheritdoc/></param>
         private void updateObeliskRecipe(object sender, AssetRequestedEventArgs e)
         {
-            if (!e.NameWithoutLocale.IsEquivalentTo("Data/Blueprints"))
+            if (!e.NameWithoutLocale.IsEquivalentTo("Data/Blueprints") || !Game1.player.HasCustomProfession(TravelSkill.ProfessionCheapObelisk))
                 return;
 
             e.Edit(asset =>

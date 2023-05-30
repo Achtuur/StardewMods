@@ -16,7 +16,16 @@ Apart from SMAPI (god bless Pathoschild), this mod relies heavily on [SpaceCore]
     - **Obelisk Builde** - Makes obelisks 50% cheaper to build (gold cost only)
     - **Totem reuser** - 50% chance to keep totem after use
 
+# For content pack creators
 
+This mod features some custom tokens for content pack creators that can tell you whether the local player has unlocked any of the professions. These tokens are:
+
+* `Achtuur.StardewTravelSkill/hasProfessionMovespeed` - Local player has the _Seasoned Runner_ profession (lvl 5)
+* `Achtuur.StardewTravelSkill/hasProfessionSprint` - Local player has the _Champion Runner_ profession (lvl 10)
+* `Achtuur.StardewTravelSkill/hasProfessionRestoreStamina` - Local player has the _Marathon Runner_ profession (lvl 10)
+* `Achtuur.StardewTravelSkill/hasProfessionCheaperWarpTotems` - Local player has the _Warp Enjoyer_ profession (lvl 5)
+* `Achtuur.StardewTravelSkill/hasProfessionCheaperObelisks` - Local player has the _Cheaper Builder_ profession (lvl 10)
+* `Achtuur.StardewTravelSkill/hasProfessionTotemReuse` - Local player has the _Totem Preserver_ profession (lvl 10)
 
 # Known Compatibility
 

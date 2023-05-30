@@ -24,11 +24,35 @@ namespace StardewTravelSkill
 
         public void CreateTokens()
         {
-            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasCheaperWarpTotems", hasCheaperWarpTotem);
-            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasCheaperObelisks", hasCheaperObelisk);
-            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "canCraftScepter", canCraftScepter);
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionMovespeed", hasMovespeed);
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionRestoreStamina", hasRestoreStamina);
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionSprint", hasSprint);
+
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionCheaperWarpTotems", hasCheaperWarpTotem);
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionCheaperObelisks", hasCheaperObelisk);
+            ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionTotemReuse", hasTotemReuse);
         }
 
+        private IEnumerable<string> hasMovespeed()
+        {
+            if (!Context.IsWorldReady)
+                return null;
+            return new[] { Game1.player.HasCustomProfession(TravelSkill.ProfessionMovespeed).ToString() };
+        }
+
+        private IEnumerable<string> hasRestoreStamina()
+        {
+            if (!Context.IsWorldReady)
+                return null;
+            return new[] { Game1.player.HasCustomProfession(TravelSkill.ProfessionRestoreStamina).ToString() };
+        }
+
+        private IEnumerable<string> hasSprint()
+        {
+            if (!Context.IsWorldReady)
+                return null;
+            return new[] { Game1.player.HasCustomProfession(TravelSkill.ProfessionSprint).ToString() };
+        }
 
         private IEnumerable<string> hasCheaperWarpTotem()
         {
@@ -37,7 +61,7 @@ namespace StardewTravelSkill
             return new[] { Game1.player.HasCustomProfession(TravelSkill.ProfessionCheapWarpTotem).ToString() };
         }
 
-        private IEnumerable<string> canCraftScepter()
+        private IEnumerable<string> hasTotemReuse()
         {
             if (!Context.IsWorldReady)
                 return null;
