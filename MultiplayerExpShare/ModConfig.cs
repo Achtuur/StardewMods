@@ -48,22 +48,24 @@ namespace StardewTravelSkill
             /// General travel skill settings header
             configMenu.AddSectionTitle(
                 mod: instance.ModManifest,
-                text: I18n.CfgSection_Travelskill,
+                text: I18n.CfgGeneral,
                 tooltip: null
             );
 
-            // Steps per Exp
+            // exp percentage to actor
             configMenu.AddTextOption(
                 mod: instance.ModManifest,
-                name: I18n.CfgExpgain_Name,
-                tooltip: I18n.CfgExpgain_Desc,
+                name: I18n.CfgExptoactor_Name,
+                tooltip: I18n.CfgExptoactor_Desc,
                 getValue: () => StepsPerExp.ToString(),
-                setValue: value => StepsPerExp = int.Parse(value),
-                allowedValues: new string[] {"5", "10", "25", "50", "100"},
-                formatAllowedValue: displayExpGainValues
+                setValue: value => StepsPerExp = float.Parse(value),
+                min: 25f/100f,
+                max: 75f/100f,
+                interval: 5f/100f,
+                formatAllowedValue: displayAsPercentage
              );
 
-            // Level movespeed bonus
+            // nearby player tile range
             configMenu.AddNumberOption(
                 mod: instance.ModManifest,
                 name: I18n.CfgNearbyplayertilerange_Name,
@@ -76,11 +78,11 @@ namespace StardewTravelSkill
              );
         }
 
-        private static string displayExpGainValues(string expgain_option)
+        private static string textoption(string expgain_option)
         {
             switch (expgain_option)
             {
-                case "5": return "5 (Very Fast)";
+                case "0.25": return "25%";
                 case "10": return "10 (Fast)";
                 case "25": return "25 (Normal)";
                 case "50": return "50 (Slow)";

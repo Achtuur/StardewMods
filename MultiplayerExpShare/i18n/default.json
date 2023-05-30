@@ -1,5 +1,7 @@
 ﻿{
-    "placeholder":  "placeholder",
+    "cfg_general":  "General settings",
     "cfg_nearbyplayertilerange.name": "Nearby player tile range",
     "cfg_nearbyplayertilerange.desc": "Range of tiles around you where other players will share exp",
+    "cfg_exptoactor.Name": "Percentage of exp to actor",
+    "cfg_exptoactor.Desc": "Percentage of exp that goes to the player performing the action giving exp"
 }
