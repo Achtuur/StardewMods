@@ -38,14 +38,18 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
-## 1.1.0 (Planned)
-* Rename movespeed profession to "Sprinter"
-* Rename restore stamina profession to "Marathon Runner"
-* Rename sprinting profession to "Champion Runner"
-* Changed color of experience bar to a blue-ish green
-* Remove movespeed per level and movespeed profession bonus console commands, as those are handled by settings
-* Added option for very fast exp gain (every 5 steps)
-* rework mod to use AssetRequested event, so `[CP] StardewTravelSkill` is now obsolete.
+## 1.1.0
+* New/Changed content
+    * Added option for very fast exp gain (every 5 steps)
+    * Rename movespeed profession to "Seasoned Runner"
+    * Rename restore stamina profession to "Marathon Runner"
+    * Rename sprinting profession to "Champion Runner"
+    * Remove movespeed per level and movespeed profession bonus console commands, as those are handled by settings
+    * Changed color of experience bar to a blue-ish green
+* Fixes
+    * Rework mod to use AssetRequested event, so `[CP] StardewTravelSkill` is now obsolete.
+    * Fixed error showing in console when placing furniture
+    * Removed config.json from archive
 ## 1.0.2
 * Fixed versioning
 ## 1.0.1
