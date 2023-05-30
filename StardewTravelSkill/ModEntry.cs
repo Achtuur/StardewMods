@@ -27,6 +27,11 @@ namespace StardewTravelSkill
         public ModConfig Config;
 
         /// <summary>
+        /// Whether player is currently under effects of sprint profession
+        /// </summary>
+        public static bool SprintActive { get; set; }
+
+        /// <summary>
         /// Amount of steps taken the previous time it was checked
         /// </summary>
         private uint m_previousSteps;
@@ -37,9 +42,14 @@ namespace StardewTravelSkill
         private uint m_consecutiveSteps;
 
         /// <summary>
-        /// Whether player is currently under effects of sprint profession
+        /// Whether totem recipe has been changed as result of profession
         /// </summary>
-        public static bool SprintActive { get; set; }
+        private bool totemRecipeChanged;
+
+        /// <summary>
+        /// Whether obelisk recipe has been changed as result of profession
+        /// </summary>
+        private bool obeliskRecipeChanged;
 
         /// <summary>
         /// Returns movespeed multiplier farmer should receive
@@ -102,13 +112,14 @@ namespace StardewTravelSkill
             helper.Events.GameLoop.TimeChanged += this.OnTimeChanged;
             helper.Events.Input.ButtonReleased += this.OnButtonReleased;
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            helper.Events.GameLoop.DayStarted += this.OnDayStart;
 
             ConsoleCommands.Initialize(helper);
         }
 
 
         /*********
-        ** Private methods
+        ** Event Listeners
         *********/
         private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
         {
@@ -127,20 +138,18 @@ namespace StardewTravelSkill
 
         private void OnSaveCreate(object sender, EventArgs e)
         {
-            // Should always true but is kept here just in case
-            if (!Context.IsWorldReady)
-                return;
-
-            this.m_previousSteps = Game1.player.stats.stepsTaken;
+            InitValueTrackers();
         }
 
         private void OnSaveLoad(object sender, EventArgs e)
         {
-            // Should always true but is kept here just in case
-            if (!Context.IsWorldReady)
-                return;
+            InitValueTrackers();
+            registerProfessionAssetEvents();
+        }
 
-            this.m_previousSteps = Game1.player.stats.stepsTaken;
+        private void OnDayStart(object sender, DayStartedEventArgs e)
+        {
+            registerProfessionAssetEvents();
         }
 
         /// <summary>
@@ -148,7 +157,7 @@ namespace StardewTravelSkill
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnButtonReleased(object sender,ButtonReleasedEventArgs e)
+        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
             // Exit early if no world loaded
             if (!Context.IsWorldReady)
@@ -164,9 +173,9 @@ namespace StardewTravelSkill
             {
                 Game1.player.AddCustomSkillExperience(TravelSkill, 1);
                 // Set previous steps to current steps, with correction
-                this.m_previousSteps = Game1.player.stats.stepsTaken + ((uint) ModConfig.StepsPerExp - step_diff);
+                this.m_previousSteps = Game1.player.stats.stepsTaken + ((uint)ModConfig.StepsPerExp - step_diff);
             }
-            
+
         }
 
         /// <summary>
@@ -180,6 +189,102 @@ namespace StardewTravelSkill
             {
                 Game1.player.stamina += Game1.player.MaxStamina * ModConfig.RestoreStaminaPercentage;
             }
+        }
+
+        /*********
+        ** Helper functions
+        *********/
+
+        /// <summary>
+        /// Initialise variables that are used to track certain values, this should be called only at start of world load.
+        /// </summary>
+        private void InitValueTrackers()
+        {
+            if (!Context.IsWorldReady)
+                return;
+
+            this.m_previousSteps = Game1.player.stats.stepsTaken;
+            this.totemRecipeChanged = false;
+            this.obeliskRecipeChanged = false;
+        }
+
+        
+        /// <summary>
+        /// Register events for AssetRequested for the obelisk and totem recipe professions
+        /// </summary>
+        private void registerProfessionAssetEvents()
+        {
+            if (!Context.IsWorldReady)
+                return;
+
+            if (!totemRecipeChanged && Game1.player.HasCustomProfession(TravelSkill.ProfessionCheapWarpTotem))
+            {
+                Instance.Helper.Events.Content.AssetRequested += updateTotemRecipe;
+                Instance.Helper.GameContent.InvalidateCache("Data/CraftingRecipes");
+            }
+            
+            if (!obeliskRecipeChanged && Game1.player.HasCustomProfession(TravelSkill.ProfessionCheapObelisk))
+            {
+                Instance.Helper.Events.Content.AssetRequested += updateObeliskRecipe;
+                Instance.Helper.GameContent.InvalidateCache("Data/Blueprints");
+            }
+        }
+
+        private void updateTotemRecipe(object sender, AssetRequestedEventArgs e)
+        {
+            if (!e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
+                return;
+
+            
+            e.Edit(asset =>
+            {
+                IDictionary<string, string> assetDict = asset.AsDictionary<string, string>().Data;
+                // Farm totem to 5 wood, 5 hay, 10 fiber
+                ChangeTotemRecipeInDict(assetDict, "Warp Totem: Farm", "388 5 178 5 771 10");
+                Instance.Monitor.Log("[StardewTravelSkill] Farm totem recipe updated!", LogLevel.Trace);
+
+                // Moutain totem to 5 wood, 1 copper bar, 10 stone
+                ChangeTotemRecipeInDict(assetDict, "Warp Totem: Mountains", "388 5 334 1 390 10");
+                Instance.Monitor.Log("[StardewTravelSkill] Mountains totem recipe updated!", LogLevel.Trace);
+
+                // Desert totem to 10 wood, coconut, 1 gold bar
+                ChangeTotemRecipeInDict(assetDict, "Warp Totem: Desert", "388 10 88 1 336 1");
+                Instance.Monitor.Log("[StardewTravelSkill] Desert totem recipe updated!", LogLevel.Trace);
+
+                // Beach totem to 5 wood, 5 fiber, any 2 fish
+                ChangeTotemRecipeInDict(assetDict, "Warp Totem: Beach", "388 5 771 5 -4 2");
+                Instance.Monitor.Log("[StardewTravelSkill] Beach totem recipe updated!", LogLevel.Trace);
+            });
+            
+            // Unsubscribe this method so asset isn't needlessly updated again
+            totemRecipeChanged = true;
+            Instance.Helper.Events.Content.AssetRequested -= updateTotemRecipe;
+        }
+
+        private void updateObeliskRecipe(object sender, AssetRequestedEventArgs e)
+        {
+            if (!e.NameWithoutLocale.IsEquivalentTo("Data/Blueprints"))
+                return;
+
+            e.Edit(asset =>
+            {
+                IDictionary<string, string> assetDict = asset.AsDictionary<string, string>().Data;
+
+                ChangeObeliskCostInDict(assetDict, "Earth Obelisk", "250000");
+                Instance.Monitor.Log("[StardewTravelSkill] Earth Obelisk cost changed!", LogLevel.Trace);
+
+                ChangeObeliskCostInDict(assetDict, "Water Obelisk", "250000");
+                Instance.Monitor.Log("[StardewTravelSkill] Water Obelisk cost changed!", LogLevel.Trace);
+
+                ChangeObeliskCostInDict(assetDict, "Desert Obelisk", "500000");
+                Instance.Monitor.Log("[StardewTravelSkill] Desert Obelisk cost changed!", LogLevel.Trace);
+
+                ChangeObeliskCostInDict(assetDict, "Island Obelisk", "500000");
+                Instance.Monitor.Log("[StardewTravelSkill] Island Obelisk cost changed!", LogLevel.Trace);
+            });
+
+            obeliskRecipeChanged = true;
+            Instance.Helper.Events.Content.AssetRequested -= updateObeliskRecipe;
         }
 
         /// <summary>
@@ -237,5 +342,18 @@ namespace StardewTravelSkill
             }
         }
 
+        private void ChangeTotemRecipeInDict(IDictionary<string, string> dict, string affected_item, string new_recipe)
+        {
+            var dictEntrySplit = dict[affected_item].Split('/');
+            dictEntrySplit[0] = new_recipe;
+            dict[affected_item] = String.Join<string>("/", dictEntrySplit);
+        }
+
+        private void ChangeObeliskCostInDict(IDictionary<string, string> dict, string affected_item, string new_cost)
+        {
+            var dictEntrySplit = dict[affected_item].Split('/');
+            dictEntrySplit[17] = new_cost;
+            dict[affected_item] = String.Join<string>("/", dictEntrySplit);
+        }
     }
 }

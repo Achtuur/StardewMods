@@ -33,6 +33,12 @@ namespace StardewTravelSkill.Patches
         {
             try
             {
+                if (!Context.IsWorldReady)
+                    return true;
+
+                if (Game1.player.ActiveObject is null)
+                    return true;
+
                 // Check if the held item that was used is a totem
                 SObject held_item = Game1.player.ActiveObject;
                 if (!isTotem(held_item.ParentSheetIndex))

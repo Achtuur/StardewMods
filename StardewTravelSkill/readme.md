@@ -1,7 +1,7 @@
 # Stardew Travelling Skill
 
 Travel skill for Stardew Valley, available on [NexusMods](https://www.nexusmods.com/stardewvalley/mods/16820/). The skill is leveled by walking around and requires about 300.000 steps to fully max.
-
+Apart from SMAPI (god bless Pathoschild), this mod relies heavily on [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/521), so a huge thanks to spacechase01 for making this possible.
 
 # Features
 
@@ -18,6 +18,15 @@ Travel skill for Stardew Valley, available on [NexusMods](https://www.nexusmods.
 
 
 
+# Known Compatibility
+
+- SpaceCore based skill mods
+  - [Cooking skill](https://www.nexusmods.com/stardewvalley/mods/522)
+  - [Luck Skill](https://www.nexusmods.com/stardewvalley/mods/521)
+- [Experience bars](https://www.nexusmods.com/stardewvalley/mods/509)
+- [Generic Configuration Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (try out the settings!)
+
+
 # Changelog
 
 ## 1.1.0 (Planned)
@@ -27,7 +36,7 @@ Travel skill for Stardew Valley, available on [NexusMods](https://www.nexusmods.
 * Changed color of experience bar to a blue-ish green
 * Remove movespeed per level and movespeed profession bonus console commands, as those are handled by settings
 * Added option for very fast exp gain (every 5 steps)
-* rework mod to use AssetRequested event
+* rework mod to use AssetRequested event, so `[CP] StardewTravelSkill` is now obsolete.
 ## 1.0.2
 * Fixed versioning
 ## 1.0.1
@@ -35,22 +44,3 @@ Travel skill for Stardew Valley, available on [NexusMods](https://www.nexusmods.
 ## 1.0.0
 * Initial release
 * Contains
-Apart from SMAPI (god bless Pathoschild), this mod relies heavily on the [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/521) library, so a huge thanks to spacechase01 for making this possible.
-
-
-
-
-### Known Compatibility
-
-- SpaceCore based skill mods
-  - [Cooking skill](https://www.nexusmods.com/stardewvalley/mods/522)
-  - [Luck Skill](https://www.nexusmods.com/stardewvalley/mods/521)
-- [Experience bars](https://www.nexusmods.com/stardewvalley/mods/509)
-- [Generic Configuration Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (try out the settings!)
-
-<!-- ### Changes for next update: -->
-<!--  -->
-<!-- - Color of experience bar (for experience bar mods) is now a blueish green. -->
-<!-- - Removed unused file TravellingData.cs -->
-<!-- - Remove movespeed/level and movespeedprofession console commands as those are now handled by settinsg -->
-<!-- - Added option for very fast exp gain (every 5 steps) -->
