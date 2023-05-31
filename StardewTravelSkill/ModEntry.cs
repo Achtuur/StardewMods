@@ -14,11 +14,38 @@ using StardewValley.Menus;
 using ContentPatcher.Framework;
 using ContentPatcher;
 using AchtuurCore.Patches;
+using SpaceCore.UI;
 
 namespace StardewTravelSkill
 {
     internal sealed class ModEntry : Mod
     {
+        /// <summary>
+        /// All buttons that correspond to moving up/north
+        /// </summary>
+        public static readonly SButton[] MoveUpButtons =  { SButton.W, SButton.LeftThumbstickUp, SButton.DPadUp };
+        /// <summary>
+        /// All buttons that correspond to moving down/south
+        /// </summary>
+        public static readonly SButton[] MoveDownButtons = { SButton.S, SButton.LeftThumbstickDown, SButton.DPadDown };
+        /// <summary>
+        /// All buttons that correspond to moving left/west
+        /// </summary>
+        public static readonly SButton[] MoveLeftButtons = { SButton.A, SButton.LeftThumbstickLeft, SButton.DPadLeft };
+        /// <summary>
+        /// All buttons that correspond to moving right/east
+        /// </summary>
+        public static readonly SButton[] MoveRightButtons = { SButton.D, SButton.LeftThumbstickRight, SButton.DPadRight };
+        /// <summary>
+        /// All buttons that correspond to movement
+        /// </summary>
+        public static readonly SButton[] AllMovementButtons = { 
+            SButton.W, SButton.LeftThumbstickUp, SButton.DPadUp, 
+            SButton.S, SButton.LeftThumbstickDown, SButton.DPadDown, 
+            SButton.A, SButton.LeftThumbstickLeft, SButton.DPadLeft, 
+            SButton.D, SButton.LeftThumbstickRight, SButton.DPadRight 
+        };
+
         public static Mod Instance;
         public static IContentPatcherAPI ContentAPI;
         public static TravelSkill TravelSkill;
@@ -304,12 +331,7 @@ namespace StardewTravelSkill
         /// <param name="button">Button to check</param>
         private bool isMovementButton(SButton button)
         {
-            InputButton b_equiv;
-            button.TryGetStardewInput(out b_equiv);
-            return Game1.options.moveUpButton.Any(b => b.Equals(b_equiv)) ||
-                Game1.options.moveDownButton.Any(b => b.Equals(b_equiv)) ||
-                Game1.options.moveLeftButton.Any(b => b.Equals(b_equiv)) ||
-                Game1.options.moveRightButton.Any(b => b.Equals(b_equiv));
+            return AllMovementButtons.Any(b => b.Equals(button));
         }
 
         /// <summary>
@@ -317,7 +339,7 @@ namespace StardewTravelSkill
         /// </summary>
         private bool MovementButtonHeld()
         {
-            return ButtonHeld(SButton.W) || ButtonHeld(SButton.S) || ButtonHeld(SButton.A) || ButtonHeld(SButton.D);
+            return AllMovementButtons.Any(movement_button => ButtonHeld(movement_button));
         }
 
         /// <summary>
