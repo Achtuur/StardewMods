@@ -7,7 +7,10 @@
     "EntryDll": "MultiplayerExpShare.dll",
     "MinimumApiVersion": "3.0.0",
     "dependencies": [
-        
+        {
+            "UniqueID": "Achtuur.AchtuurCore",
+            "MinimumVersion": "1.0.0"
+        }
     ],
     "UpdateKeys": [ "AchtuurCore" ]
 }

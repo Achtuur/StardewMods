@@ -47,6 +47,7 @@ This mod features some custom tokens for content pack creators that can tell you
     * Remove movespeed per level and movespeed profession bonus console commands, as those are handled by settings
     * Changed color of experience bar to a blue-ish green
 * Fixes
+    * Fixed stamina restore going over stamina cap   
     * Rework mod to use AssetRequested event, so `[CP] StardewTravelSkill` is now obsolete.
     * Fixed error showing in console when placing furniture
     * Removed config.json from archive

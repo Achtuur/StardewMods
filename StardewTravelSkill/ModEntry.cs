@@ -187,7 +187,8 @@ namespace StardewTravelSkill
         {
             if (Game1.player.HasCustomProfession(TravelSkill.ProfessionRestoreStamina))
             {
-                Game1.player.stamina += Game1.player.MaxStamina * ModConfig.RestoreStaminaPercentage;
+                float new_stamina = Game1.player.stamina + Game1.player.MaxStamina * ModConfig.RestoreStaminaPercentage;
+                Game1.player.stamina = Math.Min(new_stamina, Game1.player.MaxStamina);
             }
         }
 
@@ -246,19 +247,19 @@ namespace StardewTravelSkill
                 IDictionary<string, string> assetDict = asset.AsDictionary<string, string>().Data;
                 // Farm totem to 5 wood, 5 hay, 10 fiber
                 ChangeTotemRecipeInDict(assetDict, "Warp Totem: Farm", "388 5 178 5 771 10");
-                Instance.Monitor.Log("[StardewTravelSkill] Farm totem recipe updated!", LogLevel.Trace);
+                Instance.Monitor.Log("Farm totem recipe updated!", LogLevel.Trace);
 
                 // Moutain totem to 5 wood, 1 copper bar, 10 stone
                 ChangeTotemRecipeInDict(assetDict, "Warp Totem: Mountains", "388 5 334 1 390 10");
-                Instance.Monitor.Log("[StardewTravelSkill] Mountains totem recipe updated!", LogLevel.Trace);
+                Instance.Monitor.Log("Mountains totem recipe updated!", LogLevel.Trace);
 
                 // Desert totem to 10 wood, coconut, 1 gold bar
                 ChangeTotemRecipeInDict(assetDict, "Warp Totem: Desert", "388 10 88 1 336 1");
-                Instance.Monitor.Log("[StardewTravelSkill] Desert totem recipe updated!", LogLevel.Trace);
+                Instance.Monitor.Log("Desert totem recipe updated!", LogLevel.Trace);
 
                 // Beach totem to 5 wood, 5 fiber, any 2 fish
                 ChangeTotemRecipeInDict(assetDict, "Warp Totem: Beach", "388 5 771 5 -4 2");
-                Instance.Monitor.Log("[StardewTravelSkill] Beach totem recipe updated!", LogLevel.Trace);
+                Instance.Monitor.Log("Beach totem recipe updated!", LogLevel.Trace);
             });
             
             // Unsubscribe this method so asset isn't needlessly updated again
@@ -281,16 +282,16 @@ namespace StardewTravelSkill
                 IDictionary<string, string> assetDict = asset.AsDictionary<string, string>().Data;
 
                 ChangeObeliskCostInDict(assetDict, "Earth Obelisk", "250000");
-                Instance.Monitor.Log("[StardewTravelSkill] Earth Obelisk cost changed!", LogLevel.Trace);
+                Instance.Monitor.Log("Earth Obelisk cost changed!", LogLevel.Trace);
 
                 ChangeObeliskCostInDict(assetDict, "Water Obelisk", "250000");
-                Instance.Monitor.Log("[StardewTravelSkill] Water Obelisk cost changed!", LogLevel.Trace);
+                Instance.Monitor.Log("Water Obelisk cost changed!", LogLevel.Trace);
 
                 ChangeObeliskCostInDict(assetDict, "Desert Obelisk", "500000");
-                Instance.Monitor.Log("[StardewTravelSkill] Desert Obelisk cost changed!", LogLevel.Trace);
+                Instance.Monitor.Log("Desert Obelisk cost changed!", LogLevel.Trace);
 
                 ChangeObeliskCostInDict(assetDict, "Island Obelisk", "500000");
-                Instance.Monitor.Log("[StardewTravelSkill] Island Obelisk cost changed!", LogLevel.Trace);
+                Instance.Monitor.Log("Island Obelisk cost changed!", LogLevel.Trace);
             });
 
             obeliskRecipeChanged = true;

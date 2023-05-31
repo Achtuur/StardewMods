@@ -61,7 +61,6 @@ namespace AchtuurCore.Events
                 {
                     Farmer lastUser = __state.toolUsed.getLastFarmerToUse();
                     WateringFinishedArgs args = new WateringFinishedArgs(lastUser, __instance);
-
                     EventPublisher.InvokeFinishedWateringSoil(null, args);
                 }
             }
