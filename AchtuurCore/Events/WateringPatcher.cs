@@ -52,8 +52,9 @@ namespace AchtuurCore.Events
         {
             try
             {
+
                 // If tool was not a watering can, return
-                if (!__state.toolUsed.Name.ToLower().Contains("watering can"))
+                if (__state.toolUsed is null || !__state.toolUsed.Name.ToLower().Contains("watering can"))
                     return;
 
                 // Tile has been watered -> call watering soil event

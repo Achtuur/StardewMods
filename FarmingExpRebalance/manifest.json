@@ -9,7 +9,7 @@
     "dependencies": [
         {
             "UniqueID": "Achtuur.AchtuurCore",
-            "MinimumVersion": "1.0.0"
+            "MinimumVersion": "1.0.1"
         },
     ],
     "UpdateKeys": [ "AchtuurCore" ]
