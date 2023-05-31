@@ -38,9 +38,9 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
-## 1.2.0 (unreleased)
+## 1.1.1 (unreleased)
 * New/Changed content
-    * Mod now also works with controller
+    * Added controller support
 
 ## 1.1.0
 * New/Changed content
