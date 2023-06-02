@@ -93,13 +93,13 @@ namespace StardewTravelSkill
         {
             return new()
             {
-                I18n.Travelskill_LevelUpPerk(bonus: Math.Round(ModConfig.LevelMovespeedBonus * 100.0f, 2))
+                I18n.Travelskill_LevelUpPerk(bonus: Math.Round(ModEntry.Instance.Config.LevelMovespeedBonus * 100.0f, 2))
             };
         }
 
         public override string GetSkillPageHoverText(int level)
         {
-            return I18n.Travelskill_LevelUpPerk(bonus: Math.Round(100.0f * ModConfig.LevelMovespeedBonus * level, 2));
+            return I18n.Travelskill_LevelUpPerk(bonus: Math.Round(100.0f * ModEntry.Instance.Config.LevelMovespeedBonus * level, 2));
         }
     }
 }

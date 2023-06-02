@@ -8,7 +8,7 @@
     "cfg_exptoactor.Name": "Percentage of exp to actor",
     "cfg_exptoactor.Desc": "Percentage of exp that goes to the player performing the action giving exp",
 
-    "cfg_enablesection": "Enable/Disable Exp Sharing",
+    "cfg_enablesection": "Enable/Disable vanilla skills",
     "cfg_enablefarming.name": "Enable Farming",
     "cfg_enablefarming.desc": "Whether to enable exp sharing for farming skill",
     "cfg_enablefishing.name": "Enable Fishing",
@@ -18,5 +18,9 @@
     "cfg_enablemining.name": "Enable Mining",
     "cfg_enablemining.desc": "Whether to enable exp sharing for mining skill",
     "cfg_enablecombat.name": "Enable Combat",
-    "cfg_enablecombat.desc": "Whether to enable exp sharing for combat skill"
+    "cfg_enablecombat.desc": "Whether to enable exp sharing for combat skill",
+
+    "cfg_enable_spacecoresection":  "Enable/Disable Spacecore skills",
+    "cfg_spacecore_generic.Name": "Enable {{skill}}",
+    "cfg_spacecore_generic.Desc": "Whether to enable exp sharing for {{skill}} skill",
 }

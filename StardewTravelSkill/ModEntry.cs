@@ -46,7 +46,7 @@ namespace StardewTravelSkill
             SButton.D, SButton.LeftThumbstickRight, SButton.DPadRight 
         };
 
-        public static Mod Instance;
+        public static ModEntry Instance;
         public static IContentPatcherAPI ContentAPI;
         public static TravelSkill TravelSkill;
 
@@ -88,17 +88,17 @@ namespace StardewTravelSkill
         /// </returns>
         public static float GetMovespeedMultiplier()
         {
-            float professionbonus = Game1.player.HasCustomProfession(TravelSkill.ProfessionMovespeed) ? ModConfig.MovespeedProfessionBonus : 0.0f;
-            float sprintbonus = SprintActive ? ModConfig.SprintMovespeedBonus : 0.0f;
+            float professionbonus = Game1.player.HasCustomProfession(TravelSkill.ProfessionMovespeed) ? Instance.Config.MovespeedProfessionBonus : 0.0f;
+            float sprintbonus = SprintActive ? Instance.Config.SprintMovespeedBonus : 0.0f;
 
-            float multiplier = Game1.player.GetCustomSkillLevel(TravelSkill) * ModConfig.LevelMovespeedBonus + professionbonus + sprintbonus;
+            float multiplier = Game1.player.GetCustomSkillLevel(TravelSkill) * Instance.Config.LevelMovespeedBonus + professionbonus + sprintbonus;
             return 1 + multiplier;
         }
 
         public static double GetWarpTotemConsumeChance()
         {
             return Game1.player.HasCustomProfession(TravelSkill.ProfessionTotemReuse)
-                ? ModConfig.TotemUseChance
+                ? Instance.Config.TotemUseChance
                 : 1.0;
         }
 
@@ -109,7 +109,7 @@ namespace StardewTravelSkill
         public static double GetStaminaRestoreAmount()
         {
             return Game1.player.HasCustomProfession(TravelSkill.ProfessionRestoreStamina)
-                ? ModConfig.RestoreStaminaPercentage
+                ? Instance.Config.RestoreStaminaPercentage
                 : 0.0;
         }
 
@@ -154,7 +154,7 @@ namespace StardewTravelSkill
             this.contentPackHelper = new ContentPackHelper(this);
             this.contentPackHelper.CreateTokens();
 
-            this.Config.createMenu(this);
+            this.Config.createMenu();
         }
 
         private void OnUpdateTicked(object sender, EventArgs e)
@@ -196,11 +196,12 @@ namespace StardewTravelSkill
 
             // Calcuate difference in steps, and if it exceeds 1 exp treshold, add it as exp. Hacky fix to get xp values between 0 and 1
             uint step_diff = Game1.player.stats.stepsTaken - this.m_previousSteps;
-            if (step_diff > ModConfig.StepsPerExp)
+            if (step_diff >= Instance.Config.StepsPerExp * Instance.Config.AddExpIncrement)
             {
-                Game1.player.AddCustomSkillExperience(TravelSkill, 1);
+                Game1.player.AddCustomSkillExperience(TravelSkill, Instance.Config.AddExpIncrement);
                 // Set previous steps to current steps, with correction
-                this.m_previousSteps = Game1.player.stats.stepsTaken + ((uint)ModConfig.StepsPerExp - step_diff);
+                uint steps_over_exp_incr = step_diff - (uint) (Instance.Config.StepsPerExp * Instance.Config.AddExpIncrement);
+                this.m_previousSteps = Game1.player.stats.stepsTaken - steps_over_exp_incr;
             }
 
         }
@@ -214,7 +215,7 @@ namespace StardewTravelSkill
         {
             if (Game1.player.HasCustomProfession(TravelSkill.ProfessionRestoreStamina))
             {
-                float new_stamina = Game1.player.stamina + Game1.player.MaxStamina * ModConfig.RestoreStaminaPercentage;
+                float new_stamina = Game1.player.stamina + Game1.player.MaxStamina * Instance.Config.RestoreStaminaPercentage;
                 Game1.player.stamina = Math.Min(new_stamina, Game1.player.MaxStamina);
             }
         }
@@ -368,7 +369,7 @@ namespace StardewTravelSkill
 
             uint step_diff = Game1.player.stats.stepsTaken - this.m_consecutiveSteps;
             
-            if (step_diff > ModConfig.SprintSteps && !ModEntry.SprintActive)
+            if (step_diff > Instance.Config.SprintSteps && !ModEntry.SprintActive)
             {
                 this.Monitor.Log("Now sprinting", LogLevel.Debug);
                 ModEntry.SprintActive = true;

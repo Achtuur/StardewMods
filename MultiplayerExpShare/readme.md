@@ -21,6 +21,12 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 * Add support for spacemod skills, including [Luck](https://www.nexusmods.com/stardewvalley/mods/521), [Cooking](https://www.nexusmods.com/stardewvalley/mods/522) and [Travelling](https://www.nexusmods.com/stardewvalley/mods/16820).
 * Add support for MARGO
 
+## 1.0.1
+* New/Changed
+  * Added support for Spacecore based skill mods
+
+* Fixes
+  * Config now properly saves
 ## 1.0.0
 * Initial release
 

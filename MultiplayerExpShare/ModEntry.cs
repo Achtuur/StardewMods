@@ -16,8 +16,6 @@ namespace MultiplayerExpShare
         public static ModEntry Instance;
         public ModConfig Config;
 
-        private float AccumulatedExp;
-
         /// <summary>
         /// Returns whether <paramref name="other_farmer"/> is nearby <c>Game1.player</c>, based on <see cref="ModConfig.ExpShareType"/>
         /// </summary>
@@ -25,7 +23,7 @@ namespace MultiplayerExpShare
         /// <returns></returns>
         public static bool FarmerIsNearby(Farmer other_farmer)
         {
-            switch (ModConfig.ExpShareType)
+            switch (Instance.Config.ExpShareType)
             {
                 case ExpShareRangeType.Tile:
                     return other_farmer.currentLocation == Game1.player.currentLocation && IsInTileRange(other_farmer);
@@ -47,7 +45,7 @@ namespace MultiplayerExpShare
             int dx = Game1.player.getTileX() - other_farmer.getTileX();
             int dy = Game1.player.getTileY() - other_farmer.getTileY();
 
-            return dx*dx + dy*dy <= ModConfig.NearbyPlayerTileRange * ModConfig.NearbyPlayerTileRange;
+            return dx*dx + dy*dy <= Instance.Config.NearbyPlayerTileRange * Instance.Config.NearbyPlayerTileRange;
         }
 
         public static Farmer[] GetNearbyPlayers() 
@@ -63,7 +61,6 @@ namespace MultiplayerExpShare
                 // Add other player to list if they are close enough to main player
                 if (FarmerIsNearby(online_farmer))
                 {
-                    AchtuurCore.Debug.DebugLog(Instance.Monitor, $"{online_farmer.Name} is nearby to {Game1.player.Name}");
                     nearbyFarmers.Add(online_farmer);
                 }
             }
@@ -73,14 +70,13 @@ namespace MultiplayerExpShare
 
         public override void Entry(IModHelper helper)
         {
+            I18n.Init(helper.Translation);
+            ModEntry.Instance = this;
 
             HarmonyPatcher.ApplyPatches(this,
-                new GainExperiencePatch()
+                new GainExperiencePatch(),
+                new SpaceCoreExperiencePatch()
             );
-
-            ModEntry.Instance = this;
-            I18n.Init(helper.Translation);
-
 
             this.Config = helper.ReadConfig<ModConfig>();
 
@@ -90,22 +86,33 @@ namespace MultiplayerExpShare
 
         private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SharedExpGained" && e.FromPlayerID != Game1.player.UniqueMultiplayerID)
+            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SharedExpGained")
             {
                 ExpGainData msg_expdata = e.ReadAs<ExpGainData>();
 
-                // if this farmer was not nearby, don't add exp
-                if (!msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
+                // if the source is self or self was not nearby, don't add exp
+                if (msg_expdata.actor_multiplayerid == Game1.player.UniqueMultiplayerID || !msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
                     return;
 
                 AchtuurCore.Debug.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {AchtuurCore.Debug.GetSkillNameFromId(msg_expdata.skill_id)} from ({msg_expdata.actor_multiplayerid})!");
                 GainExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata.skill_id, msg_expdata.amount, isSharedExp: true);
             }
+            else if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SharedExpGainedSpaceCore")
+            {
+                ExpGainDataSpaceCore msg_expdata = e.ReadAs<ExpGainDataSpaceCore>();
+
+                // if this farmer was not nearby, don't add exp
+                if (msg_expdata.actor_multiplayerid == Game1.player.UniqueMultiplayerID || !msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
+                    return;
+
+                AchtuurCore.Debug.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {msg_expdata.skill_id} from ({msg_expdata.actor_multiplayerid})!");
+                SpaceCoreExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata.skill_id, msg_expdata.amount, isSharedExp: true);
+            }
         }
 
         private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
         {
-            this.Config.createMenu(this);
+            this.Config.createMenu();
         }
     }
 }

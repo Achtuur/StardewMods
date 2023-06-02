@@ -12,82 +12,85 @@ namespace StardewTravelSkill
         /// <summary>
         /// Exp gained for watering a single tile
         /// </summary>
-        public static float LevelMovespeedBonus { get; set; }
+        public float LevelMovespeedBonus { get; set; }
 
         /// <summary>
         /// Movespeed bonus granted by <see cref="ProfessionMovespeed"/>. Defaults to 0.05.
         /// </summary>
-        public static float MovespeedProfessionBonus { get; set; }
+        public float MovespeedProfessionBonus { get; set; }
 
         /// <summary>
         /// Percentage of stamina that recovers every 10 minutes by <see cref="ProfessionRestoreStamina"/>. Defaults to 1%
         /// </summary>
-        public static float RestoreStaminaPercentage { get; set; }
-
-        /// <summary>
-        /// Number of steps to walk before getting sprint bonus
-        /// </summary>
-        public static int SprintSteps { get; set; }
+        public float RestoreStaminaPercentage { get; set; }
 
         /// <summary>
         /// Bonus multiplier to movespeed that is applied by sprinting
         /// </summary>
-        public static float SprintMovespeedBonus { get; set; }
+        public float SprintMovespeedBonus { get; set; }
 
         /// <summary>
         /// Use chance for a totem when profession is unlocked
         /// </summary>
-        public static float TotemUseChance { get; set; }
+        public float TotemUseChance { get; set; }
 
         /// <summary>
         /// Number of steps to walk before getting 1 Exp
         /// </summary>
-        public static int StepsPerExp { get; set; }
+        public int StepsPerExp { get; set; }
 
-        
+        /// <summary>
+        /// Number of steps to walk before getting sprint bonus
+        /// </summary>
+        public int SprintSteps { get; set; }
+
+        /// <summary>
+        /// Add exp in steps of AddExpIncrement. Ie, with 25 steps per exp and AddExpIncrement = 1, the player gains 1 exp after 25 steps. With increment 5, the player gains 5 exp after 25*5 steps
+        /// </summary>
+        public int AddExpIncrement;
 
         public ModConfig()
         {
             // Changable by player
-            ModConfig.LevelMovespeedBonus = 0.01f;
-            ModConfig.MovespeedProfessionBonus = 0.05f;
-            ModConfig.RestoreStaminaPercentage = 0.01f;
-            ModConfig.SprintMovespeedBonus = 0.15f;
-            ModConfig.TotemUseChance = 0.5f;
-            ModConfig.StepsPerExp = 25;
+            this.LevelMovespeedBonus = 0.01f;
+            this.MovespeedProfessionBonus = 0.05f;
+            this.RestoreStaminaPercentage = 0.01f;
+            this.SprintMovespeedBonus = 0.15f;
+            this.TotemUseChance = 0.5f;
+            this.StepsPerExp = 25;
 
-            // Unchangable by player
-            ModConfig.SprintSteps = 5;
+            // Unchangable by player via in game menu
+            this.SprintSteps = 5;
+            this.AddExpIncrement = 10;
         }
 
         /// <summary>
         /// Constructs config menu for GenericConfigMenu mod
         /// </summary>
-        /// <param name="instance"></param>
-        public void createMenu(ModEntry instance)
+        public void createMenu()
         {
             // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            var configMenu = ModEntry.Instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
                 return;
 
             // register mod
             configMenu.Register(
-                mod: instance.ModManifest,
-                reset: () => instance.Config = new ModConfig(),
-                save: () => instance.Helper.WriteConfig(instance.Config)
+                mod: ModEntry.Instance.ModManifest,
+                reset: () => ModEntry.Instance.Config = new ModConfig(),
+                save: () => ModEntry.Instance.Helper.WriteConfig(ModEntry.Instance.Config)
             );
 
             /// General travel skill settings header
             configMenu.AddSectionTitle(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgSection_Travelskill,
                 tooltip: null
             );
 
             // Steps per Exp
             configMenu.AddTextOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgExpgain_Name,
                 tooltip: I18n.CfgExpgain_Desc,
                 getValue: () => StepsPerExp.ToString(),
@@ -98,7 +101,7 @@ namespace StardewTravelSkill
 
             // Level movespeed bonus
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgLevelmovespeed_Name,
                 tooltip: I18n.CfgLevelmovespeed_Desc,
                 getValue: () => LevelMovespeedBonus,
@@ -111,14 +114,14 @@ namespace StardewTravelSkill
 
             /// profession settings header
             configMenu.AddSectionTitle(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgSection_Professions,
                 tooltip: null
             );
 
             // Movespeed profession bonus
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgMovespeedbonus_Name,
                 tooltip: I18n.CfgMovespeedbonus_Desc,
                 getValue: () => MovespeedProfessionBonus,
@@ -131,7 +134,7 @@ namespace StardewTravelSkill
 
             // Sprint profession bonus
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgSprintbonus_Name,
                 tooltip: I18n.CfgSprintbonus_Desc,
                 getValue: () => SprintMovespeedBonus,
@@ -144,7 +147,7 @@ namespace StardewTravelSkill
 
             // Restore stamina percentage
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgRestorestamina_Name,
                 tooltip: I18n.CfgRestorestamina_Desc,
                 getValue: () => RestoreStaminaPercentage,
@@ -157,7 +160,7 @@ namespace StardewTravelSkill
 
             // Totem reuse
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgTotemreuse_Name,
                 tooltip: I18n.CfgTotemreuse_Desc,
                 getValue: () => TotemUseChance,

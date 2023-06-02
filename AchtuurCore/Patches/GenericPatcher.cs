@@ -15,6 +15,8 @@ namespace AchtuurCore.Patches
     /// </summary>
     public abstract class GenericPatcher
     {
+
+        protected static IMonitor Monitor;
         /// <summary>
         /// Apply the patch the derived method implements using <see cref="Harmony.Patch"/>
         /// </summary>
@@ -31,6 +33,11 @@ namespace AchtuurCore.Patches
         public MethodInfo getOriginalMethod<MethodClass>(string methodname)
         {
             return AccessTools.Method(typeof(MethodClass), methodname);
+        }
+
+        public MethodInfo getOriginalMethod(Type classtype, string methodname)
+        {
+            return AccessTools.Method(classtype, methodname);
         }
 
 

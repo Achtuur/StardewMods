@@ -38,7 +38,10 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
-## 1.1.1 (unreleased)
+## 1.1.2
+* Fixes
+  * Fix config saving properly
+## 1.1.1
 * New/Changed content
     * Added controller support
 

@@ -1,6 +1,8 @@
-﻿using StardewModdingAPI;
+﻿using SpaceCore;
+using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,31 +30,33 @@ namespace MultiplayerExpShare
         /// <summary>
         /// If this is true, then two players on the same map will always count as being nearby
         /// </summary>
-        public static ExpShareRangeType ExpShareType { get; set; }
+        public ExpShareRangeType ExpShareType { get; set; }
 
         /// <summary>
         /// Other farmers must be within this range to count as nearby
         /// </summary>
-        public static int NearbyPlayerTileRange { get; set; }
+        public int NearbyPlayerTileRange { get; set; }
 
         /// <summary>
         /// Percentage of exp that goes to actor, rest of exp is divided equally between nearby players
         /// </summary>
-        public static float ExpPercentageToActor { get; set; }
+        public float ExpPercentageToActor { get; set; }
 
         /// <summary>
         /// Whether Exp sharing is enabled per vanilla skill
         /// </summary>
-        public static bool[] VanillaSkillEnabled { get; set; }
+        public bool[] VanillaSkillEnabled { get; set; }
+
+        public Dictionary<string, bool> SpaceCoreSkillEnabled { get; set; }
 
         public ModConfig()
         {
             // Changable by player
-            ModConfig.NearbyPlayerTileRange = 25;
-            ModConfig.ExpPercentageToActor = 0.75f;
-            ModConfig.ExpShareType = ExpShareRangeType.Tile;
+            this.NearbyPlayerTileRange = 25;
+            this.ExpPercentageToActor = 0.75f;
+            this.ExpShareType = ExpShareRangeType.Tile;
 
-            ModConfig.VanillaSkillEnabled = new[] {
+            this.VanillaSkillEnabled = new[] {
                 true,  // Farming
                 false, // Fishing
                 true,  // Foraging
@@ -60,37 +64,54 @@ namespace MultiplayerExpShare
                 true,  // Combat
             };
 
-            // Unchangable by player
+            ResetSpaceCoreDict();
+
+        }
+
+        private void ResetSpaceCoreDict()
+        {
+            if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
+                return;
+
+            SpaceCoreSkillEnabled = new Dictionary<string, bool>();
+
+            foreach (string s in SpaceCore.Skills.GetSkillList())
+            {
+                SpaceCoreSkillEnabled.Add(s, false);
+            }
         }
 
         /// <summary>
         /// Constructs config menu for GenericConfigMenu mod
         /// </summary>
         /// <param name="instance"></param>
-        public void createMenu(ModEntry instance)
+        public void createMenu()
         {
             // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            var configMenu = ModEntry.Instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
                 return;
 
+            
             // register mod
             configMenu.Register(
-                mod: instance.ModManifest,
-                reset: () => instance.Config = new ModConfig(),
-                save: () => instance.Helper.WriteConfig(instance.Config)
+                mod: ModEntry.Instance.ModManifest,
+                reset: () => ModEntry.Instance.Config = new ModConfig(),
+                save: () => {
+                    ModEntry.Instance.Helper.WriteConfig<ModConfig>(ModEntry.Instance.Config);
+                    }
             );
 
             /// General travel skill settings header
             configMenu.AddSectionTitle(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgGeneral_Name,
                 tooltip: I18n.CfgGeneral_Desc
             );
 
             // exp percentage to actor
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgExptoactor_Name,
                 tooltip: I18n.CfgExptoactor_Desc,
                 getValue: () => ExpPercentageToActor,
@@ -103,7 +124,7 @@ namespace MultiplayerExpShare
 
             // Exp share type
             configMenu.AddTextOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgSharetype_Name,
                 tooltip: I18n.CfgSharetype_Desc,
                 getValue: getExpShareType,
@@ -113,7 +134,7 @@ namespace MultiplayerExpShare
 
             // nearby player tile range
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgNearbyplayertilerange_Name,
                 tooltip: I18n.CfgNearbyplayertilerange_Desc,
                 getValue: () => NearbyPlayerTileRange,
@@ -125,14 +146,14 @@ namespace MultiplayerExpShare
 
             // Enable/disable menu
             configMenu.AddSectionTitle(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgEnablesection,
                 tooltip: null
             );
 
             // farming
             configMenu.AddBoolOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgEnablefarming_Name,
                 tooltip: I18n.CfgEnablefarming_Desc,
                 getValue: () => VanillaSkillEnabled[0],
@@ -141,7 +162,7 @@ namespace MultiplayerExpShare
 
             // fishing
             configMenu.AddBoolOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgEnablefishing_Name,
                 tooltip: I18n.CfgEnablefishing_Desc,
                 getValue: () => VanillaSkillEnabled[1],
@@ -150,7 +171,7 @@ namespace MultiplayerExpShare
 
             // foraging
             configMenu.AddBoolOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgEnableforaging_Name,
                 tooltip: I18n.CfgEnableforaging_Desc,
                 getValue: () => VanillaSkillEnabled[2],
@@ -159,7 +180,7 @@ namespace MultiplayerExpShare
 
             // mining
             configMenu.AddBoolOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgEnablemining_Name,
                 tooltip: I18n.CfgEnablemining_Desc,
                 getValue: () => VanillaSkillEnabled[3],
@@ -168,18 +189,46 @@ namespace MultiplayerExpShare
 
             // combat
             configMenu.AddBoolOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgEnablecombat_Name,
                 tooltip: I18n.CfgEnablecombat_Desc,
                 getValue: () => VanillaSkillEnabled[4],
                 setValue: value => VanillaSkillEnabled[4] = value
             );
 
+            // SPACECORE SKILLS
+
+            if (ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
+            {
+                // Enable/disable menu
+                configMenu.AddSectionTitle(
+                    mod: ModEntry.Instance.ModManifest,
+                    text: I18n.CfgEnableSpacecoresection,
+                    tooltip: null
+                );
+
+                // Add config for each skill
+                foreach (string skill_name in SpaceCoreSkillEnabled.Keys)
+                {
+                    // [0] contains mod author, [1] contains skill name
+                    var skill_name_split = skill_name.Split('.');
+
+                    configMenu.AddBoolOption(
+                        mod: ModEntry.Instance.ModManifest,
+                        name: () => $"Enable {skill_name_split[1]}",
+                        tooltip: () => $"Whether to enable exp sharing for {skill_name_split[1]} skill (by {skill_name_split[0]})",
+                        getValue: () => SpaceCoreSkillEnabled[skill_name],
+                        setValue: value => SpaceCoreSkillEnabled[skill_name] = value
+                    );
+                }
+            }
+
+
         }
 
-        private static string getExpShareType()
+        private string getExpShareType()
         {
-            switch (ModConfig.ExpShareType)
+            switch (this.ExpShareType)
             {
                 case ExpShareRangeType.Tile: return "Tile";
                 case ExpShareRangeType.Map: return "Map";
@@ -202,10 +251,10 @@ namespace MultiplayerExpShare
         {
             switch (option)
             {
-                case "Map": ModConfig.ExpShareType = ExpShareRangeType.Map; break;
-                case "Tile": ModConfig.ExpShareType = ExpShareRangeType.Tile; break;
-                case "Global": ModConfig.ExpShareType = ExpShareRangeType.Global; break;
-                default: ModConfig.ExpShareType = ExpShareRangeType.Tile; break;
+                case "Map": ExpShareType = ExpShareRangeType.Map; break;
+                case "Tile": ExpShareType = ExpShareRangeType.Tile; break;
+                case "Global": ExpShareType = ExpShareRangeType.Global; break;
+                default: ExpShareType = ExpShareRangeType.Tile; break;
             }
         }
     }

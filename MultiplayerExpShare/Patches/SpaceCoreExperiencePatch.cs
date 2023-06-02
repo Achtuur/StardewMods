@@ -1,22 +1,25 @@
 ﻿using AchtuurCore.Patches;
 using HarmonyLib;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MultiplayerExpShare.Patches
 {
-    public struct ExpGainData
+    public struct ExpGainDataSpaceCore
     {
         public long actor_multiplayerid;
         public long[] nearby_farmer_ids;
         public int amount;
-        public int skill_id;
+        public string skill_id;
 
-        public ExpGainData (long actor_multiplayerid, long[] nearby_farmer_ids, int skill_id, int amount)
+        public ExpGainDataSpaceCore(long actor_multiplayerid, long[] nearby_farmer_ids, string skill_id, int amount)
         {
             this.actor_multiplayerid = actor_multiplayerid;
             this.nearby_farmer_ids = nearby_farmer_ids;
@@ -24,8 +27,12 @@ namespace MultiplayerExpShare.Patches
             this.amount = amount;
         }
     }
-    public class GainExperiencePatch : GenericPatcher
-    {        
+
+    /// <summary>
+    /// Patch for <see cref="SpaceCore.Skills.AddExperience(Farmer, string, int)"/> to support exp sharing for SpaceCore based skills
+    /// </summary>
+    public class SpaceCoreExperiencePatch : GenericPatcher
+    {
         /// <summary>
         /// Whether the current (patched) method is processing shared exp. If it is not, then exp should be shared
         /// </summary>
@@ -36,16 +43,18 @@ namespace MultiplayerExpShare.Patches
             Monitor = monitor;
             isProcessingSharedExp = false;
 
+            if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
+                return;
+
             harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
+                original: this.getOriginalMethod<SpaceCore.Skills>(nameof(SpaceCore.Skills.AddExperience)),
+                prefix: this.getHarmonyMethod(nameof(Prefix_AddExperienceSpaceCore))
+            );
+
+            harmony.Patch(
+                original: this.getOriginalMethod<SpaceCore.Skills>(nameof(SpaceCore.Skills.AddExperience)),
                 postfix: this.getHarmonyMethod(nameof(Postfix_GainExperience))
             );
-
-            harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
-                prefix: this.getHarmonyMethod(nameof(Prefix_GainExperience))
-            );
-
         }
 
         /// <summary>
@@ -55,12 +64,11 @@ namespace MultiplayerExpShare.Patches
         /// <param name="which"></param>
         /// <param name="howMuch"></param>
         /// <param name="isSharedExp"></param>
-        public static void InvokeGainExperience(Farmer farmer, int which, int howMuch, bool isSharedExp)
+        public static void InvokeGainExperience(Farmer farmer, string which, int howMuch, bool isSharedExp)
         {
             isProcessingSharedExp = isSharedExp;
-            farmer.gainExperience(which, howMuch);
+            farmer.AddCustomSkillExperience(which, howMuch);
         }
-       
 
         [HarmonyPriority(Priority.Last)]
         private static void Postfix_GainExperience()
@@ -70,61 +78,54 @@ namespace MultiplayerExpShare.Patches
                 isProcessingSharedExp = false;
             }
         }
-        private static void Prefix_GainExperience(int which, ref int howMuch, Farmer __instance)
+
+        private static void Prefix_AddExperienceSpaceCore(Farmer farmer, string skillName, ref int amt)
         {
             // Skip execution if world isnt loaded
             if (!Context.IsWorldReady)
                 return;
 
             // Skip sharing if its disabled for that skill
-            if (!ExpShareEnabledForSkill(which))
+            if (!ExpShareEnabledForSkill(skillName))
                 return;
 
 
             // If processing shared exp, then 'howMuch' already contains correct exp to add and no message should be sent
             if (isProcessingSharedExp)
                 return;
-            
+
             // Get nearby farmer id's
             long[] nearbyFarmerIds = ModEntry.GetNearbyPlayers().Select(f => f.UniqueMultiplayerID).ToArray();
 
             // If no farmers nearby to share exp with, actor gets all
             if (nearbyFarmerIds.Length == 0)
                 return;
-            
+
             // Calculate shared exp, with rounding
-            int shared_exp = (int) Math.Round(howMuch * (1 - ModEntry.Instance.Config.ExpPercentageToActor) / nearbyFarmerIds.Length);
+            int shared_exp = (int)Math.Round(amt * (1 - ModEntry.Instance.Config.ExpPercentageToActor) / nearbyFarmerIds.Length);
 
             // Send message of this instance of shared exp
             if (shared_exp > 0)
             {
-                ExpGainData expdata = new ExpGainData(__instance.UniqueMultiplayerID, nearbyFarmerIds, which, shared_exp);
-                ModEntry.Instance.Helper.Multiplayer.SendMessage<ExpGainData>(expdata, "SharedExpGained", modIDs: new[] { ModEntry.Instance.ModManifest.UniqueID });
+                ExpGainDataSpaceCore expdata = new ExpGainDataSpaceCore(farmer.UniqueMultiplayerID, nearbyFarmerIds, skillName, shared_exp);
+                ModEntry.Instance.Helper.Multiplayer.SendMessage<ExpGainDataSpaceCore>(expdata, "SharedExpGainedSpaceCore", modIDs: new[] { ModEntry.Instance.ModManifest.UniqueID });
             }
 
             // calculate actor exp gain, with rounding
-            int actor_exp = (int) Math.Round(howMuch * ModEntry.Instance.Config.ExpPercentageToActor);
-            int rounding_loss = howMuch - (actor_exp + shared_exp);
+            int actor_exp = (int) Math.Round(amt * ModEntry.Instance.Config.ExpPercentageToActor);
 
-            AchtuurCore.Debug.DebugLog(Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s): {howMuch} -> {actor_exp + rounding_loss} / {shared_exp}");
-            
+            int rounding_loss = amt - (actor_exp + shared_exp);
+
+            AchtuurCore.Debug.DebugLog(Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s) in {skillName}: {amt} -> {actor_exp + rounding_loss} / {shared_exp}");
+
             // Set actor exp to howMuch, so rest of method functions as if it had gotten only actor_exp
-            howMuch = actor_exp + rounding_loss;
+            amt = actor_exp + rounding_loss;
         }
 
-        /// <summary>
-        /// Returns true if exp sharing is enabled for skill with skill_id <paramref name="skill_id"/>.
-        /// 
-        /// <para>Only works for vanilla Stardew skills, where id's are the same as in vanilla (0 = farming, 1 = fishing, 2 = foraging, 3 = mining, 4 = combat)</para>. Does not work with skill_id 5 (luck)
-        /// </summary>
-        /// <param name="skill_id"></param>
-        /// <returns></returns>
-        private static bool ExpShareEnabledForSkill(int skill_id)
-        {
-            if (skill_id < 0 || skill_id > 4)
-                return false;
 
-            return ModEntry.Instance.Config.VanillaSkillEnabled[skill_id];
+        private static bool ExpShareEnabledForSkill(string skillName)
+        {
+            return true;
         }
     }
 }
