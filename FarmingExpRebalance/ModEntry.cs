@@ -1,12 +1,11 @@
 ﻿using AchtuurCore.Events;
 using AchtuurCore.Patches;
-using FarmingExpRebalance.Patches;
+using WateringCanGiveExp.Patches;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using System;
 
-namespace FarmingExpRebalance
+namespace WateringCanGiveExp
 {
     public class ModEntry : Mod
     {
@@ -35,7 +34,7 @@ namespace FarmingExpRebalance
 
         private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
         {
-            this.Config.createMenu(this);
+            this.Config.createMenu();
         }
 
         private void OnFinishedWateringSoil(object sender, WateringFinishedArgs e)
@@ -44,16 +43,12 @@ namespace FarmingExpRebalance
             if (!Context.IsWorldReady)
                 return;
 
-
-            Instance.Monitor.Log($"{e.farmer.Name} {e.farmer.IsLocalPlayer}", LogLevel.Debug);
-
             // Only add exp if farmer who watered is current player
             if (!e.farmer.IsLocalPlayer)
                 return;
 
-            Instance.Monitor.Log("hello", LogLevel.Debug);
             // Add exp
-            this.wateringExpTotal += ModConfig.ExpforWateringSoil;
+            this.wateringExpTotal += this.Config.ExpforWateringSoil;
             int floored_total = (int) Math.Floor(wateringExpTotal);
             e.farmer.gainExperience(FarmingSkillID, floored_total);
             this.wateringExpTotal -= floored_total;

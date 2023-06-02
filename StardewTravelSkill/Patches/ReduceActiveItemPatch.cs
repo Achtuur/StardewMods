@@ -13,8 +13,6 @@ namespace StardewTravelSkill.Patches
 {
     internal class ReduceActiveItemPatch : GenericPatcher
     {
-        private static IMonitor Monitor;
-
         public override void Patch(Harmony harmony, IMonitor monitor)
         {
             Monitor = monitor;

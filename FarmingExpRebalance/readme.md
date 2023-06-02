@@ -1,8 +1,15 @@
-# Farming Exp rebalance
+# Watering Can Give Exp
 
-In progress, farming exp rebalance serves to readjust the way farming exp is gained. Instead of purely gaining it from harvesting crops (and animal stuff), other farming skill related activities will increase it as well. These include hoeing and watering.
+In the Stardew Valley, gaining farming experience early on is based entirely on harvesting crops, even though most of your time is spent watering. This mod aims to change that, watering crops now gives a small amount of exp. In order to balance the total exp, harvesting exp gains are reduced by 75% (this can be disabled).
 
-The vast majority of farming skill is gained from harvesting crops, which in my opinion is quite unsatisfying as the majority of the time you're watering crops and tilling ground for new crops. Therefore, this mod serves to add that feature and shift some exp gained from harvesting towards watering and hoeing. It also serves to indirectly nerf sprinklers, as in the base game there is almost no reason for you to ever manually water your crops when you unlock them.
+# Features
+
+* Gain experience from watering soil
+* For balance (can be disabled), reduce exp gained from crops by 25%
 
 # Changelog
+
+## 1.0.0
+
+* Initial release
 

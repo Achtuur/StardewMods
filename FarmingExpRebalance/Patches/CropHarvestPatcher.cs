@@ -9,11 +9,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FarmingExpRebalance.Patches
+namespace WateringCanGiveExp.Patches
 {
     internal class CropHarvestPatcher : GenericPatcher
     {
-        private static IMonitor Monitor;
         public override void Patch(Harmony harmony, IMonitor monitor)
         {
             Monitor = monitor;
@@ -24,7 +23,7 @@ namespace FarmingExpRebalance.Patches
 
             harmony.Patch(
                 original: this.getOriginalMethod<Crop>(nameof(Crop.harvest)),
-                prefix: this.getHarmonyMethod(nameof(Postfix_Harvest))
+                postfix: this.getHarmonyMethod(nameof(Postfix_Harvest))
             );
         }
 
@@ -32,17 +31,10 @@ namespace FarmingExpRebalance.Patches
         /// Patch for <see cref="StardewValley.Crop.harvest"/>. Only checks <c> Game1.player.experiencePoints </c> for farming exp.
         /// </summary>
         /// <returns></returns>
-        private static bool Prefix_Harvest(int __state)
+        private static void Prefix_Harvest(out int __state)
         {
-            try
-            {
-                __state = Game1.player.experiencePoints[0];
-            }
-            catch (Exception e)
-            {
-                Monitor.Log($"Something went wrong when applying patch FarmingExpRebalance.Patches.Prefix_Harvest:\n{e}", LogLevel.Error);
-            }
-            return true; // Always execute original function
+            
+             __state = Game1.player.experiencePoints[0];   
         }
 
         private static void Postfix_Harvest(int __state)
@@ -50,10 +42,10 @@ namespace FarmingExpRebalance.Patches
             try
             {
                 int exp_diff = Game1.player.experiencePoints[0] - __state;
-                Monitor.Log($"Exp gained from harvesting: {exp_diff}", LogLevel.Debug);
+                AchtuurCore.Debug.DebugLog(Monitor, $"Exp gained from harvesting: {exp_diff} (old={__state})");
                 if (exp_diff > 0)
                 {
-                    subtractFarmingExp(Game1.player, (int) (exp_diff * (1 - ModConfig.HarvestingExpMultiplier)));
+                    subtractFarmingExp(Game1.player, (int) (exp_diff * (1 - ModEntry.Instance.Config.HarvestingExpMultiplier)));
                 }
             }
             catch (Exception e)
@@ -70,10 +62,14 @@ namespace FarmingExpRebalance.Patches
             int new_exp = farmer.experiencePoints[0];
 
             int level_after_sub = Farmer.checkForLevelGain(old_exp, new_exp);
+
+            AchtuurCore.Debug.DebugLog(Monitor, $"{new_exp} -> {old_exp} ({level_after_sub})");
+
             // If level is different, dont subtract as that could maybe break levelling
-            if (level_after_sub != -1 && level_after_sub == farmer.FarmingLevel)
+            if (level_after_sub == -1)
             {
                 farmer.experiencePoints[0] -= amount;
+                AchtuurCore.Debug.DebugLog(Monitor, $"Subtracted {amount} exp");
             }
 
         }

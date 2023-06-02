@@ -10,8 +10,7 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 # Changelog
 
 ## 1.0.2
-* New/Changed
-	* Add another overload for `GenericPatcher.getOriginalMethod` to support static methods
+* Minor changes to `GenericPatcher` class
 
 ## 1.0.1
 * Fixes

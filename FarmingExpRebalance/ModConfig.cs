@@ -1,5 +1,4 @@
-﻿using FarmingExpRebalance;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Utilities;
 using StardewModdingAPI;
 using StardewValley;
@@ -9,88 +8,55 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmingExpRebalance
+namespace WateringCanGiveExp
 {
     internal class ModConfig
     {
         /// <summary>
         /// Bonus multiplier to total movespeed per level of Travelling skill. Defaults to 0.5.
         /// </summary>
-        public static float ExpforWateringSoil { get; set; }
+        public float ExpforWateringSoil { get; set; }
 
         /// <summary>
         /// Multiplier applied to exp gained from harvesting. Defaults to 0.75;
         /// </summary>
-        public static float HarvestingExpMultiplier { get; set; }
+        public float HarvestingExpMultiplier { get; set; }
 
-        /// <summary>
-        /// Percentage of stamina that recovers every 10 minutes by <see cref="ProfessionRestoreStamina"/>. Defaults to 1%
-        /// </summary>
-        public static float RestoreStaminaPercentage { get; set; }
-
-
-        /// <summary>
-        /// Number of steps to walk before getting sprint bonus
-        /// </summary>
-        public static int SprintSteps { get; set; }
-
-        /// <summary>
-        /// Bonus multiplier to movespeed that is applied by sprinting
-        /// </summary>
-        public static float SprintMovespeedBonus { get; set; }
-
-        /// <summary>
-        /// Use chance for a totem when profession is unlocked
-        /// </summary>
-        public static float TotemUseChance { get; set; }
-
-        /// <summary>
-        /// Number of steps to walk before getting 1 Exp
-        /// </summary>
-        public static int StepsPerExp { get; set; }
-
-
-
+ 
         public ModConfig()
         {
-            ModConfig.ExpforWateringSoil = 0.05f;
-            ModConfig.HarvestingExpMultiplier = 0.75f;
-            //ModConfig.RestoreStaminaPercentage = 0.01f;
-            //ModConfig.LevelMovespeedBonus = 0.01f;
-            //ModConfig.SprintMovespeedBonus = 0.15f;
-            //ModConfig.SprintSteps = 5;
-            //ModConfig.TotemUseChance = 0.5f;
-            //ModConfig.StepsPerExp = 25;
+            this.ExpforWateringSoil = 0.05f;
+            this.HarvestingExpMultiplier = 0.75f;
         }
 
         /// <summary>
         /// Constructs config menu for GenericConfigMenu mod
         /// </summary>
         /// <param name="instance"></param>
-        public void createMenu(ModEntry instance)
+        public void createMenu()
         {
             // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            var configMenu = ModEntry.Instance.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
                 return;
 
             // register mod
             configMenu.Register(
-                mod: instance.ModManifest,
-                reset: () => instance.Config = new ModConfig(),
-                save: () => instance.Helper.WriteConfig(instance.Config)
+                mod: ModEntry.Instance.ModManifest,
+                reset: () => ModEntry.Instance.Config = new ModConfig(),
+                save: () => ModEntry.Instance.Helper.WriteConfig(ModEntry.Instance.Config)
             );
 
             /// General travel skill settings header
             configMenu.AddSectionTitle(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgSection_General,
                 tooltip: null
             );
 
             // Harvesting exp multiplier
             configMenu.AddTextOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgExpperwatersoil_Name,
                 tooltip: I18n.CfgExpperwatersoil_Desc,
                 getValue: () => ExpforWateringSoil.ToString(),
@@ -101,7 +67,7 @@ namespace FarmingExpRebalance
 
             // Exp per watered soil
             configMenu.AddNumberOption(
-                mod: instance.ModManifest,
+                mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgHarvestexpmultiplier_Name,
                 tooltip: I18n.CfgHarvestexpmultiplier_Desc,
                 getValue: () => HarvestingExpMultiplier,
@@ -112,79 +78,6 @@ namespace FarmingExpRebalance
                 formatValue: displayAsPercentage
              );
 
-            //// Level movespeed bonus
-            //configMenu.AddNumberOption(
-            //    mod: instance.ModManifest,
-            //    name: I18n.CfgLevelmovespeed_Name,
-            //    tooltip: I18n.CfgLevelmovespeed_Desc,
-            //    getValue: () => LevelMovespeedBonus,
-            //    setValue: value => LevelMovespeedBonus = value,
-            //    min: 0f / 100f,
-            //    max: 2f / 100f,
-            //    interval: 0.05f / 100f,
-            //    formatValue: displayAsPercentage
-            // );
-
-            ///// profession settings header
-            //configMenu.AddSectionTitle(
-            //    mod: instance.ModManifest,
-            //    text: I18n.CfgSection_Professions,
-            //    tooltip: null
-            //);
-
-            //// Movespeed profession bonus
-            //configMenu.AddNumberOption(
-            //    mod: instance.ModManifest,
-            //    name: I18n.CfgMovespeedbonus_Name,
-            //    tooltip: I18n.CfgMovespeedbonus_Desc,
-            //    getValue: () => MovespeedProfessionBonus,
-            //    setValue: value => MovespeedProfessionBonus = value,
-            //    min: 0f / 100f,
-            //    max: 10f / 100f,
-            //    interval: 0.5f / 100f,
-            //    formatValue: displayAsPercentage
-            // );
-
-            //// Sprint profession bonus
-            //configMenu.AddNumberOption(
-            //    mod: instance.ModManifest,
-            //    name: I18n.CfgSprintbonus_Name,
-            //    tooltip: I18n.CfgSprintbonus_Desc,
-            //    getValue: () => SprintMovespeedBonus,
-            //    setValue: value => SprintMovespeedBonus = value,
-            //    min: 0f / 100f,
-            //    max: 30f / 100f,
-            //    interval: 0.5f / 100f,
-            //    formatValue: displayAsPercentage
-            // );
-
-            //// Restore stamina percentage
-            //configMenu.AddNumberOption(
-            //    mod: instance.ModManifest,
-            //    name: I18n.CfgRestorestamina_Name,
-            //    tooltip: I18n.CfgRestorestamina_Desc,
-            //    getValue: () => RestoreStaminaPercentage,
-            //    setValue: value => RestoreStaminaPercentage = value,
-            //    min: 0f / 100f,
-            //    max: 2f / 100f,
-            //    interval: 0.05f / 100f,
-            //    formatValue: displayAsPercentage
-            // );
-
-            //// Totem reuse
-            //configMenu.AddNumberOption(
-            //    mod: instance.ModManifest,
-            //    name: I18n.CfgTotemreuse_Name,
-            //    tooltip: I18n.CfgTotemreuse_Desc,
-            //    getValue: () => TotemUseChance,
-            //    setValue: value => TotemUseChance = value,
-            //    min: 25f / 100f,
-            //    max: 75f / 100f,
-            //    interval: 5f / 100f,
-            //    formatValue: displayAsPercentage
-            // );
-
-            // TODO add options for cheap recipes/obelisks
         }
 
         private static string displayExpGainValues(string expgain_option)
@@ -195,7 +88,7 @@ namespace FarmingExpRebalance
                 case "0.50": return "0.50 (Every other tile)";
                 case "0.75": return "0.75 (2 Exp for 3 tiles)";
                 case "1": return "1 (Every tile)";
-                case "2": return "2 (Every tile gives double exp)";
+                case "2": return "2 (Every tile gives two exp)";
                 case "5000": return "100 (debug option)";
             }
             return "Something went wrong... :(";
