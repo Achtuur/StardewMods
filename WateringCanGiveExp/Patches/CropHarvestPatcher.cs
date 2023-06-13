@@ -42,7 +42,7 @@ namespace WateringCanGiveExp.Patches
             try
             {
                 int exp_diff = Game1.player.experiencePoints[0] - __state;
-                AchtuurCore.Debug.DebugLog(Monitor, $"Exp gained from harvesting: {exp_diff} (old={__state})");
+                AchtuurCore.Logger.DebugLog(Monitor, $"Exp gained from harvesting: {exp_diff} (old={__state})");
                 if (exp_diff > 0)
                 {
                     subtractFarmingExp(Game1.player, (int) (exp_diff * (1 - ModEntry.Instance.Config.HarvestingExpMultiplier)));
@@ -63,13 +63,13 @@ namespace WateringCanGiveExp.Patches
 
             int level_after_sub = Farmer.checkForLevelGain(old_exp, new_exp);
 
-            AchtuurCore.Debug.DebugLog(Monitor, $"{new_exp} -> {old_exp} ({level_after_sub})");
+            AchtuurCore.Logger.DebugLog(Monitor, $"{new_exp} -> {old_exp} ({level_after_sub})");
 
             // If level is different, dont subtract as that could maybe break levelling
             if (level_after_sub == -1)
             {
                 farmer.experiencePoints[0] -= amount;
-                AchtuurCore.Debug.DebugLog(Monitor, $"Subtracted {amount} exp");
+                AchtuurCore.Logger.DebugLog(Monitor, $"Subtracted {amount} exp");
             }
 
         }

@@ -4,8 +4,6 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<GamePath>D:\SteamLibrary\steamapps\common\Stardew Valley</GamePath>
 		<EnableHarmony>true</EnableHarmony>
-		<EnableModZip Condition="$(Configuration) != 'Release'">False</EnableModZip>
-		<ModZipPath>$(SolutionDir)\.releases</ModZipPath>
 	</PropertyGroup>
 
 	<ItemGroup>

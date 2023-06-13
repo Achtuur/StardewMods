@@ -25,7 +25,7 @@ namespace WateringCanGiveExp
  
         public ModConfig()
         {
-            this.ExpforWateringSoil = 0.5f;
+            this.ExpforWateringSoil = 0.05f;
             this.HarvestingExpMultiplier = 0.75f;
         }
 
@@ -61,7 +61,7 @@ namespace WateringCanGiveExp
                 tooltip: I18n.CfgExpperwatersoil_Desc,
                 getValue: () => ExpforWateringSoil.ToString(),
                 setValue: value => ExpforWateringSoil = float.Parse(value),
-                allowedValues: new string[] { "0.25", "0.50", "0.75", "1", "2" },
+                allowedValues: new string[] { "0.25", "0.50", "0.75", "1", "2", "5000" },
                 formatAllowedValue: displayExpGainValues
              );
 
@@ -89,6 +89,7 @@ namespace WateringCanGiveExp
                 case "0.75": return "0.75 (2 Exp for 3 tiles)";
                 case "1": return "1 (Every tile)";
                 case "2": return "2 (Every tile gives two exp)";
+                case "5000": return "100 (debug option)";
             }
             return "Something went wrong... :(";
         }
