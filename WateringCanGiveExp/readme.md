@@ -9,6 +9,13 @@ In the Stardew Valley, gaining farming experience early on is based entirely on 
 
 # Changelog
 
+
+## 1.0.1
+
+* Fixes
+	* Remove leftover debugging stuff
+	* Fix default watering exp being lower than intended
+
 ## 1.0.0
 
 * Initial release
