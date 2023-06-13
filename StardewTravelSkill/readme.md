@@ -38,6 +38,14 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
+
+## 1.1.3
+* New/Changed content
+    * Korean translation, thanks to poosha7375
+    
+* Fixes
+  * Fix exp gain in splitscreen mode
+
 ## 1.1.2
 * Fixes
   * Fix config saving properly

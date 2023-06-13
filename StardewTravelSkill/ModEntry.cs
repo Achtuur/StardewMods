@@ -11,10 +11,9 @@ using System.Runtime.CompilerServices;
 using HarmonyLib;
 using StardewTravelSkill.Patches;
 using StardewValley.Menus;
-using ContentPatcher.Framework;
-using ContentPatcher;
 using AchtuurCore.Patches;
 using SpaceCore.UI;
+using StardewModdingAPI.Utilities;
 
 namespace StardewTravelSkill
 {
@@ -47,7 +46,7 @@ namespace StardewTravelSkill
         };
 
         public static ModEntry Instance;
-        public static IContentPatcherAPI ContentAPI;
+        public static ContentPatcher.IContentPatcherAPI ContentAPI;
         public static TravelSkill TravelSkill;
 
         public ContentPackHelper contentPackHelper;
@@ -60,13 +59,17 @@ namespace StardewTravelSkill
 
         /// <summary>
         /// Amount of steps taken the previous time it was checked
+        /// 
+        /// Uses PerScreen for splitscreen gameplay
         /// </summary>
-        private uint m_previousSteps;
+        private readonly PerScreen<uint> m_previousSteps = new PerScreen<uint>();
 
         /// <summary>
         /// Amount of steps taken since last moving
+        /// 
+        /// Uses PerScreen for splitscreen gameplay
         /// </summary>
-        private uint m_consecutiveSteps;
+        private PerScreen<uint> m_consecutiveSteps = new PerScreen<uint>();
 
         /// <summary>
         /// Whether totem recipe has been changed as result of profession
@@ -119,20 +122,25 @@ namespace StardewTravelSkill
         /// <param name="helper">Simplified API for writing mods</param>
         public override void Entry(IModHelper helper)
         {
+            // Init references to mod api
+            I18n.Init(helper.Translation);
+            ModEntry.Instance = this;
+
+            // Apply harmony patches
             HarmonyPatcher.ApplyPatches(this,
                 new MoveSpeedPatch(),
                 new ReduceActiveItemPatch()
             );
 
-            // Init references to mod api
-            I18n.Init(helper.Translation);
-            ModEntry.Instance = this;
-
+            // Setup config
             this.Config = helper.ReadConfig<ModConfig>();
 
+
+            // Setup Spacecore skill
             Skills.RegisterSkill(ModEntry.TravelSkill = new TravelSkill());
 
 
+            // Setup event listeners
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
             helper.Events.GameLoop.SaveCreated += this.OnSaveCreate;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
@@ -195,13 +203,13 @@ namespace StardewTravelSkill
                 return;
 
             // Calcuate difference in steps, and if it exceeds 1 exp treshold, add it as exp. Hacky fix to get xp values between 0 and 1
-            uint step_diff = Game1.player.stats.stepsTaken - this.m_previousSteps;
+            uint step_diff = Game1.player.stats.stepsTaken - this.m_previousSteps.Value;
             if (step_diff >= Instance.Config.StepsPerExp * Instance.Config.AddExpIncrement)
             {
                 Game1.player.AddCustomSkillExperience(TravelSkill, Instance.Config.AddExpIncrement);
                 // Set previous steps to current steps, with correction
                 uint steps_over_exp_incr = step_diff - (uint) (Instance.Config.StepsPerExp * Instance.Config.AddExpIncrement);
-                this.m_previousSteps = Game1.player.stats.stepsTaken - steps_over_exp_incr;
+                this.m_previousSteps.Value = Game1.player.stats.stepsTaken - steps_over_exp_incr;
             }
 
         }
@@ -232,7 +240,7 @@ namespace StardewTravelSkill
             if (!Context.IsWorldReady)
                 return;
 
-            this.m_previousSteps = Game1.player.stats.stepsTaken;
+            this.m_previousSteps.Value = Game1.player.stats.stepsTaken;
             this.totemRecipeChanged = false;
             this.obeliskRecipeChanged = false;
         }
@@ -362,12 +370,12 @@ namespace StardewTravelSkill
             if (!this.MovementButtonHeld())
             {
                 // "Reset" counter by setting it to current step count
-                this.m_consecutiveSteps = Game1.player.stats.stepsTaken;
+                this.m_consecutiveSteps.Value = Game1.player.stats.stepsTaken;
                 ModEntry.SprintActive = false;
                 return;
             }
 
-            uint step_diff = Game1.player.stats.stepsTaken - this.m_consecutiveSteps;
+            uint step_diff = Game1.player.stats.stepsTaken - this.m_consecutiveSteps.Value;
             
             if (step_diff > Instance.Config.SprintSteps && !ModEntry.SprintActive)
             {
@@ -388,6 +396,14 @@ namespace StardewTravelSkill
             var dictEntrySplit = dict[affected_item].Split('/');
             dictEntrySplit[17] = new_cost;
             dict[affected_item] = String.Join<string>("/", dictEntrySplit);
+        }
+
+        private int GetScreenId()
+        {
+            if (!Context.IsSplitScreen)
+                return 0;
+
+            return Context.ScreenId;
         }
     }
 }

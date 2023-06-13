@@ -24,6 +24,10 @@ namespace StardewTravelSkill
 
         public void CreateTokens()
         {
+            if (ContentPatcherAPI == null)
+                return;
+
+
             ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionMovespeed", hasMovespeed);
             ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionRestoreStamina", hasRestoreStamina);
             ContentPatcherAPI.RegisterToken(this.Instance.ModManifest, "hasProfessionSprint", hasSprint);
