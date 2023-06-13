@@ -25,7 +25,7 @@ namespace WateringCanGiveExp
  
         public ModConfig()
         {
-            this.ExpforWateringSoil = 0.05f;
+            this.ExpforWateringSoil = 0.5f;
             this.HarvestingExpMultiplier = 0.75f;
         }
 
