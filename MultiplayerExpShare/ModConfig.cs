@@ -32,6 +32,8 @@ namespace MultiplayerExpShare
         /// </summary>
         public ExpShareRangeType ExpShareType { get; set; }
 
+        public bool ShareAllExpAtMaxLevel { get; set; }
+
         /// <summary>
         /// Other farmers must be within this range to count as nearby
         /// </summary>
@@ -55,6 +57,7 @@ namespace MultiplayerExpShare
             this.NearbyPlayerTileRange = 25;
             this.ExpPercentageToActor = 0.75f;
             this.ExpShareType = ExpShareRangeType.Tile;
+            this.ShareAllExpAtMaxLevel = true;
 
             this.VanillaSkillEnabled = new[] {
                 true,  // Farming
@@ -143,6 +146,15 @@ namespace MultiplayerExpShare
                 max: 50,
                 interval: 5
              );
+
+            // share all exp at max level
+            configMenu.AddBoolOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgShareallexpmaxlevel_Name,
+                tooltip: I18n.CfgShareallexpmaxlevel_Desc,
+                getValue: () => ShareAllExpAtMaxLevel,
+                setValue: value => ShareAllExpAtMaxLevel = value
+            );
 
             // Enable/disable menu
             configMenu.AddSectionTitle(

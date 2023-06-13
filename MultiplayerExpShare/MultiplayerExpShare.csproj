@@ -13,7 +13,7 @@
 		<PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
 		<ProjectReference Include="..\AchtuurCore\AchtuurCore.csproj" />
 		<Reference Include="AchtuurCore" HintPath="$(GameModsPath)\AchtuurCore\AchtuurCore.dll" Private="False" />
-		<Reference Include="SpaceCore" HintPath="$(GameModsPath)\SpaceCore\SpaceCore.dll" Private="True" />
+		<Reference Include="SpaceCore" HintPath="$(GameModsPath)\SpaceCore\SpaceCore.dll" Private="False" />
 	</ItemGroup>
 
 </Project>

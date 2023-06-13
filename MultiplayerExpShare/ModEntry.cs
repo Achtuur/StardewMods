@@ -8,6 +8,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace MultiplayerExpShare
 {
@@ -68,6 +69,31 @@ namespace MultiplayerExpShare
             return nearbyFarmers.ToArray();
         }
 
+        /// <summary>
+        /// Get exp percentage for actor based on settings and skill level (if setting enabled)
+        /// </summary>
+        /// <param name="level">Optional, skill level of current skill being evaluated for exp</param>
+        /// <returns></returns>
+        public static float GetActorExpPercentage(int level)
+        {
+            if (ModEntry.Instance.Config.ShareAllExpAtMaxLevel && level == 10)
+            {
+                return 0f;
+            }
+
+            return ModEntry.Instance.Config.ExpPercentageToActor;
+        }
+
+        public static float GetSharedExpPercentage(int actor_level)
+        {
+            if (ModEntry.Instance.Config.ShareAllExpAtMaxLevel && actor_level == 10)
+            {
+                return 1f;
+            }
+
+            return 1f - ModEntry.Instance.Config.ExpPercentageToActor;
+        }
+
         public override void Entry(IModHelper helper)
         {
             I18n.Init(helper.Translation);
@@ -94,8 +120,8 @@ namespace MultiplayerExpShare
                 if (msg_expdata.actor_multiplayerid == Game1.player.UniqueMultiplayerID || !msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
                     return;
 
-                AchtuurCore.Debug.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {AchtuurCore.Debug.GetSkillNameFromId(msg_expdata.skill_id)} from ({msg_expdata.actor_multiplayerid})!");
-                GainExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata.skill_id, msg_expdata.amount, isSharedExp: true);
+                AchtuurCore.Logger.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {AchtuurCore.Logger.GetSkillNameFromId(msg_expdata.skill_id)} from ({msg_expdata.actor_multiplayerid})!");
+                GainExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata);
             }
             else if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SharedExpGainedSpaceCore")
             {
@@ -105,8 +131,8 @@ namespace MultiplayerExpShare
                 if (msg_expdata.actor_multiplayerid == Game1.player.UniqueMultiplayerID || !msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
                     return;
 
-                AchtuurCore.Debug.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {msg_expdata.skill_id} from ({msg_expdata.actor_multiplayerid})!");
-                SpaceCoreExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata.skill_id, msg_expdata.amount, isSharedExp: true);
+                AchtuurCore.Logger.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {msg_expdata.skill_id} from ({msg_expdata.actor_multiplayerid})!");
+                SpaceCoreExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata);
             }
         }
 
