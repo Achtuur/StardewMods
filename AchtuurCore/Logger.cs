@@ -1,0 +1,93 @@
+﻿using StardewModdingAPI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AchtuurCore
+{
+    public static class Logger
+    {
+        /// <summary>
+        /// Calls <see cref="IMonitor.Log"/> with <see cref="LogLevel.Debug"/>, if configuration is set to Build.
+        /// </summary>
+        /// <param name="monitor">IMonitor instance, should be accessible by ModEntry.Instance</param>
+        /// <param name="debug_msg">Message to display</param>
+        public static void DebugLog(IMonitor monitor, string debug_msg)
+        {
+            #if DEBUG
+                monitor.Log(debug_msg, LogLevel.Debug);
+            #endif
+        }
+
+        public static void TraceLog(IMonitor monitor, string error_msg)
+        {
+            #if DEBUG
+                monitor.Log(error_msg, LogLevel.Trace);
+            #endif
+        }
+
+        public static void DebugPrintDictionary<K, V>(IMonitor monitor, IDictionary<K, V> dict, string name=null)
+        {
+            DebugPrintDictionary(monitor, dict as Dictionary<K, V>, name);
+        }
+
+        public static void DebugPrintDictionary<K, V>(IMonitor monitor, Dictionary<K, V> dict, string name=null)
+        {
+            if (name is not null)
+            {
+                DebugLog(monitor, $"Printing entries of {name}");
+            }
+            int i = 0;
+
+            DebugLog(monitor, $"({dict.Count})");
+            DebugLog(monitor, "{"); 
+            foreach (KeyValuePair<K, V> item in dict)
+            {
+                DebugLog(monitor, $"\t({i++}): {item.Key} -> {item.Value}");
+            }
+
+            DebugLog(monitor, "}");
+        }
+
+        public static void DebugPrintList<T>(IMonitor monitor, IList<T> list, string name=null)
+        {
+            DebugPrintList(monitor, list as List<T>, name);
+        }
+
+        public static void DebugPrintList<T>(IMonitor monitor, List<T> list, string name = null)
+        {
+            if (name is not null)
+            {
+                DebugLog(monitor, $"Printing entries of {name}");
+            }
+            int i = 0;
+
+            DebugLog(monitor, $"({list.Count})");
+            DebugLog(monitor, "{");
+            foreach (T item in list)
+            {
+                DebugLog(monitor, $"\t({i++}): {item}");
+            }
+
+            DebugLog(monitor, "}");
+        }
+
+        public static string GetSkillNameFromId(int skill_id)
+        {
+            switch (skill_id)
+            {
+                case 0: return "Farming";
+                case 1: return "Fishing";
+                case 2: return "Foraging";
+                case 3: return "Mining";
+                case 4: return "Combat";
+                case 5: return "Luck";
+                default: return "noSkill";
+
+            }
+        }
+    }
+}
