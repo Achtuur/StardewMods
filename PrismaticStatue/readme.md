@@ -12,7 +12,7 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
   * Recipe purchasable from Robin, after earning 6 friendship hearts with Robin, the Wizard and completing the community center.
   * Multiple statues stack, with diminishing returns and up to a certain maximum.
   * Works on (almost) all machines in vanilla Stardew Valley.
-    * Does **not** work on Kegs in the current version (1.1.0), as they are coded differently.
+    * Does **not** work on Casks in the current version (1.0.0), as they are coded differently.
 
 * Overlay showing the machines currently sped up.
   * Toggle overlay with `L` (can be changed in config).
@@ -29,7 +29,7 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 ### Planned
 
-* Work on Kegs as well
+* Work on Casks as well
 
 
 ### 1.1.0
