@@ -2,7 +2,7 @@
 
 Core mod required for most of my other mods, available on [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/16827).
 
-## Events included (IApi wip)
+## Events included (`IApi` wip)
 
 * `EventPublisher.onFinishedWateringSoil` - Fired when a player waters a tile of previously unwatered(!!) soil.
 

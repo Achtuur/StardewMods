@@ -1,6 +1,8 @@
 ﻿using AchtuurCore.Utility;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Pathoschild.Stardew.Automate;
+using Sickhead.Engine.Util;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -177,6 +179,10 @@ namespace PrismaticStatue
                 // Get derived class of GenericObjectMachine, which is derived of BaseMachine<MachineT>
                 var BaseMachineDerived = machine.GetType().GetProperty("Machine", BindingFlags.Public | BindingFlags.Instance).GetValue(machine, null);
 
+                string MachineId = BaseMachineDerived.GetType().GetProperty("MachineTypeID", BindingFlags.Public | BindingFlags.Instance).GetValue(BaseMachineDerived) as string;
+                if (ModEntry.PFMEnabled && MachineId.Contains("PFM"))
+                    return GetPFMMachineEntity(machine);
+
                 // Get underlying StardewValley.Object this machine refers to
                 SObject MachineEntity = BaseMachineDerived.GetType().GetProperty("Machine", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BaseMachineDerived, null) as SObject;
 
@@ -187,6 +193,30 @@ namespace PrismaticStatue
                 AchtuurCore.Logger.TraceLog(
                     ModEntry.Instance.Monitor,
                     $"Failed to find underlying machine entity for {machine.MachineTypeID} at {machine.Location} ({machine.TileArea.X}, {machine.TileArea.Y})"
+                );
+                return null;
+            }
+        }
+
+        public static SObject GetPFMMachineEntity(IMachine machine)
+        {
+            try
+            {
+                var BaseMachineDerived = machine.GetType().GetProperty("Machine", BindingFlags.Public | BindingFlags.Instance).GetValue(machine, null);
+
+                // vanilla machine, wrapped using "PfmMachine" property
+                var VanillaMachine = BaseMachineDerived.GetType().GetField("PfmMachine", BindingFlags.Public | BindingFlags.Instance);
+
+                if (VanillaMachine is not null)
+                    BaseMachineDerived = VanillaMachine.GetValue(BaseMachineDerived);
+
+                return BaseMachineDerived.GetType().GetField("_machine", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BaseMachineDerived) as SObject;
+            }
+            catch (Exception e)
+            {
+                AchtuurCore.Logger.TraceLog(
+                    ModEntry.Instance.Monitor,
+                    $"(PFM) Failed to find underlying machine entity for {machine.MachineTypeID} at {machine.Location} ({machine.TileArea.X}, {machine.TileArea.Y})"
                 );
                 return null;
             }

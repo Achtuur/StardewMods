@@ -12,8 +12,8 @@
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
 	<Reference Include="AchtuurCore" HintPath="$(GameModsPath)\AchtuurCore\AchtuurCore.dll" Private="False" />
-	<Reference Include="SpaceCore" HintPath="$(GameModsPath)\SpaceCore\SpaceCore.dll" Private="False" />
-	<Reference Include="ContentPatcher" HintPath="$(GameModsPath)\ContentPatcher\ContentPatcher.dll" Private="False"/>
+	<Reference Include="SpaceCore" HintPath="$(GameModsPath)\devmods\SpaceCore\SpaceCore.dll" Private="False" />
+	<Reference Include="ContentPatcher" HintPath="$(GameModsPath)\devmods\ContentPatcher\ContentPatcher.dll" Private="False"/>
   </ItemGroup>
 
 

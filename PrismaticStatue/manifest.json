@@ -26,6 +26,16 @@
             "UniqueID": "DIGUS.MailFrameworkMod",
             "MinimumVersion": "1.15.0",
             "isRequired": true
+        },
+        {
+            "UniqueID": "Digus.ProducerFrameworkMod",
+            "MinimumVersion": "1.7.4",
+            "isRequired": false
+        },
+        {
+            "UniqueID": "Digus.PFMAutomate",
+            "MinimumVersion": "1.4.2",
+            "isRequired": false
         }
     ],
     "UpdateKeys": [ "Nexus:17013" ]

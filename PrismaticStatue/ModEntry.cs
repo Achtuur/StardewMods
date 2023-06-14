@@ -28,6 +28,8 @@ namespace PrismaticStatue
 
         public static ModEntry Instance;
         internal ModConfig Config;
+
+        internal static bool PFMEnabled;
         internal IAutomateAPI AutomateAPI;
         internal JsonAssets.IApi JsonAssetsAPI;
         internal IMailFrameworkModApi mailFrameworkModApi;
@@ -136,8 +138,12 @@ namespace PrismaticStatue
             AutomateAPI = this.Helper.ModRegistry.GetApi<IAutomateAPI>("Pathoschild.Automate");
             JsonAssetsAPI = this.Helper.ModRegistry.GetApi<JsonAssets.IApi>("spacechase0.JsonAssets");
 
-            // Load assets
+            // Check for pfm, needed to select proper machine entity
+            ModEntry.PFMEnabled = 
+                this.Helper.ModRegistry.IsLoaded("Digus.ProducerFrameworkMod") &&
+                this.Helper.ModRegistry.IsLoaded("Digus.PFMAutomate");
 
+            // Load assets
             CreateRecipeUnlockMail();
             JsonAssetsAPI.LoadAssets(Path.Combine(Helper.DirectoryPath, this.ContentPackPath));
 
