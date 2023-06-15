@@ -4,16 +4,17 @@ using WateringCanGiveExp.Patches;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
+using StardewModdingAPI.Utilities;
 
 namespace WateringCanGiveExp
 {
     public class ModEntry : Mod
     {
-        public static ModEntry Instance;
         public const int FarmingSkillID = 0;
 
+        internal static ModEntry Instance;
         internal ModConfig Config;
-        private float wateringExpTotal;
+        private PerScreen<float> wateringExpTotal;
 
         public override void Entry(IModHelper helper)
         {
@@ -25,7 +26,7 @@ namespace WateringCanGiveExp
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
             this.Config = this.Helper.ReadConfig<ModConfig>();
-            this.wateringExpTotal = 0f;
+            this.wateringExpTotal = new PerScreen<float>(0f);
 
             AchtuurCore.Events.EventPublisher.onFinishedWateringSoil += OnFinishedWateringSoil;
 
@@ -47,11 +48,15 @@ namespace WateringCanGiveExp
             if (!e.farmer.IsLocalPlayer)
                 return;
 
-            // Add exp
-            this.wateringExpTotal += this.Config.ExpforWateringSoil;
-            int floored_total = (int) Math.Floor(wateringExpTotal);
+            // Get integer part of total watering exp to not 'lose' exp due to rounding
+            this.wateringExpTotal.Value += this.Config.ExpforWateringSoil;
+            int floored_total = (int) Math.Floor(wateringExpTotal.Value);
+
+            // Add integer part to farmer
             e.farmer.gainExperience(FarmingSkillID, floored_total);
-            this.wateringExpTotal -= floored_total;
+            
+            // Subtract integer part from total as it has already been received
+            this.wateringExpTotal.Value -= floored_total;
         }
     }
 }

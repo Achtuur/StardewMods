@@ -33,8 +33,7 @@ namespace WateringCanGiveExp.Patches
         /// <returns></returns>
         private static void Prefix_Harvest(out int __state)
         {
-            
-             __state = Game1.player.experiencePoints[0];   
+             __state = Game1.player.experiencePoints[0];
         }
 
         private static void Postfix_Harvest(int __state)

@@ -9,6 +9,9 @@ In the Stardew Valley, gaining farming experience early on is based entirely on 
 
 # Changelog
 
+## 1.0.2
+* Fixes
+	* Fix exp gain in splitscreen mode
 
 ## 1.0.1
 
