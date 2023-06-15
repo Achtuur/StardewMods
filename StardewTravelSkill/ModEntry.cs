@@ -45,7 +45,7 @@ namespace StardewTravelSkill
             SButton.D, SButton.LeftThumbstickRight, SButton.DPadRight 
         };
 
-        public static ModEntry Instance;
+        internal static ModEntry Instance;
         public static ContentPatcher.IContentPatcherAPI ContentAPI;
         public static TravelSkill TravelSkill;
 
