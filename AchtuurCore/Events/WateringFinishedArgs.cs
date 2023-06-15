@@ -12,8 +12,6 @@ namespace AchtuurCore.Events
     {
         public Farmer farmer;
         public HoeDirt target;
-        
-
         public WateringFinishedArgs(Farmer _farmer, HoeDirt _target)
         {
             this.farmer = _farmer;

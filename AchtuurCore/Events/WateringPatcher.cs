@@ -14,7 +14,6 @@ namespace AchtuurCore.Events
 {
     internal class WateringPatcher : GenericPatcher
     {
-        
         public override void Patch(Harmony harmony, IMonitor monitor)
         {
             // Prefix patch
@@ -29,11 +28,6 @@ namespace AchtuurCore.Events
                 postfix: this.getHarmonyMethod(nameof(this.postfix_performToolAction))
             );
         }
-
-
-        // performToolAction called on HoeDirt with Tool = watering can
-        // If HoeDirt.state.Value changed to 1 -> soil has been watered
-
         private static void prefix_performToolAction(Tool t, HoeDirt __instance, out WateringInfo __state)
         {
             __state = new WateringInfo();
@@ -52,7 +46,6 @@ namespace AchtuurCore.Events
         {
             try
             {
-
                 // If tool was not a watering can, return
                 if (__state.toolUsed is null || !__state.toolUsed.Name.ToLower().Contains("watering can"))
                     return;

@@ -9,6 +9,9 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.0.4
+* Add gmcm api interface to this
+
 ## 1.0.3
 * Add utility classes
 * Rename `Debug` to `Logger`

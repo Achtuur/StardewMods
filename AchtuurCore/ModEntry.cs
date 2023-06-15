@@ -12,7 +12,7 @@ namespace AchtuurCore
 {
     internal class ModEntry : Mod
     {
-        public static ModEntry Instance;
+        internal static ModEntry Instance;
         public override void Entry(IModHelper helper)
         {
             ModEntry.Instance = this;
@@ -20,14 +20,6 @@ namespace AchtuurCore
             HarmonyPatcher.ApplyPatches(this,
                 new WateringPatcher()
             );
-
-            EventPublisher.onFinishedWateringSoil += this.test_wateringevent;
-        }
-
-        private void test_wateringevent(object sender, WateringFinishedArgs e)
-        {
-            Instance.Monitor.Log($"{e.farmer} just watered {e.target}", LogLevel.Trace);
-        }
-        
+        }        
     }
 }
