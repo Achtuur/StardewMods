@@ -33,7 +33,7 @@ namespace PrismaticStatue.Patches
                 return;
 
             // Get tiles property
-            HashSet<Vector2> tiles = (HashSet<Vector2>) __instance.GetType().GetField("Tiles", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance, null);
+            IReadOnlySet<Vector2> tiles = (IReadOnlySet<Vector2>) __instance.GetType().GetField("Tiles", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance, null);
 
             // Get machine list of this machine group
             IMachine[] Machines = (IMachine[]) __instance.GetType().GetProperty("Machines").GetValue(__instance, null);
@@ -66,7 +66,7 @@ namespace PrismaticStatue.Patches
         /// <param name="tiles"></param>
         /// <param name="n_statues"></param>
         /// <returns>true if group exists, false if it doesn't</returns>
-        private static bool UpdateExistingGroup(IMachine[] MachinesToSpeedup, HashSet<Vector2> tiles, int n_statues)
+        private static bool UpdateExistingGroup(IMachine[] MachinesToSpeedup, IReadOnlySet<Vector2> tiles, int n_statues)
         {
             if (MachinesToSpeedup.Length == 0)
                 return false;

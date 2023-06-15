@@ -26,7 +26,8 @@ namespace WateringCanGiveExp
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
             this.Config = this.Helper.ReadConfig<ModConfig>();
-            this.wateringExpTotal = new PerScreen<float>(0f);
+            this.wateringExpTotal = new PerScreen<float>();
+            this.wateringExpTotal.Value = 0f;
 
             AchtuurCore.Events.EventPublisher.onFinishedWateringSoil += OnFinishedWateringSoil;
 

@@ -27,11 +27,11 @@ namespace PrismaticStatue
         /// <summary>
         /// Tiles of this machinegroup, keep this here in order to know what MachineGroup this is
         /// </summary>
-        internal HashSet<Vector2> Tiles;
+        internal IReadOnlySet<Vector2> Tiles;
 
         internal int n_statues;
 
-        internal SpedUpMachineGroup(IMachine[] MachinesToSpeedup, HashSet<Vector2> tiles, int n_statues)
+        internal SpedUpMachineGroup(IMachine[] MachinesToSpeedup, IReadOnlySet<Vector2> tiles, int n_statues)
         {
             this.n_statues = n_statues;
             this.Tiles = tiles;
@@ -50,7 +50,7 @@ namespace PrismaticStatue
             return this.Tiles.Count(tile => tile.ContainsObject(ModEntry.Instance.SpeedupStatueID, Location)) == n_statues;
         }
 
-        internal bool IsMachineGroup(HashSet<Vector2> GroupTiles, GameLocation GroupLocation)
+        internal bool IsMachineGroup(IReadOnlySet<Vector2> GroupTiles, GameLocation GroupLocation)
         {
             if (this.Location != GroupLocation)
                 return false;
@@ -70,7 +70,7 @@ namespace PrismaticStatue
         /// <param name="MachinesToSpeedup"></param>
         /// <param name="n_statues"></param>
         /// <returns>Returns true if this group should be deleted</returns>
-        internal void UpdateGroup(IMachine[] MachinesToSpeedup, HashSet<Vector2> tiles, int n_statues)
+        internal void UpdateGroup(IMachine[] MachinesToSpeedup, IReadOnlySet<Vector2> tiles, int n_statues)
         {
             UpdateMachineList(MachinesToSpeedup, tiles);
             this.UpdateNStatues(n_statues);
@@ -126,7 +126,7 @@ namespace PrismaticStatue
         /// Updates list of processing machines in this group and updates state of all machines in list
         /// </summary>
         /// <param name="machines"></param>
-        public void UpdateMachineList(IMachine[] machines, HashSet<Vector2> tiles)
+        public void UpdateMachineList(IMachine[] machines, IReadOnlySet<Vector2> tiles)
         {
             // Update machine list
             if (machines.Length != this.Machines.Count)

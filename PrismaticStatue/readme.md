@@ -29,6 +29,10 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 * Nothing for now
 
+### 1.2.1
+* Fixes
+  * Fixed error when casting to `HashSet<T>`
+
 ### 1.2.0
 * New/Changed
   * Casks are now also supported
