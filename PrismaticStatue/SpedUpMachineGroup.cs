@@ -16,7 +16,7 @@ namespace PrismaticStatue
 {
     internal class SpedUpMachineGroup
     {
-        internal List<SpedUpMachineWrapper> Machines;
+        internal List<GenericSpedUpMachineWrapper> Machines;
         internal GameLocation Location;
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace PrismaticStatue
             this.UpdateNStatues(n_statues);
         }
 
-        internal SpedUpMachineWrapper GetMachine(IMachine machine)
+        internal GenericSpedUpMachineWrapper GetMachine(IMachine machine)
         {
             return Machines.Find(sm => sm.isSameMachine(machine));
         }
@@ -96,7 +96,7 @@ namespace PrismaticStatue
             if (new_n_statues == this.n_statues)
                 return;
 
-            foreach (SpedUpMachineWrapper machine in this.Machines)
+            foreach (GenericSpedUpMachineWrapper machine in this.Machines)
             {
                 machine.OnNStautesChange(new_n_statues);
             }
@@ -106,17 +106,17 @@ namespace PrismaticStatue
 
         internal void RestoreAllMachines()
         {
-            foreach (SpedUpMachineWrapper machineWrapper in this.Machines)
+            foreach (GenericSpedUpMachineWrapper machineWrapper in this.Machines)
             {
                 machineWrapper.RestoreSpeed();
             }
         }
 
-        internal void OnTenMinutesTick()
+        internal void OnTimeChanged()
         {
-            foreach (SpedUpMachineWrapper machine in this.Machines)
+            foreach (GenericSpedUpMachineWrapper machine in this.Machines)
             {
-                machine.OnTenMinutesTick();
+                machine.OnTimeChanged();
             }
         }
 
@@ -131,20 +131,20 @@ namespace PrismaticStatue
             // Update machine list
             if (machines.Length != this.Machines.Count)
             {
-                List<SpedUpMachineWrapper> machines_wrapped = machines
-                    .Select(m => new SpedUpMachineWrapper(m, this.n_statues))
-                    .Where<SpedUpMachineWrapper>(wrap => !wrap.isNull())
+                List<GenericSpedUpMachineWrapper> machines_wrapped = machines
+                    .Select(m => GetWrapper(m))
+                    .Where<GenericSpedUpMachineWrapper>(wrap => !wrap.isNull())
                     .ToList();
 
                 //if this.Machines does not contain machine && machine contains machine -> add machine
-                List<SpedUpMachineWrapper> AddMachines = machines_wrapped.Where(m => !this.Machines.Any(this_m => this_m.isSameMachine(m))).ToList();
+                List<GenericSpedUpMachineWrapper> AddMachines = machines_wrapped.Where(m => !this.Machines.Any(this_m => this_m.isSameMachine(m))).ToList();
 
                 //if this.Machines contains machine && machine does not contain machine -> remove machine
-                List<SpedUpMachineWrapper> RemoveMachines = this.Machines.Where(this_m => !machines_wrapped.Any(m => m.isSameMachine(this_m))).ToList();
+                List<GenericSpedUpMachineWrapper> RemoveMachines = this.Machines.Where(this_m => !machines_wrapped.Any(m => m.isSameMachine(this_m))).ToList();
 
 
                 // First restore speed before deleting
-                foreach (SpedUpMachineWrapper machine in RemoveMachines)
+                foreach (GenericSpedUpMachineWrapper machine in RemoveMachines)
                 {
                     machine.RestoreSpeed();
                 }
@@ -159,67 +159,27 @@ namespace PrismaticStatue
                 this.Tiles = tiles;
             }
 
-            foreach (SpedUpMachineWrapper machine in this.Machines)
+            foreach (GenericSpedUpMachineWrapper machine in this.Machines)
             {
                 machine.UpdateState();
             }
         }
 
-        public List<SpedUpMachineWrapper> GetMachineList(IMachine[] machines)
+        public List<GenericSpedUpMachineWrapper> GetMachineList(IMachine[] machines)
         {
             return machines
-                .Select(machine => new SpedUpMachineWrapper(machine, this.n_statues))
+                .Select(machine => GetWrapper(machine))
                 .Where(wrap => !wrap.isNull())
                 .ToList();
         }
-        public static SObject GetMachineEntity(IMachine machine)
+
+        internal GenericSpedUpMachineWrapper GetWrapper(IMachine machine)
         {
-            try
+            if (machine.MachineTypeID == "Cask")
             {
-                // Get derived class of GenericObjectMachine, which is derived of BaseMachine<MachineT>
-                var BaseMachineDerived = machine.GetType().GetProperty("Machine", BindingFlags.Public | BindingFlags.Instance).GetValue(machine, null);
-
-                string MachineId = BaseMachineDerived.GetType().GetProperty("MachineTypeID", BindingFlags.Public | BindingFlags.Instance).GetValue(BaseMachineDerived) as string;
-                if (ModEntry.PFMEnabled && MachineId.Contains("PFM"))
-                    return GetPFMMachineEntity(machine);
-
-                // Get underlying StardewValley.Object this machine refers to
-                SObject MachineEntity = BaseMachineDerived.GetType().GetProperty("Machine", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BaseMachineDerived, null) as SObject;
-
-                return MachineEntity;
+                return new SpedUpCaskWrapper(machine, this.n_statues);
             }
-            catch (Exception e)
-            {
-                AchtuurCore.Logger.TraceLog(
-                    ModEntry.Instance.Monitor,
-                    $"Failed to find underlying machine entity for {machine.MachineTypeID} at {machine.Location} ({machine.TileArea.X}, {machine.TileArea.Y})"
-                );
-                return null;
-            }
-        }
-
-        public static SObject GetPFMMachineEntity(IMachine machine)
-        {
-            try
-            {
-                var BaseMachineDerived = machine.GetType().GetProperty("Machine", BindingFlags.Public | BindingFlags.Instance).GetValue(machine, null);
-
-                // vanilla machine, wrapped using "PfmMachine" property
-                var VanillaMachine = BaseMachineDerived.GetType().GetField("PfmMachine", BindingFlags.Public | BindingFlags.Instance);
-
-                if (VanillaMachine is not null)
-                    BaseMachineDerived = VanillaMachine.GetValue(BaseMachineDerived);
-
-                return BaseMachineDerived.GetType().GetField("_machine", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BaseMachineDerived) as SObject;
-            }
-            catch (Exception e)
-            {
-                AchtuurCore.Logger.TraceLog(
-                    ModEntry.Instance.Monitor,
-                    $"(PFM) Failed to find underlying machine entity for {machine.MachineTypeID} at {machine.Location} ({machine.TileArea.X}, {machine.TileArea.Y})"
-                );
-                return null;
-            }
+            return new SpedUpMachineWrapper(machine, this.n_statues);
         }
     }    
 }

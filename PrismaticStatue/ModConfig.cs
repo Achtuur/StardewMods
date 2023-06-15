@@ -11,6 +11,8 @@ using Force.DeepCloner;
 using Microsoft.Xna.Framework;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SpaceShared;
+using AchtuurCore.Integrations;
+using PrismaticStatue.Utility;
 
 namespace PrismaticStatue
 {
@@ -141,7 +143,7 @@ namespace PrismaticStatue
             for (int i = 0; i <= this.MaxStatues; i++)
             {
                 int minutes_left = SpedUpMachineWrapper.SpeedUpFunction(this.TableTime, i);
-                statue_table_times.Add($"{FormatNStatues(i)}: {FormatMinutes(minutes_left)}");
+                statue_table_times.Add($"{Formatter.FormatNStatues(i)}: {Formatter.FormatMinutes(minutes_left)}");
             }
 
 
@@ -208,67 +210,13 @@ namespace PrismaticStatue
                     break;
             }
 
-            return $"{item_name} ({FormatMinutes(int.Parse(tabletime_option))})";
+            return $"{item_name} ({Formatter.FormatMinutes(int.Parse(tabletime_option))})";
         }
 
         public static string DisplayAsPercentage(float value)
         {
             return Math.Round(100f * value, 2).ToString() + "%";
         }
-
-        private static string FormatNStatues(int n_statues)
-        {
-            switch (n_statues)
-            {
-                case 0:
-                    return "No Statues";
-                case 1:
-                    return "1 Statue";
-                default:
-                    return $"{n_statues} Statues";
-            }
-        }
-
-        private static string FormatMinutes(int minutes)
-        {
-            int days = (minutes >= 1600) ? minutes / 1600 : 0;
-            minutes %= 1600;
-            int hours = (minutes >= 60) ? minutes / 60 : 0;
-            minutes %= 60;
-
-            string time = "";
-
-            if (days > 0)
-            {
-                time += $"{days}d" + ((minutes > 0 || hours > 0) ? " " : "");
-            }
-
-            if (hours > 0)
-            {
-                time += $"{hours}h" + ((minutes > 0) ? " " : "");
-            }
-
-            if (minutes > 0 || (days == 0 && hours == 0))
-            {
-                time += $"{minutes}m";
-            }
-            return time;
-        }
-    }
-
-    /// <summary>The API which lets other mods add a config UI through Generic Mod Config Menu.</summary>
-    public interface IGenericModConfigMenuApi
-    {
-        void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
-        void Unregister(IManifest mod);
-        void AddSectionTitle(IManifest mod, Func<string> text, Func<string> tooltip = null);
-        void AddParagraph(IManifest mod, Func<string> text);
-        void AddImage(IManifest mod, Func<Texture2D> texture, Rectangle? texturePixelArea = null, int scale = Game1.pixelZoom);
-        void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string> tooltip = null, string fieldId = null);
-        void AddNumberOption(IManifest mod, Func<int> getValue, Action<int> setValue, Func<string> name, Func<string> tooltip = null, int? min = null, int? max = null, int? interval = null, Func<int, string> formatValue = null, string fieldId = null);
-        void AddNumberOption(IManifest mod, Func<float> getValue, Action<float> setValue, Func<string> name, Func<string> tooltip = null, float? min = null, float? max = null, float? interval = null, Func<float, string> formatValue = null, string fieldId = null);
-        void AddTextOption(IManifest mod, Func<string> getValue, Action<string> setValue, Func<string> name, Func<string> tooltip = null, string[] allowedValues = null, Func<string, string> formatAllowedValue = null, string fieldId = null);
-        void AddKeybind(IManifest mod, Func<SButton> getValue, Action<SButton> setValue, Func<string> name, Func<string> tooltip = null, string fieldId = null);
     }
 }
 

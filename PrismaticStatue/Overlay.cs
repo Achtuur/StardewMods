@@ -64,7 +64,7 @@ namespace PrismaticStatue
                 int tileSize = Game1.tileSize;
 
                 SpedUpMachineGroup group = ModEntry.Instance.GetMachineGroupOnTile(tile);
-                SpedUpMachineWrapper machine = ModEntry.Instance.GetMachineWrapperOnTile(group, tile);
+                GenericSpedUpMachineWrapper machine = ModEntry.Instance.GetMachineWrapperOnTile(group, tile);
 
                 Color? color = null;
 

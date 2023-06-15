@@ -26,7 +26,7 @@ namespace PrismaticStatue
         internal readonly string PFMPath = Path.Combine("assets", "PFM");
         internal readonly string StatueName = "Prismatic Statue";
 
-        public static ModEntry Instance;
+        internal static ModEntry Instance;
         internal ModConfig Config;
 
         internal static bool PFMEnabled;
@@ -51,13 +51,13 @@ namespace PrismaticStatue
             this.SpedupMachineGroups.Remove(group);
         }
 
-        internal SpedUpMachineWrapper GetMachineWrapperOnTile(SpedUpMachineGroup group, Vector2 tile)
+        internal GenericSpedUpMachineWrapper GetMachineWrapperOnTile(SpedUpMachineGroup group, Vector2 tile)
         {
             return (group is null)
                 ? null
                 : group.Machines.Find(machine => machine.IsOnTile(tile));
         }
-        internal SpedUpMachineWrapper GetMachineWrapperOnTile(Vector2 tile)
+        internal GenericSpedUpMachineWrapper GetMachineWrapperOnTile(Vector2 tile)
         {
             SpedUpMachineGroup group = GetMachineGroupOnTile(tile);
             return (group is null)
@@ -125,7 +125,7 @@ namespace PrismaticStatue
             // Tick each machine group
             foreach(SpedUpMachineGroup machinegroup in SpedupMachineGroups)
             {
-                machinegroup.OnTenMinutesTick();
+                machinegroup.OnTimeChanged();
             }
         }
 

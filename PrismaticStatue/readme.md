@@ -11,8 +11,6 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
   * Speeds up machines in the same machine group.
   * Recipe purchasable from Robin, after earning 6 friendship hearts with Robin, the Wizard and completing the community center.
   * Multiple statues stack, with diminishing returns and up to a certain maximum.
-  * Works on (almost) all machines in vanilla Stardew Valley.
-    * Does **not** work on Casks in the current version (1.0.0), as they are coded differently.
 
 * Overlay showing the machines currently sped up.
   * Toggle overlay with `L` (can be changed in config).
@@ -29,8 +27,13 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 ### Planned
 
-* Work on Casks as well
+* Nothing for now
 
+### 1.2.0
+* New/Changed
+  * Casks are now also supported
+    * Note that the minimum time will always be one night, since quality upgrade is only done once per night
+  * Internal code optimisations
 
 ### 1.1.0
 * New/Changed
