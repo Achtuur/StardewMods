@@ -14,7 +14,7 @@ namespace MultiplayerExpShare
 {
     internal class ModEntry : Mod
     {
-        public static ModEntry Instance;
+        internal static ModEntry Instance;
         public ModConfig Config;
 
         /// <summary>

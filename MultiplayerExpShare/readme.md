@@ -20,6 +20,10 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 * Change config to use the host's options
 * Add support for MARGO
 
+## 1.0.3
+* New/Changed content
+  * Updated compatiblity with AchtuurCore 1.0.4
+
 ## 1.0.2
 * New/Changed
   * Added option to share all exp in a skill when it's maxed (level 10)

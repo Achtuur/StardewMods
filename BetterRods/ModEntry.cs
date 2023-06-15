@@ -4,7 +4,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
 
-namespace Wrench
+namespace BetterRods
 {
     public class ModEntry : Mod
     {
@@ -17,9 +17,9 @@ namespace Wrench
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
 
-            //HarmonyPatcher.ApplyPatches(this,
-            //    //new CropHarvestPatcher()
-            //);
+            // HarmonyPatcher.ApplyPatches(this,
+            
+            // );
 
             this.Config = this.Helper.ReadConfig<ModConfig>();
 

@@ -1,40 +1,28 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Utilities;
+using StardewModdingAPI;
+using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AchtuurCore.Interfaces;
+using AchtuurCore.Integrations;
 
-namespace LGreenhouseBTQPlus
+namespace BetterRods
 {
-    public enum Flags
-    {
-        Rainbow,
-        Bi,
-        Trans,
-        Ace,
-        Lesbian,
-        Gay,
-        Nonbinary,
-        Pan,
-
-
-    };
     internal class ModConfig
     {
-
-        public Flags FlagEnabled;
-
+ 
         public ModConfig()
         {
-            FlagEnabled = Flags.Rainbow;
 
         }
 
         /// <summary>
         /// Constructs config menu for GenericConfigMenu mod
         /// </summary>
+        /// <param name="instance"></param>
         public void createMenu()
         {
             // get Generic Mod Config Menu's API (if it's installed)
@@ -52,21 +40,35 @@ namespace LGreenhouseBTQPlus
             /// General travel skill settings header
             configMenu.AddSectionTitle(
                 mod: ModEntry.Instance.ModManifest,
-                text: I18n.CfgSectionEnableflag,
+                text: I18n.CfgSection_General,
                 tooltip: null
             );
 
-            //configMenu.AddTextOption(
-            //    mod: ModEntry.Instance.ModManifest,
-            //    name: I18n.CfgExpgain_Name,
-            //    tooltip: I18n.CfgExpgain_Desc,
-            //    getValue: () => StepsPerExp.ToString(),
-            //    setValue: value => StepsPerExp = int.Parse(value),
-            //    allowedValues: new string[] { "5", "10", "25", "50", "100" },
-            //    formatAllowedValue: displayExpGainValues
-            // );
 
         }
 
+        private static string displayExpGainValues(string expgain_option)
+        {
+            switch (expgain_option)
+            {
+                case "0.25": return "0.25 (Every 4 tiles)";
+                case "0.50": return "0.50 (Every other tile)";
+                case "0.75": return "0.75 (2 Exp for 3 tiles)";
+                case "1": return "1 (Every tile)";
+                case "2": return "2 (Every tile gives two exp)";
+                case "5000": return "100 (debug option)";
+            }
+            return "Something went wrong... :(";
+        }
+
+        public static string displayAsPercentage(float value)
+        {
+            return Math.Round(100f * value, 2).ToString() + "%";
+        }
+
+        
+
     }
 }
+
+
