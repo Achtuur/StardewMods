@@ -1,8 +1,8 @@
 {
     "Name": "AchtuurCore",
     "Author": "Achtuur",
-    "Version": "1.0.4",
-    "Description": "Adds a new travel skill that makes all the moving you do more rewarding.",
+    "Version": "1.0.7",
+    "Description": "Core mod for most of my mods.",
     "UniqueID": "Achtuur.AchtuurCore",
     "EntryDll": "AchtuurCore.dll",
     "MinimumApiVersion": "3.0.0",

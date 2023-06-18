@@ -21,11 +21,11 @@ namespace AchtuurCore.Patches
             {
                 try
                 {
-                    patch.Patch(harmony, instance.Monitor);
+                    patch.Patch(harmony);
                 }
                 catch(Exception e)
                 {
-                    instance.Monitor.Log($"Applying patch {patch} failed:\n{e}", LogLevel.Error);
+                    Logger.ErrorLog(ModEntry.Instance.Monitor, $"Applying patch {patch} failed:\n{e}");
                 }
             }
         }

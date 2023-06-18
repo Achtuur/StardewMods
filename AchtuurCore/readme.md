@@ -9,6 +9,28 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+
+## 1.0.7
+* New/Changed
+  * Expand Logger 
+  * Change patcher to not take monitor as argument
+  * Add SliderRange
+
+* Fixes
+  * Fix error in watering event when not holding a tool
+
+
+## 1.0.6
+* New/Changed
+  * Add helper functions for transpiling
+	
+* Fixes
+  * Fixed WateringPatch erroring with flexible sprinklers mod.
+
+## 1.0.5
+* Fixes
+  * Fix EventPublisher null exception
+
 ## 1.0.4
 * Add gmcm api interface to this
 

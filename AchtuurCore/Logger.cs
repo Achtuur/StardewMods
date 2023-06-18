@@ -24,9 +24,12 @@ namespace AchtuurCore
 
         public static void TraceLog(IMonitor monitor, string error_msg)
         {
-            #if DEBUG
-                monitor.Log(error_msg, LogLevel.Trace);
-            #endif
+            monitor.Log(error_msg, LogLevel.Trace);
+        }
+
+        public static void ErrorLog(IMonitor monitor, string error_msg)
+        {
+            monitor.Log(error_msg, LogLevel.Error);
         }
 
         public static void DebugPrintDictionary<K, V>(IMonitor monitor, IDictionary<K, V> dict, string name=null)

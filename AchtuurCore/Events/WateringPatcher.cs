@@ -14,18 +14,18 @@ namespace AchtuurCore.Events
 {
     internal class WateringPatcher : GenericPatcher
     {
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
             // Prefix patch
             harmony.Patch(
-                original: this.getOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
-                prefix: this.getHarmonyMethod(nameof(this.prefix_performToolAction))
+                original: this.GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
+                prefix: this.GetHarmonyMethod(nameof(this.prefix_performToolAction))
             );
 
             // Postfix patch
             harmony.Patch(
-                original: this.getOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
-                postfix: this.getHarmonyMethod(nameof(this.postfix_performToolAction))
+                original: this.GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
+                postfix: this.GetHarmonyMethod(nameof(this.postfix_performToolAction))
             );
         }
         private static void prefix_performToolAction(Tool t, HoeDirt __instance, out WateringInfo __state)
@@ -35,13 +35,15 @@ namespace AchtuurCore.Events
             {
                 __state.soilStateBefore = __instance.state.Value;
                 __state.toolUsed = t;
+                __state.toolHeld = Game1.player.CurrentTool;
+                __state.location = __instance.currentLocation;
             }
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Something went wrong when prefix patching performToolAction (WateringPatcher):\n{e}", LogLevel.Error);
             }
         }
-
+        
         private static void postfix_performToolAction(ref HoeDirt __instance, WateringInfo __state)
         {
             try
@@ -50,9 +52,15 @@ namespace AchtuurCore.Events
                 if (__state.toolUsed is null || !__state.toolUsed.Name.ToLower().Contains("watering can"))
                     return;
 
+                // If some other mod tries to fake watering by acting as if a watering can was used, return
+                if ((__state.toolHeld is not null && __state.toolHeld.Name != __state.toolUsed.Name) ||
+                    __state.location != Game1.player.currentLocation)
+                    return;
+
+
                 // Tile has been watered -> call watering soil event
                 if (__state.soilStateBefore != 1 && __instance.state.Value == 1)
-                {
+                {   
                     Farmer lastUser = __state.toolUsed.getLastFarmerToUse();
                     WateringFinishedArgs args = new WateringFinishedArgs(lastUser, __instance);
                     EventPublisher.InvokeFinishedWateringSoil(null, args);
@@ -60,7 +68,7 @@ namespace AchtuurCore.Events
             }
             catch(Exception e)
             {
-                ModEntry.Instance.Monitor.Log($"Something went wrong when postfix patching performToolAction (WateringPatcher):\n{e}", LogLevel.Error);
+                AchtuurCore.Logger.ErrorLog(ModEntry.Instance.Monitor, $"Something went wrong when postfix patching performToolAction (WateringPatcher):\n{e}");
             }
         }
     }
@@ -72,7 +80,16 @@ namespace AchtuurCore.Events
         /// </summary>
         internal int soilStateBefore;
 
+        internal GameLocation location;
+
+        /// <summary>
+        /// Tool used according to the performToolAction method
+        /// </summary>
         internal Tool toolUsed;
-        //internal Farmer toolUser;
+
+        /// <summary>
+        /// Tool currently held by the player
+        /// </summary>
+        internal Tool toolHeld;
     }
 }

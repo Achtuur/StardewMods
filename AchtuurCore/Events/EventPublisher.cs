@@ -11,10 +11,13 @@ namespace AchtuurCore.Events
         /// <summary>
         /// This event fires when a player waters an unwatered hoe'd tile.
         /// </summary>
-        public static event EventHandler<WateringFinishedArgs> onFinishedWateringSoil;
+        public static event EventHandler<WateringFinishedArgs> FinishedWateringSoil;
 
         private static void InvokeEvent(EventHandler handler, object sender)
         {
+            if (handler is null)
+                return;
+
             foreach(var handle in handler.GetInvocationList().Cast<EventHandler>())
             {
                 try
@@ -30,6 +33,9 @@ namespace AchtuurCore.Events
 
         private static void InvokeEvent<T>(EventHandler<T> handler, object sender, T eventArg) 
         {
+            if (handler is null)
+                return;
+
             foreach(var handle in handler.GetInvocationList().Cast<EventHandler<T>>())
             {
                 try
@@ -46,7 +52,7 @@ namespace AchtuurCore.Events
 
         internal static void InvokeFinishedWateringSoil(object sender, WateringFinishedArgs e)
         {
-            EventPublisher.InvokeEvent<WateringFinishedArgs>(onFinishedWateringSoil, sender, e);
+            EventPublisher.InvokeEvent<WateringFinishedArgs>(FinishedWateringSoil, sender, e);
         }
     }
 }

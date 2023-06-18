@@ -20,6 +20,11 @@ namespace AchtuurCore
             HarmonyPatcher.ApplyPatches(this,
                 new WateringPatcher()
             );
-        }        
+            Events.EventPublisher.FinishedWateringSoil += this.OnWateredSoil;
+        }
+
+        private void OnWateredSoil(object sender, WateringFinishedArgs e)
+        {
+        }
     }
 }
