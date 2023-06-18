@@ -18,14 +18,13 @@ namespace MultiplayerExpShare.Patches
         /// </summary>
         protected static bool isProcessingSharedExp;
 
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
-            Monitor = monitor;
             isProcessingSharedExp = false;
 
             harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
-                postfix: this.getHarmonyMethod(nameof(Postfix_GainExperience))
+                original: this.GetOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
+                postfix: this.GetHarmonyMethod(nameof(Postfix_GainExperience))
             );
         }
 

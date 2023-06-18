@@ -107,9 +107,10 @@ namespace MultiplayerExpShare
             this.Config = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunch;
+            helper.Events.GameLoop.SaveLoaded += onSaveLoad;
+            helper.Events.GameLoop.SaveCreated += OnSaveCreate;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
         }
-
         private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SharedExpGained")
@@ -138,6 +139,17 @@ namespace MultiplayerExpShare
 
         private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
         {
+            this.Config.createMenu();
+        }
+        private void onSaveLoad(object sender, SaveLoadedEventArgs e)
+        { 
+            // Create config menu again, in case some Spacecore based mods are loaded after this mod
+            this.Config.createMenu();
+        }
+
+        private void OnSaveCreate(object sender, SaveCreatedEventArgs e)
+        {
+            // Create config menu again, in case some Spacecore based mods are loaded after this mod
             this.Config.createMenu();
         }
     }

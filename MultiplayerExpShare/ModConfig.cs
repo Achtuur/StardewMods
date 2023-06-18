@@ -27,7 +27,7 @@ namespace MultiplayerExpShare
     }
     internal class ModConfig
     {
-
+        private static bool isRegistered = false;
         /// <summary>
         /// If this is true, then two players on the same map will always count as being nearby
         /// </summary>
@@ -68,11 +68,11 @@ namespace MultiplayerExpShare
                 true,  // Combat
             };
 
-            ResetSpaceCoreDict();
+            InitSpacecoreDict();
 
         }
 
-        private void ResetSpaceCoreDict()
+        private void InitSpacecoreDict()
         {
             if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
                 return;
@@ -81,7 +81,7 @@ namespace MultiplayerExpShare
 
             foreach (string s in SpaceCore.Skills.GetSkillList())
             {
-                SpaceCoreSkillEnabled.Add(s, false);
+                SpaceCoreSkillEnabled.Add(s, true);
             }
         }
 
@@ -96,15 +96,21 @@ namespace MultiplayerExpShare
             if (configMenu is null)
                 return;
 
-            
+            // Unregister in case mod is already registered
+            if (ModConfig.isRegistered)
+                configMenu.Unregister(ModEntry.Instance.ModManifest);
+
+
             // register mod
             configMenu.Register(
                 mod: ModEntry.Instance.ModManifest,
                 reset: () => ModEntry.Instance.Config = new ModConfig(),
                 save: () => {
                     ModEntry.Instance.Helper.WriteConfig<ModConfig>(ModEntry.Instance.Config);
-                    }
+                }
             );
+
+            isRegistered = true;
 
             /// General travel skill settings header
             configMenu.AddSectionTitle(
@@ -210,6 +216,9 @@ namespace MultiplayerExpShare
             );
 
             // SPACECORE SKILLS
+
+            // Initialise spacecore skills dictionary
+            InitSpacecoreDict();
 
             if (ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
             {

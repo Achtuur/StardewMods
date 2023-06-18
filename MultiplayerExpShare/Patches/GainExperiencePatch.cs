@@ -26,14 +26,14 @@ namespace MultiplayerExpShare.Patches
     }
     public class GainExperiencePatch : BaseExpPatcher
     {        
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
             
-            base.Patch(harmony, monitor);
+            base.Patch(harmony);
 
             harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
-                prefix: this.getHarmonyMethod(nameof(Prefix_GainExperience))
+                original: this.GetOriginalMethod<Farmer>(nameof(Farmer.gainExperience)),
+                prefix: this.GetHarmonyMethod(nameof(Prefix_GainExperience))
             );
 
         }
@@ -83,7 +83,7 @@ namespace MultiplayerExpShare.Patches
             }
 
 
-            AchtuurCore.Logger.DebugLog(Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s): {howMuch} -> {actor_exp} / {shared_exp}");
+            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s): {howMuch} -> {actor_exp} / {shared_exp}");
 
             howMuch = actor_exp;
         }

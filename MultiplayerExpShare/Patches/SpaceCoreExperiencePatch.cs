@@ -34,16 +34,16 @@ namespace MultiplayerExpShare.Patches
     public class SpaceCoreExperiencePatch : BaseExpPatcher
     {
         
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
             if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
                 return;
 
-            base.Patch(harmony, monitor);
+            base.Patch(harmony);
 
             harmony.Patch(
-                original: this.getOriginalMethod<SpaceCore.Skills>(nameof(SpaceCore.Skills.AddExperience)),
-                prefix: this.getHarmonyMethod(nameof(Prefix_AddExperienceSpaceCore))
+                original: this.GetOriginalMethod<SpaceCore.Skills>(nameof(SpaceCore.Skills.AddExperience)),
+                prefix: this.GetHarmonyMethod(nameof(Prefix_AddExperienceSpaceCore))
             );
 
         }
@@ -103,16 +103,21 @@ namespace MultiplayerExpShare.Patches
             }
 
 
-            AchtuurCore.Logger.DebugLog(Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s) in {skillName}: {amt} -> {actor_exp} / {shared_exp}");
+            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s) in {skillName}: {amt} -> {actor_exp} / {shared_exp}");
 
             // Set actor exp to howMuch, so rest of method functions as if it had gotten only actor_exp
             amt = actor_exp;
         }
 
-
+        /// <summary>
+        /// Returns true if sharing is enabled for this skill. Returns false if skill is not found
+        /// </summary>
+        /// <param name="skillName"></param>
+        /// <returns></returns>
         private static bool ExpShareEnabledForSkill(string skillName)
         {
-            return ModEntry.Instance.Config.SpaceCoreSkillEnabled[skillName];
+            var config = ModEntry.Instance.Config;
+            return config.SpaceCoreSkillEnabled.ContainsKey(skillName) && config.SpaceCoreSkillEnabled[skillName];
         }
     }
 }

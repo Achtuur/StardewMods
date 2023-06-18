@@ -20,6 +20,14 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 * Change config to use the host's options
 * Add support for MARGO
 
+## 1.0.5
+* New/Changed
+  * Updated compatibility with AchtuurCore 1.0.7
+
+## 1.0.4
+* Fixes
+  * Fixed bug where Spacecore based skill mods loaded after MultiplayerExpShare were not recognised
+
 ## 1.0.3
 * New/Changed content
   * Updated compatiblity with AchtuurCore 1.0.4
