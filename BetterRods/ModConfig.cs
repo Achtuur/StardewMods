@@ -15,10 +15,10 @@ namespace BetterRods
     internal class ModConfig
     {
 
-        private readonly SliderRange nibbleTimeMultiplierSlider = new SliderRange(min: 0.9f, max: 1.1f, interval: 0.05f);
-        private readonly SliderRange speedMultiplierSlider = new SliderRange(min: 0.9f, max: 1.1f, interval: 0.05f);
+        private readonly SliderRange nibbleTimeMultiplierSlider = new SliderRange(min: 0.75f, max: 1.25f, interval: 0.05f);
+        private readonly SliderRange speedMultiplierSlider = new SliderRange(min: 0.85f, max: 1.15f, interval: 0.05f);
         private readonly SliderRange distanceGainMultiplierSlider = new SliderRange(min: 0.75f, max: 1.25f, interval: 0.05f);
-        private readonly SliderRange distanceLossMultiplierSlider = new SliderRange(min: 0.9f, max: 1.1f, interval: 0.05f);
+        private readonly SliderRange distanceLossMultiplierSlider = new SliderRange(min: 0.75f, max: 1.25f, interval: 0.05f);
 
         public bool enableNibbleTimeMultiplier;
         public bool enableSpeedMultiplier;
@@ -87,6 +87,14 @@ namespace BetterRods
                 mod: ModEntry.Instance.ModManifest,
                 text: I18n.CfgSection_General,
                 tooltip: null
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgEnableNibbleTimeMultiplier_Name,
+                tooltip: I18n.CfgEnableNibbleTimeMultiplier_Desc,
+                getValue: () => this.enableNibbleTimeMultiplier,
+                setValue: (val) => this.enableNibbleTimeMultiplier = val
             );
 
             configMenu.AddBoolOption(

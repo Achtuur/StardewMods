@@ -28,6 +28,10 @@ Were you under the impression that buying a fishing rod makes fishing easier? We
 * Perfect catch streaks -> higher quality fish
 
 
+## 1.0.1 (unreleased)
+* Fixes
+  * Fix inconsistent capitalisation in config menu
+
 ## 1.0.0
 
 * Initial release

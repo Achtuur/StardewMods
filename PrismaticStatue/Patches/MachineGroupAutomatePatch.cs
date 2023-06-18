@@ -39,18 +39,16 @@ namespace PrismaticStatue.Patches
                     // In junimo group, multiple machine groups are available.
                     // Every group will be processed separately, so statues are not shared globally
                     IEnumerable<object> machineGroups = GetJunimoGroupMachineGroups(__instance);
-                    foreach( object machineGroup in machineGroups )
+                    foreach (object machineGroup in machineGroups)
                     {
                         ProcessMachineGroup(machineGroup);
                     }
-                } 
+                }
                 else
                 {
                     // If not junimoGroup, then __instance is the MachineGroup
                     ProcessMachineGroup(__instance);
                 }
-
-                
             }
             catch (Exception e)
             {
