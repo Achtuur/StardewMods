@@ -78,16 +78,6 @@ namespace PrismaticStatue
         /// <returns>Returns whether the machine started processing an item.</returns>
         public bool SetInput(IStorage input)
         {
-            //if (input.TryGetIngredient(SObject.ironBar, 1, out IConsumable ingredient))
-            //{
-            //    ingredient.Take();
-            //    this.Entity.heldObject.Value = new SObject(SObject.goldBar, 1);
-            //    this.Entity.MinutesUntilReady = 120;
-            //    return true;
-            //}
-
-            //this.Entity.MinutesUntilReady = 10;
-
             // Does not need input ingredients
             return true;
         }

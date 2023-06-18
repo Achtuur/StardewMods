@@ -31,14 +31,14 @@ namespace PrismaticStatue
 
         internal int n_statues;
 
-        internal SpedUpMachineGroup(IMachine[] MachinesToSpeedup, IReadOnlySet<Vector2> tiles, int n_statues)
+        internal SpedUpMachineGroup(IMachine[] MachinesToSpeedup, IReadOnlySet<Vector2> tiles, int n_statues, GameLocation location)
         {
             this.n_statues = n_statues;
             this.Tiles = tiles;
 
             // Get machine list of this machine 
             this.Machines = GetMachineList(MachinesToSpeedup);
-            this.Location = MachinesToSpeedup[0].Location;
+            this.Location = location;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace PrismaticStatue
         /// <returns></returns>
         internal bool TilesMatchNStatues()
         {
-            return this.Tiles.Count(tile => tile.ContainsObject(ModEntry.Instance.SpeedupStatueID, Location)) == n_statues;
+            return this.Tiles is not null && this.Tiles.Count(tile => tile.ContainsObject(ModEntry.Instance.SpeedupStatueID, Location)) == n_statues;
         }
 
         internal bool IsMachineGroup(IReadOnlySet<Vector2> GroupTiles, GameLocation GroupLocation)
@@ -83,7 +83,7 @@ namespace PrismaticStatue
 
         internal bool ContainsTile(Vector2 tile)
         {
-            return this.Tiles.Contains(tile);
+            return this.Tiles is not null && this.Tiles.Contains(tile);
         }
 
 
@@ -133,7 +133,7 @@ namespace PrismaticStatue
             {
                 List<GenericSpedUpMachineWrapper> machines_wrapped = machines
                     .Select(m => GetWrapper(m))
-                    .Where<GenericSpedUpMachineWrapper>(wrap => !wrap.isNull())
+                    .Where(wrap => !wrap.isNull())
                     .ToList();
 
                 //if this.Machines does not contain machine && machine contains machine -> add machine
@@ -154,7 +154,7 @@ namespace PrismaticStatue
             }
 
             // Update tiles
-            if (tiles.Count != this.Tiles.Count)
+            if (tiles != null && tiles.Count != this.Tiles.Count)
             {
                 this.Tiles = tiles;
             }

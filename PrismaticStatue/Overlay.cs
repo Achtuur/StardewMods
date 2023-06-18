@@ -121,6 +121,9 @@ namespace PrismaticStatue
 
             IReadOnlySet<Vector2> tiles = group.Tiles;
 
+            if (tiles is null)
+                return;
+
             // top
             if (!tiles.Contains(new Vector2(tile.X, tile.Y - 1)))
                 spriteBatch.DrawLine(screenX, screenY, new Vector2(tileSize, borderSize), color); // top

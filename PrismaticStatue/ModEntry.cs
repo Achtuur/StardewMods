@@ -37,6 +37,7 @@ namespace PrismaticStatue
         internal int SpeedupStatueID;
 
         internal List<SpedUpMachineGroup> SpedupMachineGroups;
+        internal int secondUpdateCounter;
 
         internal Overlay UIOverlay;
         
@@ -81,8 +82,9 @@ namespace PrismaticStatue
 
             SpedupMachineGroups = new List<SpedUpMachineGroup>();
             this.UIOverlay = new PrismaticStatue.Overlay();
-
             this.Config = this.Helper.ReadConfig<ModConfig>();
+
+            this.secondUpdateCounter = 0;
 
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
@@ -94,10 +96,14 @@ namespace PrismaticStatue
 
         private void OnOneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
         {
+            // Only check once every 2 seconds for slightly better performance
+            if (this.secondUpdateCounter++ < 2)
+                return;
+
             // Remove machines groups that are empty or have a mismatch
             // This is for when the statue is used to connect two groups of machines. 
             // example: [m][s][c] (m = machine, s = statue, c = chest)
-            // The machine in the example would not be restored if the statue breaks, since Automate() is not called on the group.
+            // The machine in the example would not be restored if the statue breaks, since that will break the IMachineGroup, leaving this mod's groups unupdated as well
             for (int i = this.SpedupMachineGroups.Count - 1; i >= 0; i--)
             {
                 if (this.SpedupMachineGroups[i].n_statues < 1 || !this.SpedupMachineGroups[i].TilesMatchNStatues())

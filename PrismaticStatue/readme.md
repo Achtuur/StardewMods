@@ -29,6 +29,16 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 * Nothing for now
 
+### 1.2.2
+* New/Changed
+  * Add support for Jumino chests
+  * Overlay now appears when statue is connected to chest, without needing at least one machine
+  * Updated to support AchtuurCore 1.0.7
+
+* Fixes
+    * Added error handling for patch
+    * Added null check for machine group tiles
+
 ### 1.2.1
 * Fixes
   * Fixed error when casting to `HashSet<T>`
