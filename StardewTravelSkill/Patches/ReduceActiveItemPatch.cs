@@ -13,12 +13,11 @@ namespace StardewTravelSkill.Patches
 {
     internal class ReduceActiveItemPatch : GenericPatcher
     {
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
-            Monitor = monitor;
             harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.reduceActiveItemByOne)),
-                prefix: this.getHarmonyMethod(nameof(this.Prefix_ReduceActiveItemByOne))
+                original: this.GetOriginalMethod<Farmer>(nameof(Farmer.reduceActiveItemByOne)),
+                prefix: this.GetHarmonyMethod(nameof(this.Prefix_ReduceActiveItemByOne))
             );
         }
 
@@ -47,14 +46,16 @@ namespace StardewTravelSkill.Patches
                 // GetWarpTotemConsumeChance() returns 1 if the profession is unlocked, meaning the totem is always consumed
                 if (rnd.NextDouble() > ModEntry.GetWarpTotemConsumeChance())
                 {
-                    Monitor.Log("Warp totem not consumed!", LogLevel.Debug);
+
+                    AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, "Warp totem not consumed!");
                     return false;
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Failed in {nameof(Prefix_ReduceActiveItemByOne)}:\n{ex}", LogLevel.Error);
+
+                AchtuurCore.Logger.ErrorLog(ModEntry.Instance.Monitor, $"Failed in {nameof(Prefix_ReduceActiveItemByOne)}:\n{ex}");
                 return true;
             }
         }

@@ -38,6 +38,10 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
+## 1.1.5
+* New/Changed content
+  * Updated compatibility with AchtuurCore 1.0.7 
+
 ## 1.1.4
 * New/Changed content
   * Updated compatiblity with AchtuurCore 1.0.4

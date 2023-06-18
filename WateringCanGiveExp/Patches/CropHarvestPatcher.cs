@@ -13,17 +13,16 @@ namespace WateringCanGiveExp.Patches
 {
     internal class CropHarvestPatcher : GenericPatcher
     {
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
-            Monitor = monitor;
             harmony.Patch(
-                original: this.getOriginalMethod<Crop>(nameof(Crop.harvest)),
-                prefix: this.getHarmonyMethod(nameof(Prefix_Harvest))
+                original: this.GetOriginalMethod<Crop>(nameof(Crop.harvest)),
+                prefix: this.GetHarmonyMethod(nameof(Prefix_Harvest))
             );
 
             harmony.Patch(
-                original: this.getOriginalMethod<Crop>(nameof(Crop.harvest)),
-                postfix: this.getHarmonyMethod(nameof(Postfix_Harvest))
+                original: this.GetOriginalMethod<Crop>(nameof(Crop.harvest)),
+                postfix: this.GetHarmonyMethod(nameof(Postfix_Harvest))
             );
         }
 
@@ -41,7 +40,7 @@ namespace WateringCanGiveExp.Patches
             try
             {
                 int exp_diff = Game1.player.experiencePoints[0] - __state;
-                AchtuurCore.Logger.DebugLog(Monitor, $"Exp gained from harvesting: {exp_diff} (old={__state})");
+                AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"Exp gained from harvesting: {exp_diff} (old={__state})");
                 if (exp_diff > 0)
                 {
                     subtractFarmingExp(Game1.player, (int) (exp_diff * (1 - ModEntry.Instance.Config.HarvestingExpMultiplier)));
@@ -49,7 +48,8 @@ namespace WateringCanGiveExp.Patches
             }
             catch (Exception e)
             {
-                Monitor.Log($"Something went wrong when applying patch FarmingExpRebalance.Patches.Prefix_Harvest:\n{e}", LogLevel.Error);
+
+                AchtuurCore.Logger.ErrorLog(ModEntry.Instance.Monitor, $"Something went wrong when applying patch FarmingExpRebalance.Patches.Prefix_Harvest:\n{e}");
             }
         }
 
@@ -62,13 +62,13 @@ namespace WateringCanGiveExp.Patches
 
             int level_after_sub = Farmer.checkForLevelGain(old_exp, new_exp);
 
-            AchtuurCore.Logger.DebugLog(Monitor, $"{new_exp} -> {old_exp} ({level_after_sub})");
+            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{new_exp} -> {old_exp} ({level_after_sub})");
 
             // If level is different, dont subtract as that could maybe break levelling
             if (level_after_sub == -1)
             {
                 farmer.experiencePoints[0] -= amount;
-                AchtuurCore.Logger.DebugLog(Monitor, $"Subtracted {amount} exp");
+                AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"Subtracted {amount} exp");
             }
 
         }

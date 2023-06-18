@@ -13,12 +13,11 @@ namespace StardewTravelSkill.Patches
 {
     internal class MoveSpeedPatch : GenericPatcher
     {
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
-            Monitor = monitor;
             harmony.Patch(
-                original: this.getOriginalMethod<Farmer>(nameof(Farmer.getMovementSpeed)),
-                postfix: this.getHarmonyMethod(nameof(Postfix_GetMoveSpeed))
+                original: this.GetOriginalMethod<Farmer>(nameof(Farmer.getMovementSpeed)),
+                postfix: this.GetHarmonyMethod(nameof(Postfix_GetMoveSpeed))
             );
         }
         /// <summary>
@@ -33,7 +32,7 @@ namespace StardewTravelSkill.Patches
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Failed in {nameof(Postfix_GetMoveSpeed)}:\n{ex}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Postfix_GetMoveSpeed)}:\n{ex}", LogLevel.Error);
             }
         }
 

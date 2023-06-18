@@ -5,11 +5,12 @@ This repository contains all mods I have made for Stardew Valley. For mod specif
 
 ## Released Mods
 
-* [AchtuurCore 1.0.3](./AchtuurCore)
-* [MultiplayerExpShare 1.0.2](./MultiplayerExpShare/)
-* [PrismaticStatue 1.1.0](./PrismaticStatue/)
-* [StardewTravelSkill 1.1.3](./StardewTravelSkill)
-* [WateringCanGiveExp 1.0.1](./WateringCanGiveExp)
+* [AchtuurCore](./AchtuurCore)
+* [BetterRods](./BetterRods/)
+* [MultiplayerExpShare](./MultiplayerExpShare/)
+* [PrismaticStatue](./PrismaticStatue/)
+* [StardewTravelSkill](./StardewTravelSkill)
+* [WateringCanGiveExp](./WateringCanGiveExp)
 
 
 ## WIP / Idea Mods

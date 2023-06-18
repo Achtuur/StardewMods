@@ -14,7 +14,7 @@ namespace WateringCanGiveExp
 
         internal static ModEntry Instance;
         internal ModConfig Config;
-        private PerScreen<float> wateringExpTotal;
+        private PerScreen<float> wateringExpTotal = new PerScreen<float>();
 
         public override void Entry(IModHelper helper)
         {
@@ -26,10 +26,9 @@ namespace WateringCanGiveExp
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
             this.Config = this.Helper.ReadConfig<ModConfig>();
-            this.wateringExpTotal = new PerScreen<float>();
             this.wateringExpTotal.Value = 0f;
 
-            AchtuurCore.Events.EventPublisher.onFinishedWateringSoil += OnFinishedWateringSoil;
+            AchtuurCore.Events.EventPublisher.FinishedWateringSoil += OnFinishedWateringSoil;
 
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
         }
