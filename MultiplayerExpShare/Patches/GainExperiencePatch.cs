@@ -9,21 +9,7 @@ using System.Linq;
 
 namespace MultiplayerExpShare.Patches
 {
-    public struct ExpGainData
-    {
-        public long actor_multiplayerid;
-        public long[] nearby_farmer_ids;
-        public int amount;
-        public int skill_id;
-
-        public ExpGainData(long actor_multiplayerid, long[] nearby_farmer_ids, int skill_id, int amount)
-        {
-            this.actor_multiplayerid = actor_multiplayerid;
-            this.nearby_farmer_ids = nearby_farmer_ids;
-            this.skill_id = skill_id;
-            this.amount = amount;
-        }
-    }
+    
     public class GainExperiencePatch : BaseExpPatcher
     {        
         public override void Patch(Harmony harmony)
@@ -48,7 +34,10 @@ namespace MultiplayerExpShare.Patches
         public static void InvokeGainExperience(Farmer farmer, ExpGainData exp_data)
         {
             isProcessingSharedExp = true;
-            farmer.gainExperience(exp_data.skill_id, exp_data.amount);
+
+            int skill = AchtuurCore.Utility.Skills.GetSkillIdFromName(exp_data.skill_id);
+            
+            farmer.gainExperience(skill, exp_data.amount);
         }
        
         private static void Prefix_GainExperience(int which, ref int howMuch, Farmer __instance)
@@ -56,34 +45,34 @@ namespace MultiplayerExpShare.Patches
             if (!CanExpBeShared())
                 return;
 
+            string skillName = AchtuurCore.Utility.Skills.GetSkillNameFromId(which);
+
             // Skip sharing if its disabled for that skill
             if (!ExpShareEnabledForSkill(which))
                 return;
 
             // Get nearby farmer id's
-            long[] nearbyFarmerIds = ModEntry.GetNearbyPlayers()
-                .Where(f => ModEntry.GetActorExpPercentage(f.GetSkillLevel(which)) != 0f) // get all players that would actually receive exp
-                .Select(f => f.UniqueMultiplayerID).ToArray();
+            Farmer[] nearbyFarmers = ModEntry.GetNearbyPlayers()
+                .Where(f => ModEntry.GetActorExpPercentage(f.GetSkillLevel(which), skillName) != 0f) // get all players that would actually receive exp
+                .ToArray();
 
             // If no farmers nearby to share exp with, actor gets all
-            if (nearbyFarmerIds.Length == 0)
+            if (nearbyFarmers.Length == 0)
                 return;
 
             int level = __instance.GetSkillLevel(which);
-            int actor_exp = GetActorExp(howMuch, level);
+            int actor_exp = GetActorExp(howMuch, level, skillName);
 
             // Calculate shared exp, with rounding
-            int shared_exp = (int)Math.Round(howMuch * ModEntry.GetSharedExpPercentage(level) / nearbyFarmerIds.Length);
+            int shared_exp = (int)Math.Round(howMuch * ModEntry.GetSharedExpPercentage(level, skillName) / nearbyFarmers.Length);
 
             // Send message of this instance of shared exp
             if (shared_exp > 0)
             {
-                ExpGainData expdata = new ExpGainData(__instance.UniqueMultiplayerID, nearbyFarmerIds, which, shared_exp);
-                ModEntry.Instance.Helper.Multiplayer.SendMessage<ExpGainData>(expdata, "SharedExpGained", modIDs: new[] { ModEntry.Instance.ModManifest.UniqueID });
+                ModEntry.ShareExpWithFarmers(nearbyFarmers, skillName, shared_exp, "SharedExpGained");
             }
 
-
-            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmerIds.Length} farmer(s): {howMuch} -> {actor_exp} / {shared_exp}");
+            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmers.Length} farmer(s): {howMuch} -> {actor_exp} / {shared_exp}");
 
             howMuch = actor_exp;
         }

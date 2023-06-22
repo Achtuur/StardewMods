@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewTravelSkill;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
-﻿using ContentPatcher;
-using SpaceCore;
+﻿using SpaceCore;
 using SpaceShared.APIs;
 using StardewModdingAPI;
+using StardewTravelSkill.Integrations;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace StardewTravelSkill
         public ContentPackHelper(ModEntry instance)
         {
             this.Instance = instance;
-            ContentPackHelper.ContentPatcherAPI = this.Instance.Helper.ModRegistry.GetApi<ContentPatcher.IContentPatcherAPI>("Pathoschild.ContentPatcher");
+            ContentPackHelper.ContentPatcherAPI = this.Instance.Helper.ModRegistry.GetApi<IContentPatcherAPI>("Pathoschild.ContentPatcher");
         }
 
         public void CreateTokens()

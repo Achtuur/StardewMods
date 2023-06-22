@@ -18,7 +18,19 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 
 ## Planned
 * Change config to use the host's options
-* Add support for MARGO
+
+
+## 1.1.0
+* New/Changed
+	* Added support for [MARGO](https://www.nexusmods.com/stardewvalley/mods/14470).
+		* Note that there is some EXP waste in a specific situation. If you can level beyond 10, but your friends cannot and are currently level 10, then the shared exp is wasted. Make sure to prestige as soon as possible!
+	* Now shows particle when you share exp!
+		* C# devs can use interface to add colors for their own custom skill's trails
+  * Added overlay (toggle with 'K') that shows exp sharing range!
+	
+* Fixes
+	* Fix mod not loading without SpaceCore
+	* Internal optimisations
 
 ## 1.0.5
 * New/Changed

@@ -28,7 +28,10 @@ namespace StardewTravelSkill.Patches
         {
             try
             {
-                __result *= ModEntry.GetMovespeedMultiplier();
+                if (ModEntry.MovementButtonHeld() && Game1.player.canMove)
+                {
+                    __result *= ModEntry.GetMovespeedMultiplier();
+                }
             }
             catch (Exception ex)
             {

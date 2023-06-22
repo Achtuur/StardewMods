@@ -11,6 +11,21 @@ using System.Threading.Tasks;
 
 namespace MultiplayerExpShare.Patches
 {
+    public struct ExpGainData
+    {
+        public long actor_multiplayerid;
+        public long[] nearby_farmer_ids;
+        public int amount;
+        public string skill_id;
+
+        public ExpGainData(long actor_multiplayerid, long[] nearby_farmer_ids, string skill_id, int amount)
+        {
+            this.actor_multiplayerid = actor_multiplayerid;
+            this.nearby_farmer_ids = nearby_farmer_ids;
+            this.skill_id = skill_id;
+            this.amount = amount;
+        }
+    }
     public abstract class BaseExpPatcher : GenericPatcher
     {
         /// <summary>
@@ -60,11 +75,11 @@ namespace MultiplayerExpShare.Patches
         /// <param name="totalExp"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        protected static int GetActorExp(int totalExp, int level)
+        protected static int GetActorExp(int totalExp, int level, string skill_id)
         {
             // calculate actor exp gain, with rounding
-            int actor_exp = (int)Math.Round(totalExp * ModEntry.GetActorExpPercentage(level));
-            int total_shared_exp = (int)Math.Round(totalExp * ModEntry.GetSharedExpPercentage(level));
+            int actor_exp = (int)Math.Round(totalExp * ModEntry.GetActorExpPercentage(level, skill_id));
+            int total_shared_exp = (int)Math.Round(totalExp * ModEntry.GetSharedExpPercentage(level, skill_id));
             int rounding_loss = totalExp - (actor_exp + total_shared_exp);
             return actor_exp + rounding_loss;
         }

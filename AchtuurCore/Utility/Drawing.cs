@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,34 @@ namespace AchtuurCore.Utility
         public static void DrawLine(this SpriteBatch batch, float x, float y, in Vector2 size, in Color? color = null)
         {
             batch.Draw(Drawing.Pixel, new Rectangle((int)x, (int)y, (int)size.X, (int)size.Y), color ?? Color.White);
+        }
+        public static void DrawLine(this SpriteBatch batch, Vector2 pos, in Vector2 size, in Color? color = null)
+        {
+            batch.Draw(Drawing.Pixel, new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y), color ?? Color.White);
+        }
+
+        public static void DrawBorder(this SpriteBatch batch, Vector2 pos, in Vector2 size, in Color? color=null, int bordersize=2)
+        {
+            // Top
+            batch.DrawLine(pos.X - bordersize, pos.Y - bordersize, new Vector2(size.X + bordersize, bordersize), color);
+
+            // Bottom
+            batch.DrawLine(pos.X - bordersize, pos.Y + size.Y - bordersize, new Vector2(size.X + bordersize, bordersize), color);
+
+            // Left
+            batch.DrawLine(pos.X - bordersize, pos.Y - bordersize, new Vector2(bordersize, size.Y + bordersize), color);
+
+            // Right
+            batch.DrawLine(pos.X + size.X, pos.Y - bordersize, new Vector2(bordersize, size.Y + bordersize), color);
+        }
+
+        public static Vector2 GetPositionScreenCoords(Vector2 position)
+        {
+            return new Vector2
+            (
+                position.X - Game1.viewport.X,
+                position.Y - Game1.viewport.Y
+            );
         }
     }
 }

@@ -46,7 +46,6 @@ namespace StardewTravelSkill
         };
 
         internal static ModEntry Instance;
-        public static ContentPatcher.IContentPatcherAPI ContentAPI;
         public static TravelSkill TravelSkill;
 
         public ContentPackHelper contentPackHelper;
@@ -114,6 +113,14 @@ namespace StardewTravelSkill
             return Game1.player.HasCustomProfession(TravelSkill.ProfessionRestoreStamina)
                 ? Instance.Config.RestoreStaminaPercentage
                 : 0.0;
+        }
+
+        /// <summary>
+        /// Returns true if a button corresponding to movement is held
+        /// </summary>
+        public static bool MovementButtonHeld()
+        {
+            return AllMovementButtons.Any(movement_button => ButtonHeld(movement_button));
         }
 
         /// <summary>
@@ -344,20 +351,12 @@ namespace StardewTravelSkill
         }
 
         /// <summary>
-        /// Returns true if a button corresponding to movement is held
-        /// </summary>
-        private bool MovementButtonHeld()
-        {
-            return AllMovementButtons.Any(movement_button => ButtonHeld(movement_button));
-        }
-
-        /// <summary>
         /// Checks whether <paramref name="button"/> is held this tick
         /// </summary>
         /// <param name="button">Button to check</param> 
-        private bool ButtonHeld(SButton button)
+        private static bool ButtonHeld(SButton button)
         {
-            SButtonState state = this.Helper.Input.GetState(button);
+            SButtonState state = Instance.Helper.Input.GetState(button);
             return state == SButtonState.Held || state == SButtonState.Pressed;
         }
 
@@ -367,7 +366,7 @@ namespace StardewTravelSkill
         /// </summary>
         private void CheckSprintActive()
         {
-            if (!this.MovementButtonHeld())
+            if (!MovementButtonHeld())
             {
                 // "Reset" counter by setting it to current step count
                 this.m_consecutiveSteps.Value = Game1.player.stats.stepsTaken;
@@ -379,7 +378,7 @@ namespace StardewTravelSkill
             
             if (step_diff > Instance.Config.SprintSteps && !ModEntry.SprintActive)
             {
-                this.Monitor.Log("Now sprinting", LogLevel.Debug);
+                AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, "Now sprinting");
                 ModEntry.SprintActive = true;
             }
         }

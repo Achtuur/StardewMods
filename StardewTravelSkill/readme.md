@@ -38,6 +38,15 @@ This mod features some custom tokens for content pack creators that can tell you
 
 # Changelog
 
+## 1.1.7
+* New/Changed
+  * Added Simplified Chinese translation, thanks to Andrewxu 
+
+## 1.1.6
+* Fixes
+ * Movespeed buff now only applied when manually moving, should no longer break cutscenes
+ * Fix content patcher dependency requirement
+
 ## 1.1.5
 * New/Changed content
   * Updated compatibility with AchtuurCore 1.0.7 

@@ -11,9 +11,8 @@ namespace Wrench.Patches
 {
     internal class DrawInMenuPatch : GenericPatcher
     {
-        public override void Patch(Harmony harmony, IMonitor monitor)
+        public override void Patch(Harmony harmony)
         {
-            Monitor = monitor;
             
         }
 

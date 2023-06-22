@@ -143,7 +143,8 @@ namespace PrismaticStatue
             for (int i = 0; i <= this.MaxStatues; i++)
             {
                 int minutes_left = SpedUpMachineWrapper.SpeedUpFunction(this.TableTime, i);
-                statue_table_times.Add($"{Formatter.FormatNStatues(i)}: {Formatter.FormatMinutes(minutes_left)}");
+                float speedup_percentage = (float) Math.Round(100f * minutes_left / this.TableTime, 1);
+                statue_table_times.Add($"{Formatter.FormatNStatues(i)}: {Formatter.FormatMinutes(minutes_left)} ({speedup_percentage}% faster)");
             }
 
 

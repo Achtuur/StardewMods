@@ -1,16 +1,160 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
 namespace AchtuurCore.Utility
 {
     public static class Tiles
     {
+
+        
+        /// <summary>
+        /// Get all tiles that have a manhattan distance of <paramref name="radius"/> around <paramref name="farmer"/>
+        /// </summary>
+        /// <param name="farmer">Farmer to get tiles around</param>
+        /// <param name="radius">Radius of tiles</param>
+        /// <returns></returns>
+        public static IEnumerable<Vector2> GetTilesInManhattan(this Farmer farmer, int radius, int min_radius = 0)
+        {
+            return GetTilesInManhattan(farmer.getTileLocation(), radius, min_radius);
+        }
+
+        public static IEnumerable<Vector2> GetTilesInRadius(this Farmer farmer, int radius, int min_radius)
+        {
+            return GetTilesInRadius(farmer.getTileLocation(), radius, min_radius);
+        }
+
+        /// <summary>
+        /// Get all tiles that have a manhattan distance smaller or equal to <paramref name="radius"/> around <paramref name="center"/>. Always returns <paramref name="center"/> first.
+        /// </summary>
+        /// <param name="center">Center tile. Will return tiles around this one</param>
+        /// <param name="radius">Radius of tiles to look in, in manhattan distance</param>
+        /// <param name="min_radius">Minimum radius/manhattan distance tiles will be taken in</param>
+        /// <returns></returns>
+        public static IEnumerable<Vector2> GetTilesInManhattan(Vector2 center, int radius, int min_radius = 0)
+        {
+            if (min_radius == 0)
+            {
+                yield return center;
+                min_radius = 1;
+            }
+
+            if (radius == 0)
+            {
+                yield break;
+            }        
+
+            for(int r = min_radius; r <= radius; r++)
+            {
+                // Loop around edge of radius r
+                // Start at the tip of the diagonals, walk to next tip clockwise
+                for(int c = 0; c < r; c++)
+                {
+                    
+                    // Top to right
+                    yield return center + new Vector2(c, r - c);
+
+                    // Right to bottom
+                    yield return center + new Vector2(r - c, -c);
+
+                    // Bottom to left
+                    yield return center + new Vector2(-c, c - r);
+
+                    // Left to top
+                    yield return center + new Vector2(c - r, c);
+                }
+            }
+        }
+
+        public static IEnumerable<Vector2> GetTilesInRadius(Vector2 center, int radius, int min_radius = 0)
+        {
+
+            if (min_radius == 0)
+            {
+                yield return center;
+            }
+
+            if (radius == 0)
+            {
+                yield break;
+            }
+
+            for (int r = min_radius; r <= radius; r++)
+            {
+                int x = 0;
+                int y = r;
+                int r_sq = radius * radius;
+
+                while (x <= y)
+                {
+                    foreach (Vector2 octant_mirror in MirrorInOctants(center, x, y))
+                    {
+                        yield return octant_mirror;
+                    }
+
+                    int xp = x + 1;
+
+                    if (xp * xp + y * y > r_sq)
+                    {
+                        y--;
+                    }
+                    x++;
+                }
+            }
+        }
+
+        public static IEnumerable<Vector2> MirrorInQuadrants(Vector2 center, float x, float y)
+        {
+            if (x == 0 && y == 0)
+            {
+                yield return center;
+            }
+            if (x == 0)
+            {
+                yield return center + new Vector2(0, y);
+                yield return center + new Vector2(0, -y);
+            }
+            else if (y == 0)
+            {
+                yield return center + new Vector2(x, 0);
+                yield return center + new Vector2(-x, 0);
+            }
+            else if (x == y)
+            {
+                yield return center + new Vector2(x, x);
+                yield return center + new Vector2(x, -x);
+                yield return center + new Vector2(-x, x);
+                yield return center + new Vector2(-x, -x);
+            }
+            else
+            {
+                yield return center + new Vector2(x, y);
+                yield return center + new Vector2(x, -y);
+                yield return center + new Vector2(-x, y);
+                yield return center + new Vector2(-x, -y);
+            }
+        }
+        public static IEnumerable<Vector2> MirrorInOctants(Vector2 center, float x, float y)
+        {
+            // Mirror in 4 quadrants
+            foreach (Vector2 quad in MirrorInQuadrants(center, x, y))
+                yield return quad;
+
+            // if x == y, then mirrored_quad == quad
+            if (x == y)
+                yield break;
+
+            // Mirror in 4 quadrants with x and y flipped, resulting in mirrored octants
+            foreach (Vector2 mirrored_quad in MirrorInQuadrants(center, y, x))
+            {
+                yield return mirrored_quad;
+            }
+        }
+
         /// <summary>
         /// <para>Get visible tiles, taken from Pathoschild's Tilehelper.GetVisibleTiles</para>
         /// 
@@ -54,6 +198,15 @@ namespace AchtuurCore.Utility
         public static IEnumerable<Vector2> GetTiles(this Rectangle rect)
         {
             return Tiles.GetTiles(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        public static Vector2 GetTileScreenCoords(Vector2 tile)
+        {
+            return new Vector2
+            (
+                tile.X * Game1.tileSize - Game1.viewport.X,
+                tile.Y * Game1.tileSize - Game1.viewport.Y
+            );
         }
 
         /// <summary>

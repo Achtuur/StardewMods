@@ -9,6 +9,12 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.1.0
+* New/Changed
+  * Add skill utility class
+  * Add GetTilesInRadius method
+  * Add Particle and TrailParticle
+  * Add Generic Overlay
 
 ## 1.0.7
 * New/Changed

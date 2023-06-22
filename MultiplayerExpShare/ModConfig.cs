@@ -1,16 +1,12 @@
-﻿using SpaceCore;
-using StardewModdingAPI;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AchtuurCore.Integrations;
+using AchtuurCore.Utility;
+using StardewModdingAPI;
 
 namespace MultiplayerExpShare
 {
-    internal enum ExpShareRangeType
+    internal enum ExpShareType
     {
         /// <summary>
         /// All players share exp globally
@@ -27,11 +23,21 @@ namespace MultiplayerExpShare
     }
     internal class ModConfig
     {
+
+        private readonly SliderRange PercentageToActorSlider = new SliderRange(0.25f, 0.75f, 0.05f);
+        private readonly SliderRange NearbyPlayerTileRangeSlider = new SliderRange(10, 50, 5);
+        private readonly SliderRange OverlayOpacitySlider = new SliderRange(0f, 1f, 0.05f);
+        private readonly SliderRange ExpPerParticleSlider = new SliderRange(1, 10, 1);
+
+
         private static bool isRegistered = false;
         /// <summary>
         /// If this is true, then two players on the same map will always count as being nearby
         /// </summary>
-        public ExpShareRangeType ExpShareType { get; set; }
+        public ExpShareType ExpShareType { get; set; }
+
+        public SButton OverlayButton { get; set; }
+        public float OverlayOpacity { get; set; }
 
         public bool ShareAllExpAtMaxLevel { get; set; }
 
@@ -52,13 +58,19 @@ namespace MultiplayerExpShare
 
         public Dictionary<string, bool> SpaceCoreSkillEnabled { get; set; }
 
+        public int ExpPerParticle { get; set; }
+
         public ModConfig()
         {
             // Changable by player
             this.NearbyPlayerTileRange = 25;
             this.ExpPercentageToActor = 0.75f;
-            this.ExpShareType = ExpShareRangeType.Tile;
+            this.OverlayOpacity = 0.5f;
+            this.ExpShareType = ExpShareType.Tile;
+            this.OverlayButton = SButton.K;
             this.ShareAllExpAtMaxLevel = true;
+
+            this.ExpPerParticle = 3;
 
             this.VanillaSkillEnabled = new[] {
                 true,  // Farming
@@ -74,12 +86,12 @@ namespace MultiplayerExpShare
 
         private void InitSpacecoreDict()
         {
-            if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore"))
-                return;
-
             SpaceCoreSkillEnabled = new Dictionary<string, bool>();
 
-            foreach (string s in SpaceCore.Skills.GetSkillList())
+            if (!ModEntry.Instance.Helper.ModRegistry.IsLoaded("spacechase0.SpaceCore") || ModEntry.Instance.SpaceCoreAPI is null)
+                return;
+
+            foreach (string s in ModEntry.Instance.SpaceCoreAPI.GetCustomSkills())
             {
                 SpaceCoreSkillEnabled.Add(s, true);
             }
@@ -119,26 +131,13 @@ namespace MultiplayerExpShare
                 tooltip: I18n.CfgGeneral_Desc
             );
 
-            // exp percentage to actor
-            configMenu.AddNumberOption(
-                mod: ModEntry.Instance.ModManifest,
-                name: I18n.CfgExptoactor_Name,
-                tooltip: I18n.CfgExptoactor_Desc,
-                getValue: () => ExpPercentageToActor,
-                setValue: value => ExpPercentageToActor = value,
-                min: 25f / 100f,
-                max: 75f / 100f,
-                interval: 5f / 100f,
-                formatValue: displayAsPercentage
-             );
-
             // Exp share type
             configMenu.AddTextOption(
                 mod: ModEntry.Instance.ModManifest,
                 name: I18n.CfgSharetype_Name,
                 tooltip: I18n.CfgSharetype_Desc,
-                getValue: getExpShareType,
-                setValue: setExpShareType,
+                getValue: GetExpShareType,
+                setValue: SetExpShareType,
                 allowedValues: new string[] { "Tile", "Map", "Global" }
              );
 
@@ -149,9 +148,22 @@ namespace MultiplayerExpShare
                 tooltip: I18n.CfgNearbyplayertilerange_Desc,
                 getValue: () => NearbyPlayerTileRange,
                 setValue: value => NearbyPlayerTileRange = value,
-                min: 10,
-                max: 50,
-                interval: 5
+                min: (int)NearbyPlayerTileRangeSlider.min,
+                max: (int)NearbyPlayerTileRangeSlider.max,
+                interval: (int)NearbyPlayerTileRangeSlider.interval
+             );
+
+            // exp percentage to actor
+            configMenu.AddNumberOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgExptoactor_Name,
+                tooltip: I18n.CfgExptoactor_Desc,
+                getValue: () => ExpPercentageToActor,
+                setValue: value => ExpPercentageToActor = value,
+                min: PercentageToActorSlider.min,
+                max: PercentageToActorSlider.max,
+                interval: PercentageToActorSlider.interval,
+                formatValue: displayAsPercentage
              );
 
             // share all exp at max level
@@ -162,6 +174,52 @@ namespace MultiplayerExpShare
                 getValue: () => ShareAllExpAtMaxLevel,
                 setValue: value => ShareAllExpAtMaxLevel = value
             );
+
+
+            /// General travel skill settings header
+            configMenu.AddSectionTitle(
+                mod: ModEntry.Instance.ModManifest,
+                text: I18n.CfgParticlesection_Name
+            );
+
+            // nearby player tile range
+            configMenu.AddNumberOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgExpperparticle_Name,
+                tooltip: I18n.CfgExpperparticle_Desc,
+                getValue: () => ExpPerParticle,
+                setValue: value => ExpPerParticle = value,
+                min: (int)ExpPerParticleSlider.min,
+                max: (int)ExpPerParticleSlider.max,
+                interval: (int)ExpPerParticleSlider.interval
+             );
+
+            configMenu.AddSectionTitle(
+                ModEntry.Instance.ModManifest,
+                text: I18n.CfgOverlay_Name
+            );
+
+            configMenu.AddKeybind(
+               mod: ModEntry.Instance.ModManifest,
+               name: I18n.CfgOverlaybutton_Name,
+               tooltip: I18n.CfgOverlaybutton_Desc,
+               getValue: () => this.OverlayButton,
+               setValue: value => this.OverlayButton = value
+            );
+
+
+            // exp percentage to actor
+            configMenu.AddNumberOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgOverlayopacity_Name,
+                tooltip: I18n.CfgOverlayopacity_Desc,
+                getValue: () => OverlayOpacity,
+                setValue: value => OverlayOpacity = value,
+                min: OverlayOpacitySlider.min,
+                max: OverlayOpacitySlider.max,
+                interval: OverlayOpacitySlider.interval,
+                formatValue: displayAsPercentage
+             );
 
             // Enable/disable menu
             configMenu.AddSectionTitle(
@@ -248,16 +306,26 @@ namespace MultiplayerExpShare
 
         }
 
-        private string getExpShareType()
+        private string GetExpShareType()
         {
             switch (this.ExpShareType)
             {
-                case ExpShareRangeType.Tile: return "Tile";
-                case ExpShareRangeType.Map: return "Map";
-                case ExpShareRangeType.Global: return "Global";
+                case ExpShareType.Tile: return "Tile";
+                case ExpShareType.Map: return "Map";
+                case ExpShareType.Global: return "Global";
             }
             // should be unreachable, if this ever appears then you made a mistake sir programmer
             return "Something went wrong... :(";
+        }
+        private void SetExpShareType(string option)
+        {
+            switch (option)
+            {
+                case "Map": ExpShareType = ExpShareType.Map; break;
+                case "Tile": ExpShareType = ExpShareType.Tile; break;
+                case "Global": ExpShareType = ExpShareType.Global; break;
+                default: ExpShareType = ExpShareType.Tile; break;
+            }
         }
 
         /// <summary>
@@ -269,15 +337,5 @@ namespace MultiplayerExpShare
             return Math.Round(100f * value, 2).ToString() + "%";
         }
 
-        private void setExpShareType(string option)
-        {
-            switch (option)
-            {
-                case "Map": ExpShareType = ExpShareRangeType.Map; break;
-                case "Tile": ExpShareType = ExpShareRangeType.Tile; break;
-                case "Global": ExpShareType = ExpShareRangeType.Global; break;
-                default: ExpShareType = ExpShareRangeType.Tile; break;
-            }
-        }
     }
 }

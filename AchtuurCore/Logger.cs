@@ -14,22 +14,27 @@ namespace AchtuurCore
         /// Calls <see cref="IMonitor.Log"/> with <see cref="LogLevel.Debug"/>, if configuration is set to Build.
         /// </summary>
         /// <param name="monitor">IMonitor instance, should be accessible by ModEntry.Instance</param>
-        /// <param name="debug_msg">Message to display</param>
-        public static void DebugLog(IMonitor monitor, string debug_msg)
+        /// <param name="msg">Message to display</param>
+        public static void DebugLog(IMonitor monitor, string msg)
         {
             #if DEBUG
-                monitor.Log(debug_msg, LogLevel.Debug);
+                monitor.Log(msg, LogLevel.Debug);
             #endif
         }
 
-        public static void TraceLog(IMonitor monitor, string error_msg)
+        public static void TraceLog(IMonitor monitor, string msg)
         {
-            monitor.Log(error_msg, LogLevel.Trace);
+            monitor.Log(msg, LogLevel.Trace);
         }
 
-        public static void ErrorLog(IMonitor monitor, string error_msg)
+        public static void ErrorLog(IMonitor monitor, string msg)
         {
-            monitor.Log(error_msg, LogLevel.Error);
+            monitor.Log(msg, LogLevel.Error);
+        }
+
+        public static void WarningLog(IMonitor monitor, string msg)
+        {
+            monitor.Log(msg, LogLevel.Warn);
         }
 
         public static void DebugPrintDictionary<K, V>(IMonitor monitor, IDictionary<K, V> dict, string name=null)
@@ -76,21 +81,6 @@ namespace AchtuurCore
             }
 
             DebugLog(monitor, "}");
-        }
-
-        public static string GetSkillNameFromId(int skill_id)
-        {
-            switch (skill_id)
-            {
-                case 0: return "Farming";
-                case 1: return "Fishing";
-                case 2: return "Foraging";
-                case 3: return "Mining";
-                case 4: return "Combat";
-                case 5: return "Luck";
-                default: return "noSkill";
-
-            }
         }
     }
 }
