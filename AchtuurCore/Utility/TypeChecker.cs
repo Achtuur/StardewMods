@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace AchtuurCore.Utility;
 
-namespace AchtuurCore.Utility
+public static class TypeChecker
 {
-    internal static class TypeChecker
+    public static bool isType<T>(object obj)
     {
-
-        public static bool isType<T>(object obj)
-        {
-            return obj.GetType() == typeof(T);
-        }
-
+        return obj is not null && obj.GetType() == typeof(T);
     }
 }

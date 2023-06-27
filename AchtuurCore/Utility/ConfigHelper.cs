@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace AchtuurCore.Utility;
 
-namespace AchtuurCore.Utility
+public static class ConfigHelper
 {
-    public static class ConfigHelper
-    {
-    }
 }

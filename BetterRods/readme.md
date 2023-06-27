@@ -29,6 +29,8 @@ Were you under the impression that buying a fishing rod makes fishing easier? We
 
 
 ## 1.0.1 (unreleased)
+* New/Changes
+  * Updated to support AchtuurCore 1.1.1 
 * Fixes
   * Fix inconsistent capitalisation in config menu
 

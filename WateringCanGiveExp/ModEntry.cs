@@ -1,62 +1,61 @@
 ﻿using AchtuurCore.Events;
 using AchtuurCore.Patches;
-using WateringCanGiveExp.Patches;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using System;
 using StardewModdingAPI.Utilities;
+using System;
+using WateringCanGiveExp.Patches;
 
-namespace WateringCanGiveExp
+namespace WateringCanGiveExp;
+
+public class ModEntry : Mod
 {
-    public class ModEntry : Mod
+    public const int FarmingSkillID = 0;
+
+    internal static ModEntry Instance;
+    internal ModConfig Config;
+    private PerScreen<float> wateringExpTotal = new PerScreen<float>();
+
+    public override void Entry(IModHelper helper)
     {
-        public const int FarmingSkillID = 0;
 
-        internal static ModEntry Instance;
-        internal ModConfig Config;
-        private PerScreen<float> wateringExpTotal = new PerScreen<float>();
+        HarmonyPatcher.ApplyPatches(this,
+            new CropHarvestPatcher()
+        );
 
-        public override void Entry(IModHelper helper)
-        {
+        I18n.Init(helper.Translation);
+        ModEntry.Instance = this;
+        this.Config = this.Helper.ReadConfig<ModConfig>();
+        this.wateringExpTotal.Value = 0f;
 
-            HarmonyPatcher.ApplyPatches(this,
-                new CropHarvestPatcher()
-            );
+        AchtuurCore.Events.EventPublisher.FinishedWateringSoil += OnFinishedWateringSoil;
 
-            I18n.Init(helper.Translation);
-            ModEntry.Instance = this;
-            this.Config = this.Helper.ReadConfig<ModConfig>();
-            this.wateringExpTotal.Value = 0f;
+        helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
+    }
 
-            AchtuurCore.Events.EventPublisher.FinishedWateringSoil += OnFinishedWateringSoil;
+    private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
+    {
+        this.Config.createMenu();
+    }
 
-            helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
-        }
+    private void OnFinishedWateringSoil(object sender, WateringFinishedArgs e)
+    {
+        // Quit if world is not loaded
+        if (!Context.IsWorldReady)
+            return;
 
-        private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
-        {
-            this.Config.createMenu();
-        }
+        // Only add exp if farmer who watered is current player
+        if (!e.farmer.IsLocalPlayer)
+            return;
 
-        private void OnFinishedWateringSoil(object sender, WateringFinishedArgs e)
-        {
-            // Quit if world is not loaded
-            if (!Context.IsWorldReady)
-                return;
+        // Get integer part of total watering exp to not 'lose' exp due to rounding
+        this.wateringExpTotal.Value += this.Config.ExpforWateringSoil;
+        int floored_total = (int)Math.Floor(wateringExpTotal.Value);
 
-            // Only add exp if farmer who watered is current player
-            if (!e.farmer.IsLocalPlayer)
-                return;
+        // Add integer part to farmer
+        e.farmer.gainExperience(FarmingSkillID, floored_total);
 
-            // Get integer part of total watering exp to not 'lose' exp due to rounding
-            this.wateringExpTotal.Value += this.Config.ExpforWateringSoil;
-            int floored_total = (int) Math.Floor(wateringExpTotal.Value);
-
-            // Add integer part to farmer
-            e.farmer.gainExperience(FarmingSkillID, floored_total);
-            
-            // Subtract integer part from total as it has already been received
-            this.wateringExpTotal.Value -= floored_total;
-        }
+        // Subtract integer part from total as it has already been received
+        this.wateringExpTotal.Value -= floored_total;
     }
 }

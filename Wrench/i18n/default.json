@@ -1,8 +1,0 @@
-﻿{
-    /** Config Menu **/
-    "cfg_section.general": "General settings",
-
-
-    "wrenchtool.name": "Wrench",
-    "wrenchtool.desc": "Used to speed up machines"
-}

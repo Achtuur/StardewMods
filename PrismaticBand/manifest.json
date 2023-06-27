@@ -1,0 +1,20 @@
+{
+    "Name": "Prismatic Band",
+    "Author": "Achtuur",
+    "Version": "1.0.0",
+    "Description": "mod_desc",
+    "UniqueID": "Achtuur.PrismaticBand",
+    "EntryDll": "PrismaticBand.dll",
+    "MinimumApiVersion": "3.0.0",
+    "dependencies": [
+        {
+            "UniqueID": "Achtuur.AchtuurCore",
+            "MinimumVersion": "1.1.0"
+        },
+        {
+            "UniqueID": "spacechase0.JsonAssets",
+            "MinimumVersion": "1.1.0"
+        }
+    ],
+    "UpdateKeys": [ "Nexus:17135" ]
+}

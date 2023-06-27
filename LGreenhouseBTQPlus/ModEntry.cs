@@ -1,18 +1,16 @@
 ﻿using StardewModdingAPI;
-using System;
 
-namespace LGreenhouseBTQPlus
+namespace LGreenhouseBTQPlus;
+
+internal class ModEntry : Mod
 {
-    internal class ModEntry : Mod
+    internal static ModEntry Instance;
+    public ModConfig Config;
+    public override void Entry(IModHelper helper)
     {
-        internal static ModEntry Instance;
-        public ModConfig Config;
-        public override void Entry(IModHelper helper)
-        {
-            I18n.Init(helper.Translation);
-            ModEntry.Instance = this;
+        I18n.Init(helper.Translation);
+        ModEntry.Instance = this;
 
-            
-        }
+
     }
 }

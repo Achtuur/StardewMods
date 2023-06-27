@@ -1,100 +1,90 @@
-﻿using Microsoft.Xna.Framework;
-using Pathoschild.Stardew.Automate;
+﻿using Pathoschild.Stardew.Automate;
 using PrismaticStatue.Utility;
-using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Threading.Tasks;
-using SObject = StardewValley.Object;
-namespace PrismaticStatue
+namespace PrismaticStatue;
+
+public class SpedUpMachineWrapper : GenericSpedUpMachineWrapper
 {
-    public class SpedUpMachineWrapper : GenericSpedUpMachineWrapper
+
+    /// <summary>
+    /// Initial MinutesUntilReady when this wrapper was constructed
+    /// </summary>
+    //int intialMinutesUntilReady;
+
+    /// <summary>
+    /// Current MinutesUntilReady as if there was no speedup, decremented by 10 every ten minutes
+    /// </summary>
+    int actualMinutesUntilReady;
+
+    public SpedUpMachineWrapper(IMachine machine, int n_statues) : base(machine, n_statues)
     {
+    }
 
-        /// <summary>
-        /// Initial MinutesUntilReady when this wrapper was constructed
-        /// </summary>
-        //int intialMinutesUntilReady;
+    /// <inheritdoc/>
+    public override void Initialise()
+    {
+        if (this.entity is null)
+            return;
 
-        /// <summary>
-        /// Current MinutesUntilReady as if there was no speedup, decremented by 10 every ten minutes
-        /// </summary>
-        int actualMinutesUntilReady;
+        this.spedUp = false;
+        this.SetActualTime();
+        this.previousState = this.automateMachine.GetState();
+    }
 
-        public SpedUpMachineWrapper(IMachine machine, int n_statues) : base(machine, n_statues) 
-        { 
-        }
-
-        /// <inheritdoc/>
-        public override void Initialise()
+    /// <inheritdoc/>
+    public override void OnTimeChanged()
+    {
+        if (this.actualMinutesUntilReady > 0)
         {
-            if (this.entity is null)
-                return;
-
-            this.spedUp = false;
-            this.SetActualTime();
-            this.previousState = this.automateMachine.GetState();
+            this.actualMinutesUntilReady -= 10;
         }
+        this.previousState = this.automateMachine.GetState();
+    }
 
-        /// <inheritdoc/>
-        public override void OnTimeChanged()
-        {
-            if (this.actualMinutesUntilReady > 0)
-            {
-                this.actualMinutesUntilReady -= 10;
-            }
-            this.previousState = this.automateMachine.GetState();
-        }
+    /// <inheritdoc/>
+    public override void OnDayStarted()
+    {
+    }
 
-        /// <inheritdoc/>
-        public override void OnDayStarted()
-        {   
-        }
-
-        /// <inheritdoc/>
-        protected override bool ShouldDoSpeedup()
-        {
-            if (this.automateMachine.GetState() != MachineState.Processing || this.n_statues < 1)
-                return false;
-
-            if (this.previousState != MachineState.Processing || // wasn't processing before, but is processing now
-                this.actualMinutesUntilReady == this.entity.MinutesUntilReady || // isn't sped up
-                this.actualMinutesUntilReady == -1) // speed has been restored
-                return true;
-
+    /// <inheritdoc/>
+    protected override bool ShouldDoSpeedup()
+    {
+        if (this.automateMachine.GetState() != MachineState.Processing || this.n_statues < 1)
             return false;
-        }
 
-        protected override void SetActualTime()
-        {
-            this.actualMinutesUntilReady = this.entity.MinutesUntilReady;
-        }
+        if (this.previousState != MachineState.Processing || // wasn't processing before, but is processing now
+            this.actualMinutesUntilReady == this.entity.MinutesUntilReady || // isn't sped up
+            this.actualMinutesUntilReady == -1) // speed has been restored
+            return true;
 
-        /// <inheritdoc/>
-        public override void SpeedUp()
-        {
-            // Don't speedup if there is nothing to speedup
-            if (this.automateMachine.GetState() != MachineState.Processing || this.actualMinutesUntilReady <= 0)
-                return;
+        return false;
+    }
 
-            this.spedUp = true;
-            this.entity.MinutesUntilReady = SpeedUpFunction(this.actualMinutesUntilReady, this.n_statues);
-            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{automateMachine.MachineTypeID} at {automateMachine.Location} ({automateMachine.TileArea.X}, {automateMachine.TileArea.Y}) was sped up:\t{Formatter.FormatMinutes(this.actualMinutesUntilReady)} -> {Formatter.FormatMinutes(this.entity.MinutesUntilReady)}\t({Formatter.FormatNStatues(this.n_statues)})");
-        }
+    protected override void SetActualTime()
+    {
+        this.actualMinutesUntilReady = this.entity.MinutesUntilReady;
+    }
 
-        /// <inheritdoc/>
-        public override void RestoreSpeed()
-        {
-            this.spedUp = false;
+    /// <inheritdoc/>
+    public override void SpeedUp()
+    {
+        // Don't speedup if there is nothing to speedup
+        if (this.automateMachine.GetState() != MachineState.Processing || this.actualMinutesUntilReady <= 0)
+            return;
 
-            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{automateMachine.MachineTypeID} at {automateMachine.Location} ({automateMachine.TileArea.X}, {automateMachine.TileArea.Y}) speed restored:\t{Formatter.FormatMinutes(this.actualMinutesUntilReady)} -> {Formatter.FormatMinutes(this.entity.MinutesUntilReady)}");
-            this.entity.MinutesUntilReady = this.actualMinutesUntilReady;
+        this.spedUp = true;
+        this.entity.MinutesUntilReady = SpeedUpFunction(this.actualMinutesUntilReady, this.n_statues);
+        AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{automateMachine.MachineTypeID} at {automateMachine.Location} ({automateMachine.TileArea.X}, {automateMachine.TileArea.Y}) was sped up:\t{Formatter.FormatMinutes(this.actualMinutesUntilReady)} -> {Formatter.FormatMinutes(this.entity.MinutesUntilReady)}\t({Formatter.FormatNStatues(this.n_statues)})");
+    }
 
-            // Set these values to -1 to know that in the next update the machine's speed was restored, as opposed to just finished/not processing
-            this.actualMinutesUntilReady = -1;
-        }
+    /// <inheritdoc/>
+    public override void RestoreSpeed()
+    {
+        this.spedUp = false;
+
+        AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{automateMachine.MachineTypeID} at {automateMachine.Location} ({automateMachine.TileArea.X}, {automateMachine.TileArea.Y}) speed restored:\t{Formatter.FormatMinutes(this.actualMinutesUntilReady)} -> {Formatter.FormatMinutes(this.entity.MinutesUntilReady)}");
+        this.entity.MinutesUntilReady = this.actualMinutesUntilReady;
+
+        // Set these values to -1 to know that in the next update the machine's speed was restored, as opposed to just finished/not processing
+        this.actualMinutesUntilReady = -1;
     }
 }

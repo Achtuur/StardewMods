@@ -9,6 +9,10 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.1.1 (unreleased)
+* Fixes
+  * Particles now despawn when changing location
+
 ## 1.1.0
 * New/Changed
   * Add skill utility class
