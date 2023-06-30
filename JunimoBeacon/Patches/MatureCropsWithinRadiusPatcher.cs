@@ -1,6 +1,5 @@
 ﻿using AchtuurCore.Patches;
 using HarmonyLib;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -38,7 +37,7 @@ internal class MatureCropsWithinRadiusPatcher : GenericPatcher
         // Get hut-beacon group __instance is part of
         JunimoGroup hutGroup = ModEntry.Instance.GetHutGroup(__instance);
 
-        if (hutGroup is null) 
+        if (hutGroup is null)
             return;
 
         Farm farm = Game1.getFarm();
@@ -46,7 +45,7 @@ internal class MatureCropsWithinRadiusPatcher : GenericPatcher
         foreach (Vector2 tile in hutGroup.GetBeaconTiles())
         {
             // this line taken from source code JunimoHut -> areThereMatureCropsWithinRadius
-            if (farm.isCropAtTile((int) tile.X, (int) tile.Y) && (farm.terrainFeatures[tile] as HoeDirt).readyForHarvest())
+            if (farm.isCropAtTile((int)tile.X, (int)tile.Y) && (farm.terrainFeatures[tile] as HoeDirt).readyForHarvest())
             {
                 __instance.lastKnownCropLocation = new Point((int)tile.X, (int)tile.Y);
                 __result = true;
@@ -54,7 +53,7 @@ internal class MatureCropsWithinRadiusPatcher : GenericPatcher
                 return;
             }
         }
-        
+
 
         // If execution never finds valid tile then:
         // lastKnownCropLocation is 0 due to it being unchanged

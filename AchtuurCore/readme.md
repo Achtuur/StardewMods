@@ -9,7 +9,11 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
-## 1.1.1 (unreleased)
+## 1.1.1
+* New/Changed
+  * Added placement Tile to overlay
+  * Added more helper functions to overlay
+  * Added random/unique colors to colorhelper
 * Fixes
   * Particles now despawn when changing location
 

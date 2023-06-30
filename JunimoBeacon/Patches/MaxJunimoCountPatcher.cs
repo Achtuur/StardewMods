@@ -3,11 +3,8 @@ using HarmonyLib;
 using StardewValley.Buildings;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JunimoBeacon.Patches;
 internal class MaxJunimoCountPatcher : GenericPatcher
@@ -52,7 +49,7 @@ internal class MaxJunimoCountPatcher : GenericPatcher
             .Advance(1) // Don't replace LdLoc_0
             .SetAndAdvance(OpCodes.Ldarg_0, null) // Replaces Ldc_I4_3
             .Insert(new CodeInstruction(OpCodes.Call, Method_GetMaxJunimo))
-            
+
             // 'Return 2' part
             .MatchStartForward(
                 new CodeMatch(i => i.opcode == OpCodes.Ldc_I4_2),
@@ -104,6 +101,6 @@ internal class MaxJunimoCountPatcher : GenericPatcher
         if (group is null)
             return 3;
 
-        return 3 + group.NumConnectedBeacons * ModEntry.Instance.Config.ExtraJunimoPerBeacon;
+        return group.GetMaximumJunimoCount();
     }
 }

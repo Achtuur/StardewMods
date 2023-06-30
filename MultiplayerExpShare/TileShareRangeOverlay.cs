@@ -50,6 +50,7 @@ internal class TileShareRangeOverlay : AchtuurCore.Framework.Overlay
             {
                 // Get tile color (blueish green)
                 Color color = RangeColor * color_fac;
+                Vector2 screenCoord = Tiles.GetTileScreenCoords(tile);
 
                 // Draw only once per row, so tiles on the right side of the row's perimeter should only have their border drawn
                 if (tile.X > currentTile.X || ExpShareRadius.Contains(new Vector2(tile.X - 1, tile.Y)))
@@ -62,7 +63,6 @@ internal class TileShareRangeOverlay : AchtuurCore.Framework.Overlay
                 float inv_tileX = currentTile.X + Math.Abs(currentTile.X - tile.X);
                 float row_length = Math.Abs(inv_tileX - tile.X + 1);
 
-                Vector2 screenCoord = Tiles.GetTileScreenCoords(tile);
 
                 // Draw tile and border
                 spriteBatch.DrawLine(screenCoord.X, screenCoord.Y, new Vector2(tileSize * row_length, tileSize), color);
@@ -88,7 +88,6 @@ internal class TileShareRangeOverlay : AchtuurCore.Framework.Overlay
         {
             float screenX = tile.X * Game1.tileSize - Game1.viewport.X;
             float screenY = tile.Y * Game1.tileSize - Game1.viewport.Y;
-
             Color color = FarmerInRangeColor * color_fac;
             spriteBatch.DrawLine(screenX + tileGap, screenY + tileGap, new Vector2(tileSize - tileGap * 2, tileSize - tileGap * 2), color);
             DrawEdgeBorders(spriteBatch, tile, color * (1f / color_fac));

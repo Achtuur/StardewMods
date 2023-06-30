@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using StardewValley.Buildings;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace JunimoBeacon.Extensions;
 

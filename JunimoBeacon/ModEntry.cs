@@ -46,6 +46,11 @@ public class ModEntry : Mod
         }
     }
 
+    private void RemoveGroupWithHut(JunimoHut hut)
+    {
+        this.JunimoGroups = this.JunimoGroups.Where(group => !group.Hut.Equals(hut)).ToList();
+    }
+
     private void TryRemoveBeaconFromGroups(SObject beacon_object)
     {
         foreach (JunimoGroup group in JunimoGroups)
@@ -81,8 +86,7 @@ public class ModEntry : Mod
         HarmonyPatcher.ApplyPatches(this,
             new MatureCropsWithinRadiusPatcher(),
             new PathFindToNewCropPatcher(),
-            new MaxJunimoCountPatcher(),
-            new FoundCropEndFunctionPatcher()
+            new MaxJunimoCountPatcher()
         );
 
         this.Config = this.Helper.ReadConfig<ModConfig>();
@@ -91,14 +95,65 @@ public class ModEntry : Mod
 
         placeBeaconOverlay = new PlaceBeaconOverlay();
 
-        PlaceBeaconOverlay.LoadPlacementTileTexture();
-
 
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
         helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
+
+        /// Add/Remove beacons or groups
         helper.Events.GameLoop.DayStarted += this.OnDayStarted;
         helper.Events.World.ObjectListChanged += this.OnObjectListChanged;
+        helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
+        helper.Events.GameLoop.TimeChanged += this.OnTimeChanged;
+
+        /// Rendering
         helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
+
+        /// Debug
+        helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+
+    }
+
+    private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+    {
+        Debug.DebugOnlyExecute(() =>
+        {
+            /// Re-assign random colors
+            if (e.Button.Equals(SButton.R))
+            {
+                foreach (JunimoGroup group in this.JunimoGroups)
+                {
+                    group.Color = ColorHelper.GetUniqueColor(alpha: 230);
+                }
+            }
+        });
+    }
+
+    private void OnTimeChanged(object sender, TimeChangedEventArgs e)
+    {
+        // Check if groups and beacons still in range
+        // This should only be wrong if junimo hut is moved through building interface
+        // Otherwise, it is here as a failsafe
+        foreach (JunimoGroup group in this.JunimoGroups)
+        {
+            group.RemoveOutOfRangeBeacons();
+        }
+    }
+
+    private void OnBuildingListChanged(object sender, BuildingListChangedEventArgs e)
+    {
+        foreach (Building farmBuilding in e.Added)
+        {
+            if (TypeChecker.isType<JunimoHut>(farmBuilding))
+            {
+                TryAddJunimoGroup(farmBuilding as JunimoHut);
+            }
+        }
+
+        foreach (Building farmBuilding in e.Removed)
+        {
+            if (TypeChecker.isType<JunimoHut>(farmBuilding))
+                RemoveGroupWithHut(farmBuilding as JunimoHut);
+        }
     }
 
     private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
@@ -155,6 +210,7 @@ public class ModEntry : Mod
     {
         // Get id here, as id is not available before save loads
         JunimoBeacon.ID = JsonAssetsAPI.GetBigCraftableId(JunimoBeacon.ItemName);
+        this.JunimoGroups = new List<JunimoGroup>();
     }
 
     private void CreateRecipeUnlockMail()
