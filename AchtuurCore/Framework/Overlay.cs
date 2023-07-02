@@ -193,12 +193,12 @@ public abstract class Overlay
             spriteBatch.DrawLine(screenCoord.X + tileSize, screenCoord.Y, new Vector2(borderSize, tileSize), color); // right
     }
 
-    protected static void DrawPoint(SpriteBatch spriteBatch, Point point, Color? color = null, float? tileSizePercentage = null)
+    protected static void DrawPoint(SpriteBatch spriteBatch, Point point, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
     {
-        DrawTile(spriteBatch, point.ToVector2(), color, tileSizePercentage);
+        DrawTile(spriteBatch, point.ToVector2(), color, tileTexture, tileSizePercentage);
     }
 
-    protected static void DrawTile(SpriteBatch spriteBatch, Vector2 tile, Color? color = null, float? tileSizePercentage = null)
+    protected static void DrawTile(SpriteBatch spriteBatch, Vector2 tile, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
     {
         int offset = (tileSizePercentage is null) ? 0 : (int)(tileSizePercentage.Value * Game1.tileSize);
 
@@ -208,13 +208,13 @@ public abstract class Overlay
         Vector2 size = Vector2.One * Game1.tileSize
             * ((tileSizePercentage is null) ? 1 : tileSizePercentage.Value);
 
-        spriteBatch.DrawTexture(TilePlacementTexture, coords, size, color ?? Color.White);
+        spriteBatch.DrawTexture(tileTexture ?? TilePlacementTexture, coords, size, color ?? Color.White);
     }
 
-    protected static void DrawTiles(SpriteBatch spriteBatch, IEnumerable<Vector2> tiles, Color? color = null, float? tileSizePercentage = null)
+    protected static void DrawTiles(SpriteBatch spriteBatch, IEnumerable<Vector2> tiles, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
     {
         foreach (Vector2 tile in tiles)
-            DrawTile(spriteBatch, tile, color, tileSizePercentage);
+            DrawTile(spriteBatch, tile, color, tileTexture, tileSizePercentage);
     }
 
     public static void LoadPlacementTileTexture()

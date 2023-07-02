@@ -104,7 +104,7 @@ internal class PlaceBeaconOverlay : Overlay
         pathColor ??= color * 0.75f;
         foreach (Point point in pathPoints.Skip(1).SkipLast(1))
         {
-            DrawPoint(spriteBatch, point, pathColor, 0.5f);
+            DrawPoint(spriteBatch, point, color: pathColor, tileSizePercentage: 0.5f);
         }
     }
 }

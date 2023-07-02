@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace PrismaticStatue;
 
-internal class Overlay
+internal class StatueOverlay
 {
     internal bool Enabled;
 
@@ -31,7 +31,7 @@ internal class Overlay
     /// </summary>
     private float ColorIndex;
 
-    public Overlay()
+    public StatueOverlay()
     {
         this.ColorIndex = 0f;
         this.Enabled = false;

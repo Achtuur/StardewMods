@@ -9,6 +9,10 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.1.2 (unrelased)
+* New/Changed
+  * Add VectorHelper class
+
 ## 1.1.1
 * New/Changed
   * Added placement Tile to overlay

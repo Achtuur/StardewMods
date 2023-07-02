@@ -32,7 +32,7 @@ public class ModEntry : Mod
     internal List<SpedUpMachineGroup> SpedupMachineGroups;
     internal int secondUpdateCounter;
 
-    internal Overlay UIOverlay;
+    internal StatueOverlay UIOverlay;
 
     internal void RemoveMachineGroup(int i)
     {
@@ -74,7 +74,7 @@ public class ModEntry : Mod
         );
 
         SpedupMachineGroups = new List<SpedUpMachineGroup>();
-        this.UIOverlay = new PrismaticStatue.Overlay();
+        this.UIOverlay = new PrismaticStatue.StatueOverlay();
         this.Config = this.Helper.ReadConfig<ModConfig>();
 
         this.secondUpdateCounter = 0;

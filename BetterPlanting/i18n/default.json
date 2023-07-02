@@ -1,0 +1,15 @@
+﻿{
+    /** Config Menu **/
+    "cfg_section.general": "General settings",
+
+    "cfg_IncrementKeyBind.Name": "Next Fill Mode",
+    "cfg_IncrementKeyBind.Desc": "Key to press when swapping to next fill mode",
+    "cfg_DecrementKeyBind.Name": "Previous Fill Mode",
+    "cfg_DecrementKeyBind.Desc": "Key to press when swapping to previous fill mode",
+
+    // These are shown above cursor when switching modes
+    "FillMode_Disabled": "Disabled",
+    "FillMode_InArow": "{{n}} in a row",
+    "FillMode_Square": "{{n}}x{{n}} square",
+    "FillMode_All": "Fill"
+}
