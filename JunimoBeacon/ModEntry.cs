@@ -3,6 +3,7 @@ using AchtuurCore.Utility;
 using JunimoBeacon.Patches;
 using MailFrameworkMod;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -111,6 +112,38 @@ public class ModEntry : Mod
         /// Debug
         helper.Events.Input.ButtonPressed += this.OnButtonPressed;
 
+        helper.Events.Content.AssetRequested += this.OnAssetRequested;
+    }
+
+    private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+    {
+        if (!e.Name.IsEquivalentTo("Tilesheets/Craftables") || JunimoBeacon.ID is null || (Context.IsSplitScreen && !Context.IsMainPlayer))
+            return;
+
+        e.Edit(static asset =>
+        {
+            // Load beacon
+            string season = (Context.IsWorldReady) ? Game1.currentSeason.ToString().ToLower() : "spring";
+            IRawTextureData seasonalBeacon = ModEntry.Instance.Helper.ModContent.Load<IRawTextureData>($"assets/{season}.png");
+
+            var img = asset.AsImage();
+
+            Rectangle sourceRect = new Rectangle(0, 0, seasonalBeacon.Width, seasonalBeacon.Height);
+            Rectangle targetRect = SObject.getSourceRectForBigCraftable(JunimoBeacon.ID.Value);
+
+            if (!sourceRect.Contains(targetRect))
+                return;
+
+            if (targetRect.Y + targetRect.Height > 4096)
+            {
+                SpaceCore.TileSheetExtensions.PatchExtendedTileSheet(img, seasonalBeacon, sourceArea: sourceRect, targetArea: targetRect);
+            }
+            else
+            {
+                img.PatchImage(seasonalBeacon, sourceArea: sourceRect, targetArea: targetRect);
+            }
+
+        });
     }
 
     private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -164,6 +197,9 @@ public class ModEntry : Mod
 
     private void OnDayStarted(object sender, DayStartedEventArgs e)
     {
+        // Force asset request of big craftable
+        Instance.Helper.GameContent.InvalidateCache("Tilesheets/Craftables");
+
         foreach (Building farmBuilding in Game1.getFarm().buildings)
         {
             if (TypeChecker.isType<JunimoHut>(farmBuilding))

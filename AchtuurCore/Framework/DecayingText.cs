@@ -58,7 +58,6 @@ public class DecayingText
     public void DrawToScreen(SpriteBatch spriteBatch, Vector2 position, Color? color = null)
     {
         Color clr = new Color(color ?? this.TextColor, TextColor.A);
-
         spriteBatch.DrawString(Game1.dialogueFont, this.Text, position, clr);
     }
 }
