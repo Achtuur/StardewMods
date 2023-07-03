@@ -29,28 +29,34 @@ namespace BetterPlanting
 
         internal static bool PlayerIsHoldingPlantableObject()
         {
-            return !Game1.player.IsHoldingCategory(SeedCategory) && !Game1.player.IsHoldingCategory(FertilizerCategory);
+            return Game1.player.IsHoldingCategory(SeedCategory) || Game1.player.IsHoldingCategory(FertilizerCategory);
         }
 
         internal static bool CanPlantHeldObject(Vector2 tile)
         {
-            if (!Game1.currentLocation.isTileHoeDirt(tile))
+            if (Context.IsWorldReady && !Game1.currentLocation.isTileHoeDirt(tile))
                 return false;
 
-            StardewValley.Item held_object = Game1.player.CurrentItem;
 
             if (!PlayerIsHoldingPlantableObject())
                 return false;
 
+            StardewValley.Item held_object = Game1.player.CurrentItem;
             bool isFertilizer = held_object.Category == ModEntry.FertilizerCategory;
 
             HoeDirt tileFeature = Game1.currentLocation.terrainFeatures[tile] as HoeDirt;
             return tileFeature.canPlantThisSeedHere(held_object.ParentSheetIndex, (int)tile.X, (int)tile.Y, isFertilizer);
         }
 
-        internal static bool TileContainsCrop(Vector2 tile)
+        internal static bool TileContainsAliveCrop(Vector2 tile)
         {
-            return Game1.currentLocation.isCropAtTile((int)tile.X, (int)tile.Y);
+            // If no crop -> no alive crop
+            if (!Game1.currentLocation.isCropAtTile((int)tile.X, (int)tile.Y))
+                return false;
+
+            // Check if crop is dead
+            HoeDirt tileFeature = Game1.currentLocation.terrainFeatures[tile] as HoeDirt;
+            return !tileFeature.crop.dead.Value;
         }
 
 
@@ -60,9 +66,6 @@ namespace BetterPlanting
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
 
-            // HarmonyPatcher.ApplyPatches(this,
-
-            // );
 
             UIOverlay = new TilePlaceOverlay();
             UIOverlay.Enable();
@@ -89,13 +92,12 @@ namespace BetterPlanting
             }
             else if (e.Button == Config.IncrementModeKey)
             {
-                this.TileFiller.IncrementFillMode();
-                this.UIOverlay.ModeSwitchText = new DecayingText(TileFiller.GetFillModeAsString(), TilePlaceOverlay.DecayingTextLifeSpan);
+                this.TileFiller.IncrementFillMode(1);
+                
             }
             else if (e.Button == Config.DecrementModeKey)
             {
-                this.TileFiller.DecrementFillMode();
-                this.UIOverlay.ModeSwitchText = new DecayingText(TileFiller.GetFillModeAsString(), TilePlaceOverlay.DecayingTextLifeSpan);
+                this.TileFiller.IncrementFillMode(-1);
             }
         }
 
@@ -110,7 +112,7 @@ namespace BetterPlanting
             // if StardewValley.HoeDirt.canPlantThisSeedHere
             // StardewValley.HoeDirt.Plant
 
-            if (held_object.Category != SeedCategory && held_object.Category != FertilizerCategory)
+            if (!PlayerIsHoldingPlantableObject())
                 return;
 
             IEnumerable<FillTile> tiles = TileFiller.GetFillTiles(Game1.player.getTileLocation(), CursorTile)

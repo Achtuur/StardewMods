@@ -9,6 +9,7 @@ using AchtuurCore.Utility;
 using StardewValley;
 using xTile.Tiles;
 using StardewValley.TerrainFeatures;
+using AchtuurCore.Framework;
 
 namespace BetterPlanting
 {
@@ -64,16 +65,40 @@ namespace BetterPlanting
 
         private int fillModePointer;
 
-        private FillMode fillMode;
+        public FillMode fillMode { get; set; }
+
+        // caching
+        private Vector2 previousFarmerTile;
+        private Vector2 previousCursorTile;
+        private IEnumerable<FillTile> fillTiles;
+
 
         public TileFiller()
         {
             this.TileLimit = 500;
             this.fillModePointer = 0;
             this.fillMode = FillMode.Disabled;
+
+            this.previousCursorTile = Vector2.Zero;
+            this.previousFarmerTile = Vector2.Zero;
         }
 
         public IEnumerable<FillTile> GetFillTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition)
+        {
+            // if farmer and cursor not position or fillTiles has not been filled yet, recalculate tiles
+            if (this.fillTiles is null || FarmerTilePosition != previousFarmerTile || CursorTilePosition != previousCursorTile)
+            {
+                this.previousCursorTile = CursorTilePosition;
+                this.previousFarmerTile = FarmerTilePosition;
+                this.fillTiles = RecalculateFillTiles(FarmerTilePosition, CursorTilePosition);
+            }
+
+
+            foreach (FillTile tile in fillTiles)
+                yield return tile;
+        }
+
+        private IEnumerable<FillTile> RecalculateFillTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition)
         {
             // Dont return any tiles when out of range
             if ((CursorTilePosition - FarmerTilePosition).LengthSquared() > PlacementRange * PlacementRange)
@@ -104,37 +129,39 @@ namespace BetterPlanting
                 case FillMode.All:
                     fillModeTiles = GetAllModeTiles(FarmerTilePosition, CursorTilePosition);
                     break;
-                default: 
+                default:
                     fillModeTiles = new List<FillTile>();
                     break;
             }
 
+            int tile_count = 0;
+            int heldSeeds = -1;
+            if (ModEntry.PlayerIsHoldingPlantableObject())
+                heldSeeds = Game1.player.ActiveObject.Stack - 1; // -1 to account for vanilla seed placement
+
             foreach (FillTile tile in fillModeTiles)
+            {
+                // Quit early if more tiles than seeds in hand
+                if (heldSeeds != -1 && tile_count++ >= heldSeeds)
+                    break;
+
                 yield return tile;
+            }
         }
 
-        public void IncrementFillMode()
+        public void IncrementFillMode(int amount)
         {
             if (!ModEntry.PlayerIsHoldingPlantableObject())
                 return;
 
-            this.fillModePointer = (this.fillModePointer + 1) % FillModeNumber;
-            this.fillMode = (FillMode) this.fillModePointer;
-
-            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"FillMode: {this.fillMode}");
-        }
-
-        public void DecrementFillMode()
-        {
-            if (!ModEntry.PlayerIsHoldingPlantableObject())
-                return;
-
-            this.fillModePointer--;
+            this.fillModePointer = (this.fillModePointer + amount) % FillModeNumber;
             if (this.fillModePointer < 0)
                 this.fillModePointer += FillModeNumber;
 
             this.fillMode = (FillMode)this.fillModePointer;
+
             AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"FillMode: {this.fillMode}");
+            ModEntry.Instance.UIOverlay.ModeSwitchText = new DecayingText(ModEntry.Instance.TileFiller.GetFillModeAsString(), TilePlaceOverlay.DecayingTextLifeSpan);
         }
 
         public string GetFillModeAsString()
@@ -246,10 +273,10 @@ namespace BetterPlanting
             Vector2 dir = (CursorTilePosition - FarmerTilePosition).toCardinal();
             Vector2 startTile = FarmerTilePosition + dir;
 
-            List<Vector2> tileQueue = new List<Vector2>() { startTile };
+            List<Vector2> tileQueue = new() { startTile };
             int backPointer = 0;
 
-            Vector2[] card_dir = new Vector2[]
+            Vector2[] card_dir = new[]
             {
                 new Vector2(0, 1),
                 new Vector2(1, 0),
@@ -266,7 +293,7 @@ namespace BetterPlanting
                 foreach (Vector2 d in card_dir)
                 {
                     Vector2 newTile = currentTile + d;
-                    if ((ModEntry.CanPlantHeldObject(newTile) || ModEntry.TileContainsCrop(newTile)) 
+                    if ((ModEntry.CanPlantHeldObject(newTile) || ModEntry.TileContainsAliveCrop(newTile)) 
                         && !tileQueue.Contains(newTile))
                         tileQueue.Add(newTile);
                 }
@@ -275,7 +302,5 @@ namespace BetterPlanting
             foreach (Vector2 tile in tileQueue)
                 yield return new FillTile(tile);
         }
-
-
     }
 }
