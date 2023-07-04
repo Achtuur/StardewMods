@@ -16,6 +16,8 @@ namespace BetterPlanting
     internal class TilePlaceOverlay : Overlay
     {
         internal const int DecayingTextLifeSpan = 60;
+        internal readonly Vector2 SwitchTextOffset = new Vector2(0f, -50f);
+        internal readonly Vector2 PlantAmountOffset = new Vector2(40f, 115f);
 
         private DecayingText _modeSwitchText;
 
@@ -37,9 +39,8 @@ namespace BetterPlanting
         {
             DrawSwitchText(spriteBatch);
 
-            if (!ModEntry.PlayerIsHoldingPlantableObject() || ModEntry.Instance.TileFiller.fillMode == FillMode.Disabled)
+            if (!ModEntry.PlayerIsHoldingPlantableObject() || ModEntry.Instance.TileFiller.FillMode == FillMode.Disabled)
                 return;
-
 
             Vector2 farmerTilePosition = Game1.player.getTileLocation();
             Vector2 cursorTilePosition = Game1.currentCursorTile;
@@ -51,11 +52,11 @@ namespace BetterPlanting
             foreach (FillTile tile in tiles)
             {
                 Color color = tile.GetColor();
-                Texture2D texture = (tile.TileState == TileState.Plantable) ? GreenTilePlacementTexture : TilePlacementTexture;
+                Texture2D texture = (tile.State == TileState.Plantable) ? GreenTilePlacementTexture : TilePlacementTexture;
                 DrawTile(spriteBatch, tile.Location, color, tileTexture: texture);
             }
 
-            DrawPlantAmountText(spriteBatch, tiles.Count(t => t.TileState == TileState.Plantable));
+            DrawPlantAmountText(spriteBatch, GetPlantAmount(tiles, cursorTilePosition));
         }
 
         /// <summary>
@@ -72,9 +73,8 @@ namespace BetterPlanting
                 return;
             }
 
-            
             Vector2 mousePos = ModEntry.Instance.Helper.Input.GetCursorPosition().AbsolutePixels;
-            Vector2 screenCoords = Drawing.GetPositionScreenCoords(mousePos + Vector2.UnitY * -50f);
+            Vector2 screenCoords = Drawing.GetPositionScreenCoords(mousePos + SwitchTextOffset);
             this._modeSwitchText.DrawToScreen(spriteBatch, screenCoords, color: Color.White);
             
         }
@@ -93,14 +93,25 @@ namespace BetterPlanting
             // Get object that will be planted
             string plantType = "";
             if (Game1.player.IsHoldingCategory(ModEntry.SeedCategory))
-                plantType = "seed";
+                plantType = (amt > 1) ? "seeds" : "seed";
             else if (Game1.player.IsHoldingCategory(ModEntry.FertilizerCategory))
                 plantType = "fertilizer";
 
             Vector2 mousePos = ModEntry.Instance.Helper.Input.GetCursorPosition().AbsolutePixels;
-            Vector2 offset = new Vector2(40f, 115f);
-            Vector2 screenCoords = Drawing.GetPositionScreenCoords(mousePos + offset);
+            Vector2 screenCoords = Drawing.GetPositionScreenCoords(mousePos + PlantAmountOffset);
             spriteBatch.DrawString(Game1.dialogueFont, $"Plant {amt} {plantType}", screenCoords, Color.White);
+        }
+
+        private int GetPlantAmount(IEnumerable<FillTile> fillTiles, Vector2 CursorTile)
+        {
+            int amt = fillTiles.Count(t => t.State == TileState.Plantable);
+
+            int cursor_amt = 0;
+            // if cursor tile can be planted, check if one of the fillTiles is the cursor
+            if (ModEntry.IsCursorTilePlantable())
+                cursor_amt = 1 - fillTiles.Where(t => t.State == TileState.Plantable && t.Location == CursorTile).Count();
+
+            return amt + cursor_amt;
         }
     }
 }

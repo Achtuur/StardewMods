@@ -37,7 +37,6 @@ namespace BetterPlanting
             if (Context.IsWorldReady && !Game1.currentLocation.isTileHoeDirt(tile))
                 return false;
 
-
             if (!PlayerIsHoldingPlantableObject())
                 return false;
 
@@ -45,7 +44,8 @@ namespace BetterPlanting
             bool isFertilizer = held_object.Category == ModEntry.FertilizerCategory;
 
             HoeDirt tileFeature = Game1.currentLocation.terrainFeatures[tile] as HoeDirt;
-            return tileFeature.canPlantThisSeedHere(held_object.ParentSheetIndex, (int)tile.X, (int)tile.Y, isFertilizer);
+            return tileFeature.canPlantThisSeedHere(held_object.ParentSheetIndex, (int)tile.X, (int)tile.Y, isFertilizer)
+                && !Game1.currentLocation.isObjectAtTile((int)tile.X, (int)tile.Y);
         }
 
         internal static bool TileContainsAliveCrop(Vector2 tile)
@@ -59,13 +59,18 @@ namespace BetterPlanting
             return !tileFeature.crop.dead.Value;
         }
 
+        internal static bool IsCursorTilePlantable()
+        {
+            // cursor has to be on ring of 8 tiles around player and object must be plantable
+            float player_cursor_distance = (Game1.currentCursorTile - Game1.player.getTileLocation()).Length();
+            return player_cursor_distance < 1.5f && CanPlantHeldObject(Game1.currentCursorTile);
+        }
 
         public override void Entry(IModHelper helper)
         {
 
             I18n.Init(helper.Translation);
             ModEntry.Instance = this;
-
 
             UIOverlay = new TilePlaceOverlay();
             UIOverlay.Enable();
@@ -76,6 +81,12 @@ namespace BetterPlanting
             helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunch;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Player.Warped += this.OnPlayerWarped;
+        }
+
+        private void OnPlayerWarped(object sender, WarpedEventArgs e)
+        {
+            this.TileFiller.SetFillMode(FillMode.Disabled);
         }
 
         private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
@@ -108,15 +119,14 @@ namespace BetterPlanting
 
         private void TryPlantSeed(StardewValley.Item held_object, Vector2 CursorTile)
         {
-            // is holding object category -19 (fertilizer) or -74 (seed)
-            // if StardewValley.HoeDirt.canPlantThisSeedHere
-            // StardewValley.HoeDirt.Plant
-
-            if (!PlayerIsHoldingPlantableObject())
+            if (!PlayerIsHoldingPlantableObject() || !Context.IsPlayerFree)
                 return;
 
             IEnumerable<FillTile> tiles = TileFiller.GetFillTiles(Game1.player.getTileLocation(), CursorTile)
-                .Where(t => t.Location != CursorTile);
+                .Where(t => t.State == TileState.Plantable);
+
+            if (IsCursorTilePlantable())
+                tiles = tiles.Where(t => t.Location != CursorTile);
 
             foreach (FillTile tile in tiles)
             {
@@ -125,12 +135,13 @@ namespace BetterPlanting
 
                 HoeDirt tileFeature = Game1.currentLocation.terrainFeatures[tile.Location] as HoeDirt;
                 bool isFertilizer = held_object.Category == FertilizerCategory;
+                
+                bool planted = tileFeature.plant(held_object.ParentSheetIndex, (int)tile.Location.X, (int)tile.Location.Y, Game1.player, isFertilizer, Game1.currentLocation);
 
-                if (CanPlantHeldObject(tile.Location) && held_object.Stack > 0)
-                {
-                    tileFeature.plant(held_object.ParentSheetIndex, (int)tile.Location.X, (int)tile.Location.Y, Game1.player, isFertilizer, Game1.currentLocation);
-                    held_object.Stack--;
-                }
+                if (planted)
+                    Game1.player.ActiveObject.ConsumeInventoryItem(Game1.player, held_object.ParentSheetIndex, 1);
+                    //Game1.player.removeItemFromInventory(held_object.ParentSheetIndex);
+                
             }
 
         }

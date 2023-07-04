@@ -10,7 +10,17 @@ namespace AchtuurCore.Framework;
 public abstract class Overlay
 {
 
+    /// <summary>
+    /// Green tile placement texture, same one that is used when player is trying to place objects or charges up tools
+    /// </summary>
     protected static Texture2D GreenTilePlacementTexture;
+    /// <summary>
+    /// Red tile placement texture, same on that is used when player is trying to place object but is unable to
+    /// </summary>
+    protected static Texture2D RedTilePlacementTexture;
+    /// <summary>
+    /// Grayscale version of green tile placement texture.
+    /// </summary>
     protected static Texture2D TilePlacementTexture;
 
     /// <summary>
@@ -24,7 +34,7 @@ public abstract class Overlay
     protected int tileGap;
 
 
-    internal bool Enabled;
+    public bool Enabled { get; set; }
 
 
     public Overlay()
@@ -227,20 +237,22 @@ public abstract class Overlay
         fullAsset.GetData<Color>(fullAssetColors);
 
         // Copy only leftmost tile to smaller array
-        Color[] sliceAssetColors = new Color[64 * fullAsset.Height];
+        Color[] greenSliceAssetColors = new Color[64 * fullAsset.Height];
+        Color[] redSliceAssetColors = new Color[64 * fullAsset.Height];
         Color[] grayScaleAssetColors = new Color[64 * fullAsset.Height];
 
         for (int y = 0; y < 64; y++)
         {
             for (int x = 0; x < 64; x++)
             {
-                sliceAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width];
+                greenSliceAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width];
+                redSliceAssetColors[x + y * 64] = fullAssetColors[(64 + x) + y * fullAsset.Width];
                 grayScaleAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width].ToGrayScale();
             }
         }
 
         GreenTilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
-        GreenTilePlacementTexture.SetData<Color>(sliceAssetColors);
+        GreenTilePlacementTexture.SetData<Color>(greenSliceAssetColors);
 
         TilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
         TilePlacementTexture.SetData<Color>(grayScaleAssetColors);

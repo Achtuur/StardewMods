@@ -15,9 +15,21 @@ This mod lets you plant faster, by letting you plant multiple seeds at once
 
 # Changelog
 
-## Planned
 
-* Show number of seeds that will be planted
+## 1.1.0
+* New/Changed
+  * New option to not plant seeds diagonally.
+	* Being able to plant diagonally gives a bit more freedom, but requires more precision from the player
+  * Overlay now displays when you do not have enough seeds in red
+  * When you don't have enough seeds, it is now attempted to pick seeds in a more logical way (more adjacent seeds, instead of random corners)
+  * Now changes plant mode to disabled when changing locations.
+
+* Fixed
+  * Fixed seed plant sometimes not displaying properly
+
+## 1.0.4
+* New/Changed
+  * Changed overlay showup range from 2 to 1 tiles, meaning it only shows up now when you are in range to plant seeds in vanilla.
 
 ## 1.0.3
 * New/Changed

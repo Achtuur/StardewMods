@@ -56,16 +56,19 @@ namespace BetterPlanting
     /// </summary>
     internal class TileFiller
     {
-        public const int PlacementRange = 2;
-        public const int FillModeNumber = 7;
+        /// <summary>
+        /// Placement range where tile filler starts doing work. Set to 1.5f (should be sqrt(2) technically) so the 8 squares around the player are counted
+        /// </summary>
+        internal const float PlacementRange = 1.5f;
+        internal const int FillModeNumber = 7;
         /// <summary>
         /// Maxmimum number of tiles this filler is allowed to use
         /// </summary>
-        public int TileLimit { get; set; }
+        internal int TileLimit { get; set; }
 
         private int fillModePointer;
 
-        public FillMode fillMode { get; set; }
+        internal FillMode FillMode { get; set; }
 
         // caching
         private Vector2 previousFarmerTile;
@@ -73,17 +76,61 @@ namespace BetterPlanting
         private IEnumerable<FillTile> fillTiles;
 
 
-        public TileFiller()
+        internal TileFiller()
         {
             this.TileLimit = 500;
             this.fillModePointer = 0;
-            this.fillMode = FillMode.Disabled;
+            this.FillMode = FillMode.Disabled;
 
             this.previousCursorTile = Vector2.Zero;
             this.previousFarmerTile = Vector2.Zero;
         }
 
-        public IEnumerable<FillTile> GetFillTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition)
+        internal void SetFillMode(FillMode fillMode)
+        {
+            this.FillMode = fillMode;
+            this.fillModePointer = (int)fillMode;
+        }
+
+        internal void IncrementFillMode(int amount)
+        {
+            if (!ModEntry.PlayerIsHoldingPlantableObject())
+                return;
+
+            this.fillModePointer = (this.fillModePointer + amount) % FillModeNumber;
+            if (this.fillModePointer < 0)
+                this.fillModePointer += FillModeNumber;
+
+            this.FillMode = (FillMode)this.fillModePointer;
+
+            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"FillMode: {this.FillMode}");
+            ModEntry.Instance.UIOverlay.ModeSwitchText = new DecayingText(ModEntry.Instance.TileFiller.GetFillModeAsString(), TilePlaceOverlay.DecayingTextLifeSpan);
+        }
+
+        internal string GetFillModeAsString()
+        {
+            switch (this.FillMode)
+            {
+                case FillMode.Disabled:
+                    return I18n.FillModeDisabled();
+                case FillMode.ThreeInARow:
+                    return I18n.FillModeInArow(3);
+                case FillMode.FiveInARow:
+                    return I18n.FillModeInArow(5);
+                case FillMode.ThreeSquare:
+                    return I18n.FillModeSquare(3);
+                case FillMode.FiveSquare:
+                    return I18n.FillModeSquare(5);
+                case FillMode.SevenSquare:
+                    return I18n.FillModeSquare(7);
+                case FillMode.All:
+                    return I18n.FillModeAll();
+                default:
+                    return "";
+            }
+        }
+
+        internal IEnumerable<FillTile> GetFillTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition)
         {
             // if farmer and cursor not position or fillTiles has not been filled yet, recalculate tiles
             if (this.fillTiles is null || FarmerTilePosition != previousFarmerTile || CursorTilePosition != previousCursorTile)
@@ -92,7 +139,6 @@ namespace BetterPlanting
                 this.previousFarmerTile = FarmerTilePosition;
                 this.fillTiles = RecalculateFillTiles(FarmerTilePosition, CursorTilePosition);
             }
-
 
             foreach (FillTile tile in fillTiles)
                 yield return tile;
@@ -106,7 +152,7 @@ namespace BetterPlanting
 
             IEnumerable<FillTile> fillModeTiles;
 
-            switch (this.fillMode)
+            switch (this.FillMode)
             {
                 case FillMode.Disabled:
                     fillModeTiles = new List<FillTile>();
@@ -134,59 +180,36 @@ namespace BetterPlanting
                     break;
             }
 
+            // Sort tiles based on approximity to player, useful when number of seeds < tiles in fill mode
+            fillModeTiles = fillModeTiles.OrderByDescending(t => t.Priority).ThenBy(t => t.State);
+
+            // Track number of seeds farmer has
             int tile_count = 0;
-            int heldSeeds = -1;
+            int? heldSeeds = null;
             if (ModEntry.PlayerIsHoldingPlantableObject())
-                heldSeeds = Game1.player.ActiveObject.Stack - 1; // -1 to account for vanilla seed placement
+            {
+                heldSeeds = Game1.player.ActiveObject.Stack;
+                if (ModEntry.IsCursorTilePlantable())
+                    heldSeeds--;
+            }
 
             foreach (FillTile tile in fillModeTiles)
             {
+                if (tile.State == TileState.Plantable)
+                    tile_count++;
+
                 // Quit early if more tiles than seeds in hand
-                if (heldSeeds != -1 && tile_count++ >= heldSeeds)
-                    break;
+                if (heldSeeds != null && tile_count > heldSeeds.Value)
+                {
+                    if (FillMode == FillMode.All)
+                        break;
+                    else
+                        tile.State = TileState.NotEnoughSeeds;
+                }
 
                 yield return tile;
             }
         }
-
-        public void IncrementFillMode(int amount)
-        {
-            if (!ModEntry.PlayerIsHoldingPlantableObject())
-                return;
-
-            this.fillModePointer = (this.fillModePointer + amount) % FillModeNumber;
-            if (this.fillModePointer < 0)
-                this.fillModePointer += FillModeNumber;
-
-            this.fillMode = (FillMode)this.fillModePointer;
-
-            AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"FillMode: {this.fillMode}");
-            ModEntry.Instance.UIOverlay.ModeSwitchText = new DecayingText(ModEntry.Instance.TileFiller.GetFillModeAsString(), TilePlaceOverlay.DecayingTextLifeSpan);
-        }
-
-        public string GetFillModeAsString()
-        {
-            switch (this.fillMode)
-            {
-                case FillMode.Disabled:
-                    return I18n.FillModeDisabled();
-                case FillMode.ThreeInARow:
-                    return I18n.FillModeInArow(3);
-                case FillMode.FiveInARow:
-                    return I18n.FillModeInArow(5);
-                case FillMode.ThreeSquare:
-                    return I18n.FillModeSquare(3);
-                case FillMode.FiveSquare:
-                    return I18n.FillModeSquare(5);
-                case FillMode.SevenSquare:
-                    return I18n.FillModeSquare(7);
-                case FillMode.All:
-                    return I18n.FillModeAll();
-                default: 
-                    return "";
-            }
-        }
-
 
         /// <summary>
         /// Get <paramref name="nTiles"/> tiles in the direction of <paramref name="FarmerTilePosition"/> - <paramref name="CursorTilePosition"/>
@@ -197,7 +220,7 @@ namespace BetterPlanting
         private IEnumerable<FillTile> GetRowModeTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition, int nTiles)
         {
             // get vector2 in a cardinal direction
-            Vector2 dir = (CursorTilePosition - FarmerTilePosition).toCardinal();
+            Vector2 dir = GetCardinalDirection(CursorTilePosition - FarmerTilePosition);
             Vector2 startTile = FarmerTilePosition + dir;
 
             // dir = 0 (cursor is on the farmers position)
@@ -207,9 +230,7 @@ namespace BetterPlanting
             for (int t = 0; t < nTiles; t++)
             {
                 Vector2 tile = startTile + t * dir;
-                yield return new FillTile(tile);
-                //if (ModEntry.CanPlantHeldObject(tile))
-                //    yield return tile;
+                yield return new FillTile(tile, priority: t);
             }
         }
 
@@ -222,14 +243,17 @@ namespace BetterPlanting
         /// <returns></returns>
         private IEnumerable<FillTile> GetSquareModeTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition, int sideLength)
         {
-            Vector2 dir = (CursorTilePosition - FarmerTilePosition).toCardinal();
+            Vector2 dir = GetCardinalDirection(CursorTilePosition - FarmerTilePosition);
             Vector2 center = FarmerTilePosition + dir * (sideLength / 2 + 1);
 
-            yield return new FillTile(center);
+            yield return new FillTile(center, 10 * sideLength);
             // iterate outwards in rings from center
             // Start at 3 since s=1 will never return anything
             for (int s = 3; s <= sideLength; s+=2)
             {
+                // prioritise tiles closer to center of square
+                int base_priority = sideLength - s;
+
                 // iterate over a single side (except last square)
                 // Last square is skipped because mirroring 4 sides takes care of that
                 // (the first square of the next mirror is the last one of the previous side)
@@ -237,31 +261,20 @@ namespace BetterPlanting
                 {
                     // Top
                     Vector2 top = center + new Vector2(i, -s/2);
-                    //if (ModEntry.CanPlantHeldObject(top))
-                    //    yield return top;
-
-                    yield return new FillTile(top);
-
-                    // Bottom (starts at bottom right)
-                    Vector2 bot = center + new Vector2(-i, s/2);
-                    //if (ModEntry.CanPlantHeldObject(bot))
-                    //    yield return bot;
-
-                    yield return new FillTile(bot);
-
-                    // Left
-                    Vector2 left = center + new Vector2(-s/2, -i);
-                    //if (ModEntry.CanPlantHeldObject(left))
-                    //    yield return left;
-
-                    yield return new FillTile(left);
+                    yield return new FillTile(top, priority: 10 * base_priority - i - s);
 
                     // Right
                     Vector2 right = center + new Vector2(s/2, i);
-                    //if (ModEntry.CanPlantHeldObject(right))
-                    //    yield return right;
+                    yield return new FillTile(right, priority: 10 * base_priority - i - 2*s);
 
-                    yield return new FillTile(right);
+                    // Bottom (starts at bottom right)
+                    Vector2 bot = center + new Vector2(-i, s/2);
+                    yield return new FillTile(bot, priority: 10 * base_priority - i - 3*s);
+
+                    // Left (starts at bottom left)
+                    Vector2 left = center + new Vector2(-s/2, -i);
+                    yield return new FillTile(left, priority: 10 * base_priority - i - 4*s);
+
 
                 }
             }
@@ -270,7 +283,7 @@ namespace BetterPlanting
         
         private IEnumerable<FillTile> GetAllModeTiles(Vector2 FarmerTilePosition, Vector2 CursorTilePosition)
         {
-            Vector2 dir = (CursorTilePosition - FarmerTilePosition).toCardinal();
+            Vector2 dir = GetCardinalDirection(CursorTilePosition - FarmerTilePosition);
             Vector2 startTile = FarmerTilePosition + dir;
 
             List<Vector2> tileQueue = new() { startTile };
@@ -301,6 +314,27 @@ namespace BetterPlanting
 
             foreach (Vector2 tile in tileQueue)
                 yield return new FillTile(tile);
+        }
+
+
+        private Vector2 GetCardinalDirection(Vector2 vec)
+        {
+            vec = vec.toCardinal();
+
+            // if can place diagonally, or vector is not diagonal, return vec as is
+            if (ModEntry.Instance.Config.CanPlaceDiagonally || vec.LengthSquared() <= 1f)
+                return vec;
+
+            Vector2 faceDirection = VectorHelper.GetFaceDirectionUnitVector(Game1.player.FacingDirection);
+
+            float LenfaceDirMinVec = (faceDirection - vec).Length();
+
+            // Cursor is either diagonally above/to the side of where player is looking
+            if (LenfaceDirMinVec <= 1f)
+                return faceDirection;
+            // In other case, cursor is diagonally behind player, so invert faceDirection
+            else
+                return -faceDirection;
         }
     }
 }

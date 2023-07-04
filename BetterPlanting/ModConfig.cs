@@ -18,12 +18,15 @@ namespace BetterPlanting
         public SButton IncrementModeKey { get; set; }
         public SButton DecrementModeKey { get; set; }
 
+        public bool CanPlaceDiagonally { get; set; }
+
         public ModConfig()
         {
             // Initialise variables here
 
             IncrementModeKey = SButton.LeftControl;
             DecrementModeKey = SButton.RightControl;
+            CanPlaceDiagonally = false;
 
         }
 
@@ -68,6 +71,14 @@ namespace BetterPlanting
                 tooltip: I18n.CfgDecrementKeyBind_Desc,
                 getValue: () => this.DecrementModeKey,
                 setValue: (key) => this.DecrementModeKey = key
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgPlaceDiagonally_Name,
+                tooltip: I18n.CfgPlaceDiagonally_Desc,
+                getValue: () => this.CanPlaceDiagonally,
+                setValue: (val) => this.CanPlaceDiagonally = val
             );
 
         }

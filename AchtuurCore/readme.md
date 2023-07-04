@@ -9,7 +9,11 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
-## 1.1.2 (unrelased)
+## 1.1.3
+* New/Changed
+  * Added red tile placement texture to overlay
+
+## 1.1.2
 * New/Changed
   * Add VectorHelper class
 
