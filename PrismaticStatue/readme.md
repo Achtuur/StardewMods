@@ -25,9 +25,16 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 ## Changelog
 
-### Planned
+## 1.3.1
+* Fixes
+  * Fix issues related to changing statue ID:
+    * Breaking statue resulting in "???" item
+    * Statues not properly speeding up machines
+    * Overlay not showing statues properly
 
-* Nothing for now
+### 1.3.0
+* New/Changed
+  * Updated sprite for Prismatic Statue, thanks to [brightonmorris1](https://forums.nexusmods.com/index.php?/user/52800236-brightonmorris1/)!
 
 ### 1.2.2
 * New/Changed

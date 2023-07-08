@@ -2,6 +2,7 @@
 using MailFrameworkMod;
 using MailFrameworkMod.Api;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Pathoschild.Stardew.Automate;
 using PrismaticStatue.Patches;
 using StardewModdingAPI;
@@ -10,14 +11,20 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
+using SObject = StardewValley.Object;
 
 namespace PrismaticStatue;
 
 public class ModEntry : Mod
 {
+    internal int AnimationTickCooldown = 10;
+    internal const int AnimationFrames = 8;
+
     internal readonly string ContentPackPath = Path.Combine("assets", "ContentPack");
     internal readonly string PFMPath = Path.Combine("assets", "PFM");
     internal readonly string StatueName = "Prismatic Statue";
+
 
     internal static ModEntry Instance;
     internal ModConfig Config;
@@ -27,13 +34,26 @@ public class ModEntry : Mod
     internal JsonAssets.IApi JsonAssetsAPI;
     internal IMailFrameworkModApi mailFrameworkModApi;
 
-    internal int SpeedupStatueID;
-
     internal List<SpedUpMachineGroup> SpedupMachineGroups;
     internal int secondUpdateCounter;
 
     internal StatueOverlay UIOverlay;
 
+    internal int animationTickCounter = 0;
+
+    internal static IEnumerable<int> GetPossibleStatueIDs()
+    {
+        if (SpeedupStatue.ID is null)
+            yield break;
+
+        for (int i = SpeedupStatue.ID.Value; i < SpeedupStatue.ID.Value + AnimationFrames; i++)
+            yield return i;
+    }
+
+    internal static bool IsStatueID(int id)
+    {
+        return SpeedupStatue.ID is not null && id >= SpeedupStatue.ID && id < SpeedupStatue.ID + ModEntry.AnimationFrames;
+    }
     internal void RemoveMachineGroup(int i)
     {
         this.SpedupMachineGroups[i].RestoreAllMachines();
@@ -70,6 +90,7 @@ public class ModEntry : Mod
         ModEntry.Instance = this;
 
         HarmonyPatcher.ApplyPatches(this,
+            new PerformToolActionPatch(),
             new MachineGroupAutomatePatch()
         );
 
@@ -85,6 +106,40 @@ public class ModEntry : Mod
         helper.Events.GameLoop.OneSecondUpdateTicked += this.OnOneSecondUpdateTicked;
         helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
         helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+
+        // Animation stuff
+        helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+    }
+
+    private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
+    {
+        if (!Context.IsWorldReady)
+            return;
+
+        AnimationTickCooldown = 10;
+
+        if (this.animationTickCounter++ >= AnimationTickCooldown)
+        {
+            UpdateAnimationFrame();
+            animationTickCounter = 0;
+        }
+    }
+
+
+    private void UpdateAnimationFrame()
+    {
+        if (!Context.IsWorldReady)
+            return;
+
+        foreach (SObject sobj in Game1.currentLocation.objects.Values) 
+        {
+            if (ModEntry.IsStatueID(sobj.ParentSheetIndex))
+            {
+                sobj.ParentSheetIndex++;
+                if (sobj.ParentSheetIndex >= SpeedupStatue.ID.Value + ModEntry.AnimationFrames)
+                    sobj.ParentSheetIndex = SpeedupStatue.ID.Value;
+            }
+        }        
     }
 
     private void OnOneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
@@ -154,7 +209,7 @@ public class ModEntry : Mod
     private void OnSaveLoad(object sender, EventArgs e)
     {
         // Get id here, as id is not available before save loads
-        SpeedupStatueID = JsonAssetsAPI.GetBigCraftableId(StatueName);
+        SpeedupStatue.ID = JsonAssetsAPI.GetBigCraftableId(StatueName);
     }
 
     private void CreateRecipeUnlockMail()

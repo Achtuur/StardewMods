@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PrismaticStatue;
 
@@ -77,7 +78,7 @@ internal class StatueOverlay
             // Inside the group's tiles, but not on a processing machine
             else if (group is not null)
             {
-                if (tile.ContainsObject(ModEntry.Instance.SpeedupStatueID))
+                if (ModEntry.GetPossibleStatueIDs().Any(id => tile.ContainsObject(id)))
                 {
                     color = GetSpeedupStatueColor() * color_fac;
                 }
