@@ -1,11 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
+﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using StardewValley;
 
 namespace AchtuurCore.Utility;
 public static class VectorHelper
@@ -47,7 +41,7 @@ public static class VectorHelper
             case 3: // West
                 return new Vector2(-1, 0);
             default: //default to south
-                return new Vector2(0, 1); 
+                return new Vector2(0, 1);
         }
     }
 }

@@ -15,6 +15,11 @@ This mod lets you plant faster, by letting you plant multiple seeds at once
 
 # Changelog
 
+## 1.2.0
+* New/Changed
+  * Now works on garden pots as well
+  * Added option to change fill mode maximum tiles
+  * Mode switching text now decays
 
 ## 1.1.0
 * New/Changed

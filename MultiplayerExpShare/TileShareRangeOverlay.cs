@@ -1,6 +1,7 @@
 ﻿using AchtuurCore.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,6 @@ namespace MultiplayerExpShare;
 
 internal class TileShareRangeOverlay : AchtuurCore.Framework.Overlay
 {
-    internal bool Enabled;
-
     /// <summary>
     /// Color used to indicate sharing range. Blueish green color
     /// </summary>

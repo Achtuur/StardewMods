@@ -19,6 +19,10 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 ## Planned
 * Change config to use the host's options
 
+## 1.1.2
+* Fixes
+  * Overlay can no longer be toggled in menus
+
 ## 1.1.1
 * New/Changed
   * Updated to support AchtuureCore 1.0.1, bringing with it better behaving exp share particles

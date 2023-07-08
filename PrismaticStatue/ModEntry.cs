@@ -2,7 +2,6 @@
 using MailFrameworkMod;
 using MailFrameworkMod.Api;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Pathoschild.Stardew.Automate;
 using PrismaticStatue.Patches;
 using StardewModdingAPI;
@@ -11,7 +10,6 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
 using SObject = StardewValley.Object;
 
 namespace PrismaticStatue;
@@ -131,7 +129,7 @@ public class ModEntry : Mod
         if (!Context.IsWorldReady)
             return;
 
-        foreach (SObject sobj in Game1.currentLocation.objects.Values) 
+        foreach (SObject sobj in Game1.currentLocation.objects.Values)
         {
             if (ModEntry.IsStatueID(sobj.ParentSheetIndex))
             {
@@ -139,7 +137,7 @@ public class ModEntry : Mod
                 if (sobj.ParentSheetIndex >= SpeedupStatue.ID.Value + ModEntry.AnimationFrames)
                     sobj.ParentSheetIndex = SpeedupStatue.ID.Value;
             }
-        }        
+        }
     }
 
     private void OnOneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
@@ -168,7 +166,7 @@ public class ModEntry : Mod
     private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
     {
         // Check if overlay button is pressed
-        if (e.Button == this.Config.OverlayButton)
+        if (e.Button == this.Config.OverlayButton && Context.IsPlayerFree)
         {
             this.UIOverlay.Enabled = !this.UIOverlay.Enabled;
         }

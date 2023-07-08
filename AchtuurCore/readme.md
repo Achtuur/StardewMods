@@ -9,6 +9,11 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.1.4
+* New/Changed
+  * Decaying text now properly decays
+  * Add extension methods for gamelocation
+
 ## 1.1.3
 * New/Changed
   * Added red tile placement texture to overlay

@@ -25,6 +25,10 @@ Well then, this is the mod for you! This mod introduces the _Prismatic Statue_, 
 
 ## Changelog
 
+## 1.3.2
+* Fixes
+  * Overlay can no longer be toggled in menus
+
 ## 1.3.1
 * Fixes
   * Fix issues related to changing statue ID:

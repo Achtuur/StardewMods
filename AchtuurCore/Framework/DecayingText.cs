@@ -1,13 +1,8 @@
-﻿using AchtuurCore.Utility;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace AchtuurCore.Framework;
 public class DecayingText
@@ -45,7 +40,7 @@ public class DecayingText
     private void Tick()
     {
         this.tickTimer++;
-        int a = Math.Max(0, 255 * (this.TickLifeSpan - this.tickTimer) / this.TickLifeSpan);
+        int a = Math.Max(0, AlphaDecayFunction(tickTimer, TickLifeSpan));
         TextColor = new Color(TextColor, a);
     }
 
@@ -57,7 +52,26 @@ public class DecayingText
 
     public void DrawToScreen(SpriteBatch spriteBatch, Vector2 position, Color? color = null)
     {
-        Color clr = new Color(color ?? this.TextColor, TextColor.A);
+        // Multipliy entire color by alpha to reduce opacity
+        Color clr = (color ?? this.TextColor) * ((float)TextColor.A / 255f);
         spriteBatch.DrawString(Game1.dialogueFont, this.Text, position, clr);
+    }
+
+    /// <summary>
+    /// Mathematical function that defines behaviour of decay duration. Currently an exponential function.
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="maxT"></param>
+    /// <returns></returns>
+    private int AlphaDecayFunction(float t, float maxT)
+    {
+        // Offset, decay only starts after t = o
+        float o = (float)maxT / 2f;
+        // Some constant to make decay a bit faster
+        float c = 10;
+        // Exponent
+        float exp = -(c * (t - o)) / maxT;
+        // e^exp
+        return (int)(255 * Math.Pow(Math.E, exp));
     }
 }

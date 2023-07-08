@@ -1,10 +1,5 @@
 ﻿using AchtuurCore.Patches;
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
 namespace PrismaticStatue.Patches;

@@ -339,7 +339,7 @@ internal class ModEntry : Mod
     private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
     {
         // Check if overlay button is pressed
-        if (e.Button == this.Config.OverlayButton)
+        if (e.Button == this.Config.OverlayButton && Context.IsPlayerFree)
         {
             this.TileUIOverlay.Toggle();
         }

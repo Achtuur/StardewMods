@@ -2,7 +2,6 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -34,7 +33,7 @@ internal class BobberBarPatch : GenericPatcher
                 new CodeMatch(i => i.opcode == OpCodes.Add)
             )
             .Advance(4) // point to after LdLoc_3
-            // transform into this.BobberBarSpeed += this.gravity * GetGravityMultiplier()
+                        // transform into this.BobberBarSpeed += this.gravity * GetGravityMultiplier()
             .Insert(
                 new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(ModEntry.GetGravityMultiplier))),
                 new CodeInstruction(OpCodes.Mul)
@@ -45,11 +44,11 @@ internal class BobberBarPatch : GenericPatcher
             new CodeMatch(i => i.opcode == OpCodes.Ldarg_0),
                 new CodeMatch(i => i.opcode == OpCodes.Ldarg_0),
                 new CodeMatch(i => i.opcode == OpCodes.Ldfld && (FieldInfo)i.operand == AccessTools.Field(BobberBar, "distanceFromCatching")),
-                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float) i.operand == 0.002f),
+                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float)i.operand == 0.002f),
                 new CodeMatch(i => i.opcode == OpCodes.Add)
             )
             .Advance(4) // point to after Ldc_r4
-            // Multipliy 0.002f by GetDistanceGainMultiplier()
+                        // Multipliy 0.002f by GetDistanceGainMultiplier()
             .Insert(
                 new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(ModEntry.GetDistanceGainMultiplier))),
                 new CodeInstruction(OpCodes.Mul)
@@ -58,11 +57,11 @@ internal class BobberBarPatch : GenericPatcher
             .MatchStartForward(
                 new CodeMatch(i => i.opcode == OpCodes.Ldarg_0),
                 new CodeMatch(i => i.opcode == OpCodes.Ldarg_0),
-                new CodeMatch(i => i.opcode == OpCodes.Ldfld && (FieldInfo) i.operand == AccessTools.Field(BobberBar, "beginnersRod")),
+                new CodeMatch(i => i.opcode == OpCodes.Ldfld && (FieldInfo)i.operand == AccessTools.Field(BobberBar, "beginnersRod")),
                 new CodeMatch(i => i.opcode == OpCodes.Brtrue_S),
-                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float) i.operand ==  0.003f),
+                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float)i.operand == 0.003f),
                 new CodeMatch(i => i.opcode == OpCodes.Br_S),
-                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float) i.operand == 0.002f),
+                new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && (float)i.operand == 0.002f),
                 new CodeMatch(i => i.opcode == OpCodes.Sub)
             )
             .Advance(6) // Point to after Ldc_r4 0.002f
