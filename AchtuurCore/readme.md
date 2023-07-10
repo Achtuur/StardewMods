@@ -9,6 +9,11 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+
+## 1.1.5
+* New/Changed
+  * `Overlay.Enable/Disable` are now virtual methods
+
 ## 1.1.4
 * New/Changed
   * Decaying text now properly decays

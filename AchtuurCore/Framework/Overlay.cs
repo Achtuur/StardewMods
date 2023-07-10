@@ -44,12 +44,12 @@ public abstract class Overlay
         this.tileSize = Game1.tileSize;
     }
 
-    public void Enable()
+    public virtual void Enable()
     {
         this.Enabled = true;
     }
 
-    public void Disable()
+    public virtual void Disable()
     {
         this.Enabled = false;
     }
