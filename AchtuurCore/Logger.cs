@@ -52,7 +52,7 @@ public static class Logger
             DebugLog(monitor, $"\t({i++}): {item.Key} -> {item.Value}");
         }
 
-        DebugLog(monitor, "}");
+        DebugLog(monitor, "{");
     }
 
     public static void DebugPrintList<T>(IMonitor monitor, IList<T> list, string name = null)

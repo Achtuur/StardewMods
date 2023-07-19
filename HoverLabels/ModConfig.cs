@@ -8,17 +8,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AchtuurCore.Integrations;
+using System.Security;
+using HoverLabels.Framework;
+using AchtuurCore.Utility;
 
 namespace HoverLabels
 {
     internal class ModConfig
     {
- 
+        private readonly SliderRange LabelPopupDelayMsRange = new(0f, 1f, 0.05f);
+
+        private static bool registered = false;
         public int LabelPopupDelayTicks { get; set; }
+
+        public int LabelListMaxSize { get; set; }
+
+        public SButton ShowDetailsButton { get; set; }
+        public SButton AlternativeSortButton { get; set; }
+
         public ModConfig()
         {
             // Initialise variables here
             LabelPopupDelayTicks = 30;
+            LabelListMaxSize = 5;
+            ShowDetailsButton = SButton.LeftControl;
+            AlternativeSortButton = SButton.LeftShift;
         }
 
         /// <summary>
@@ -32,12 +46,17 @@ namespace HoverLabels
             if (configMenu is null)
                 return;
 
+            if (registered)
+                configMenu.Unregister(ModEntry.Instance.ModManifest);
+
             // register mod
             configMenu.Register(
                 mod: ModEntry.Instance.ModManifest,
                 reset: () => ModEntry.Instance.Config = new ModConfig(),
                 save: () => ModEntry.Instance.Helper.WriteConfig(ModEntry.Instance.Config)
             );
+
+            registered = true;
 
             /// General travel skill settings header
             configMenu.AddSectionTitle(
@@ -46,30 +65,59 @@ namespace HoverLabels
                 tooltip: null
             );
 
+            configMenu.AddNumberOption(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgDelayms_Name,
+                tooltip: I18n.CfgDelayms_Desc,
+                getValue: () => (float) (LabelPopupDelayTicks / 60f),
+                setValue: (val) => this.LabelPopupDelayTicks = (int) (val * 60f),
+                min: LabelPopupDelayMsRange.min,
+                max: LabelPopupDelayMsRange.max,
+                interval: LabelPopupDelayMsRange.interval
+            );
 
-        }
+            configMenu.AddKeybind(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgButtonShowdetails_Name,
+                tooltip: I18n.CfgButtonShowdetails_Desc,
+                getValue: () => this.ShowDetailsButton,
+                setValue: (button) => this.ShowDetailsButton = button
+            );
 
-        private static string displayExpGainValues(string expgain_option)
-        {
-            switch (expgain_option)
+            configMenu.AddKeybind(
+                mod: ModEntry.Instance.ModManifest,
+                name: I18n.CfgButtonAlternativesort_Name,
+                tooltip: I18n.CfgButtonAlternativesort_Desc,
+                getValue: () => this.AlternativeSortButton,
+                setValue: (button) => this.AlternativeSortButton = button
+            );
+
+
+            IEnumerable<RegisteredLabel> registeredLabels = LabelManager.RegisteredLabels;
+            foreach (IManifest manifest in LabelManager.GetUniqueRegisteredManifests())
             {
-                case "0.25": return "0.25 (Every 4 tiles)";
-                case "0.50": return "0.50 (Every other tile)";
-                case "0.75": return "0.75 (2 Exp for 3 tiles)";
-                case "1": return "1 (Every tile)";
-                case "2": return "2 (Every tile gives two exp)";
-                case "5000": return "100 (debug option)";
+                configMenu.AddSectionTitle(
+                    mod: ModEntry.Instance.ModManifest,
+                    text: () => I18n.CfgSection_Enablemod(manifest.Name, manifest.Author),
+                    tooltip: null
+                );
+
+                IEnumerable<RegisteredLabel> modRegisteredLabels = registeredLabels
+                    .Where(l => l.Manifest == manifest)
+                    .OrderBy(l => l.Name);
+
+                foreach(RegisteredLabel registeredLabel in modRegisteredLabels)
+                {
+                    configMenu.AddBoolOption(
+                        mod: ModEntry.Instance.ModManifest,
+                        name: () => I18n.CfgEnableLabel_Name(registeredLabel.Name),
+                        tooltip: () => I18n.CfgEnableLabel_Desc(registeredLabel.Name),
+                        getValue: () => registeredLabel.Enabled,
+                        setValue: (val) => registeredLabel.Enabled = val
+                    );
+                }
             }
-            return "Something went wrong... :(";
         }
-
-        public static string displayAsPercentage(float value)
-        {
-            return Math.Round(100f * value, 2).ToString() + "%";
-        }
-
-        
-
     }
 }
 

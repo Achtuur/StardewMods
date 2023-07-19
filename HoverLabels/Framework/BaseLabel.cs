@@ -8,62 +8,68 @@ using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HoverLabels.Framework;
-internal abstract class BaseLabel
+internal abstract class BaseLabel : IHoverLabel
 {
-    protected readonly string NewLineDelimiter = "\n\n";
-
     protected Vector2 CursorTile { get; set; }
     protected string Name { get; set; }
     protected List<string> Description { get; set; }
+    public virtual int Priority { get; set; }
 
-    public BaseLabel(Vector2 cursorTile)
+    public BaseLabel(int? priority)
     {
-        this.CursorTile = cursorTile;
         this.Name = string.Empty;
         this.Description = new List<string>();
+        this.Priority = priority ?? 0;
+    }
+
+    public void UpdateCursorTile(Vector2 cursorTile)
+    {
+        this.ResetLabel();
+        this.SetCursorTile(cursorTile);
         this.GenerateLabel();
+    }
+
+    /// <summary>
+    /// This method should set the cursor tile and get the info from the tile that is necessary in <see cref="GenerateLabel"/>
+    /// </summary>
+    /// <param name="cursorTile"></param>
+    public virtual void SetCursorTile(Vector2 cursorTile)
+    {
+        this.CursorTile = cursorTile;
     }
 
     /// <summary>
     /// Generates objectname and description, is called in the constructor
     /// </summary>
-    protected abstract void GenerateLabel();
+    public abstract void GenerateLabel();
 
     public bool HasDescription()
     {
         return Description.Count > 0;
     }
 
-    public string GetObjectName()
+    public virtual string GetName()
     {
         return this.Name;
     }
 
-    public string GetDescriptionAsString()
+    public IEnumerable<string> GetDescription()
     {
-        return String.Join(NewLineDelimiter, Description.ToArray());
+        return this.Description;
     }
 
-    public string GetLabelString()
+    public virtual bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        return GetObjectName() + (this.HasDescription() ? this.NewLineDelimiter + this.GetDescriptionAsString() : "");
+        return false;
     }
 
-    public Vector2 GetLabelSize(SpriteFont font)
+    public virtual void DrawOnOverlay(SpriteBatch spriteBatch)
     {
-        return font.MeasureString(this.GetLabelString());
     }
 
-    public Vector2 GetNameSize(SpriteFont font)
+    protected virtual void ResetLabel()
     {
-        return font.MeasureString(this.Name);
+        this.Name = String.Empty;
+        this.Description = new List<string>();
     }
-
-    public Vector2 GetDescriptionSize(SpriteFont font)
-    {
-        if (this.HasDescription())
-            return font.MeasureString(this.GetDescriptionAsString());
-        return Vector2.Zero;
-    }
-
 }

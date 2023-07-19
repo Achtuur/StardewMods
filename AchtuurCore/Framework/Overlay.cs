@@ -13,15 +13,15 @@ public abstract class Overlay
     /// <summary>
     /// Green tile placement texture, same one that is used when player is trying to place objects or charges up tools
     /// </summary>
-    protected static Texture2D GreenTilePlacementTexture;
+    public static Texture2D GreenTilePlacementTexture;
     /// <summary>
     /// Red tile placement texture, same on that is used when player is trying to place object but is unable to
     /// </summary>
-    protected static Texture2D RedTilePlacementTexture;
+    public static Texture2D RedTilePlacementTexture;
     /// <summary>
     /// Grayscale version of green tile placement texture.
     /// </summary>
-    protected static Texture2D TilePlacementTexture;
+    public static Texture2D TilePlacementTexture;
 
     /// <summary>
     /// Size of each tile (in pixels?)
@@ -77,6 +77,19 @@ public abstract class Overlay
 
         // Update tilesize
         this.tileSize = Game1.tileSize;
+
+        Debug.DebugOnlyExecute(() =>
+        {
+            float textHeight = Game1.dialogueFont.MeasureString("a").Y;
+
+            Rectangle visibleTiles = Drawing.GetVisibleArea();
+            Vector2 visibleCoords = new(visibleTiles.Width - visibleTiles.X, visibleTiles.Height + visibleTiles.Y);
+
+            spriteBatch.DrawString(Game1.dialogueFont, visibleCoords.ToString(), new Vector2(0, 0), Color.White);
+            spriteBatch.DrawString(Game1.dialogueFont, Game1.currentLocation.ToString(), new Vector2(0, textHeight), Color.White);
+        });
+
+
         DrawOverlayToScreen(spriteBatch);
     }
 
@@ -203,12 +216,12 @@ public abstract class Overlay
             spriteBatch.DrawLine(screenCoord.X + tileSize, screenCoord.Y, new Vector2(borderSize, tileSize), color); // right
     }
 
-    protected static void DrawPoint(SpriteBatch spriteBatch, Point point, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
+    public static void DrawPoint(SpriteBatch spriteBatch, Point point, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
     {
-        DrawTile(spriteBatch, point.ToVector2(), color, tileTexture, tileSizePercentage);
+        DrawTile(spriteBatch, point.ToVector2(), color: color, tileTexture: tileTexture, tileSizePercentage: tileSizePercentage);
     }
 
-    protected static void DrawTile(SpriteBatch spriteBatch, Vector2 tile, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null, Vector2? offset = null)
+    public static void DrawTile(SpriteBatch spriteBatch, Vector2 tile, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null, Vector2? offset = null, float? layerDepth = null)
     {
         int tilesize_offset = (tileSizePercentage is null) ? 0 : (int)((1 - tileSizePercentage.Value) * Game1.tileSize);
 
@@ -218,16 +231,16 @@ public abstract class Overlay
         Vector2 size = Vector2.One * Game1.tileSize
             * ((tileSizePercentage is null) ? 1 : tileSizePercentage.Value);
 
-        spriteBatch.DrawTexture(tileTexture ?? TilePlacementTexture, coords, size, color ?? Color.White);
+        spriteBatch.DrawTexture(tileTexture ?? TilePlacementTexture, coords, size, color ?? Color.White, layerDepth: layerDepth);
     }
 
-    protected static void DrawTiles(SpriteBatch spriteBatch, IEnumerable<Vector2> tiles, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
+    public static void DrawTiles(SpriteBatch spriteBatch, IEnumerable<Vector2> tiles, Color? color = null, Texture2D tileTexture = null, float? tileSizePercentage = null)
     {
         foreach (Vector2 tile in tiles)
-            DrawTile(spriteBatch, tile, color, tileTexture, tileSizePercentage);
+            DrawTile(spriteBatch, tile, color: color, tileTexture: tileTexture, tileSizePercentage: tileSizePercentage);
     }
 
-    public static void LoadPlacementTileTexture()
+    internal static void LoadPlacementTileTexture()
     {
         // Full asset is five 64x64 pixel tiles in a row, we only want the leftmost one of these tiles
         Texture2D fullAsset = ModEntry.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");

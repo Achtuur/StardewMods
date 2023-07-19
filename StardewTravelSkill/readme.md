@@ -39,9 +39,11 @@ This mod features some custom tokens for content pack creators that can tell you
 # Changelog
 
 ## 1.1.8
+* New/Changed
+  * Added French translation, thanks to RockingChair1196
+
 * Fixes
   * Sprinting in splitscreen now does not sprint both players
-  * 
 
 ## 1.1.7
 * New/Changed

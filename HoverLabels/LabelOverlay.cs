@@ -1,10 +1,14 @@
 ﻿using AchtuurCore.Extensions;
 using AchtuurCore.Framework;
+using AchtuurCore.Utility;
 using HoverLabels.Framework;
+using HoverLabels.Labels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,41 +18,84 @@ using System.Threading.Tasks;
 namespace HoverLabels;
 internal class LabelOverlay : Overlay
 {
+    internal readonly Vector2 baseOffset = new Vector2(75f, 75f);
+
     Dictionary<string, Texture2D> MenuTextures = new Dictionary<string, Texture2D>();
 
-    BaseLabel currentLabel;
+    SpriteFont nameFont;
+    SpriteFont descFont;
 
     public LabelOverlay() : base()
     {
         this.LoadMenuTextureAssets();
     }
 
+    public override void Enable()
+    {
+        base.Enable();
+        this.nameFont = Game1.dialogueFont;
+        this.descFont = Game1.smallFont;
+    }
+
     public override void Disable()
     {
         base.Disable();
-        this.currentLabel = null;
     }
 
     protected override void DrawOverlayToScreen(SpriteBatch spriteBatch)
     {
-        if (currentLabel is null)
+        if (!ModEntry.Instance.LabelManager.HasLabel())
             return;
 
-        Vector2 offset = new(75f, 75f);
+        // Draw additional stuff from label first, so other stuff is drawn over it
+        ModEntry.Instance.LabelManager.CurrentLabel.DrawOnOverlay(spriteBatch);
+
+        // Get coordinates of cursor on screen
         Vector2 cursorPos = ModEntry.Instance.Helper.Input.GetCursorPosition().AbsolutePixels;
-        Vector2 cursorCoords = AchtuurCore.Utility.Drawing.GetPositionScreenCoords(cursorPos) + offset;
+        Vector2 offset = GetOffset(cursorPos);
+        Vector2 cursorCoords = Drawing.GetPositionScreenCoords(cursorPos) + offset;
 
-
-        string displayString = currentLabel.GetLabelString();
-
-
+        // Draw box that contains label text
         DrawLabelBox(spriteBatch, cursorCoords);
 
-        spriteBatch.DrawString(Game1.dialogueFont, displayString, cursorCoords, Color.Black);
+        // Draw label text
+        string displayName = ModEntry.Instance.LabelManager.CurrentLabel.GetName();
+        string displayDesc = ModEntry.Instance.LabelManager.GetDescriptionAsString();
+        Vector2 nameSize = ModEntry.Instance.LabelManager.GetNameSize(this.nameFont);
+        Vector2 descOffset = new(0f, nameSize.Y + 32f); // the +32f is there so the description aligns with the box
 
-        //spriteBatch.DrawString(Game1.smallFont, currentLabel.GetObjectName(), cursorCoords, Color.White);
-        //spriteBatch.DrawString(Game1.smallFont, currentLabel.GetDescriptionAsString(), cursorCoords, Color.White);
+        spriteBatch.DrawString(this.nameFont, displayName, cursorCoords, Color.Black);
+        spriteBatch.DrawString(this.descFont, displayDesc, cursorCoords + descOffset, Color.Black);
+    }
 
+    /// <summary>
+    /// Generate offset for label box relative to cursor
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 GetOffset(Vector2 cursorPos)
+    {
+        // Label defaults to bottom right of cursor
+        Vector2 offset = baseOffset;
+
+        Rectangle visibleRect = Drawing.GetVisibleArea();
+        Vector2 visibleCoords = new(visibleRect.Width + visibleRect.X, visibleRect.Height + visibleRect.Y);
+
+        Vector2 labelSize = ModEntry.Instance.LabelManager.GetLabelSize(this.nameFont, this.descFont);
+
+        // Overflow on right side -> put label on left
+        if (cursorPos.X + labelSize.X + baseOffset.X >= visibleCoords.X - 2f*Game1.tileSize)
+            offset.X -= baseOffset.X * 1.2f + labelSize.X;
+
+        // Overflow on bottom side -> put label on top
+        if (cursorPos.Y + labelSize.Y + baseOffset.Y >= visibleCoords.Y - 3f*Game1.tileSize)
+            offset.Y -= baseOffset.Y * 1.2f + labelSize.Y;
+
+        // If putting label on top causes overflow on top size, go back to default offset
+        // Overflow on bottom part of screen is preferred
+        if (cursorPos.Y + offset.Y <= visibleRect.Y)
+            offset.Y = baseOffset.Y;
+
+        return offset;
     }
 
     private void DrawLabelBox(SpriteBatch spriteBatch, Vector2 cursorCoords)
@@ -64,8 +111,8 @@ internal class LabelOverlay : Overlay
 
         cursorCoords -= offset;
 
-        Vector2 nameSize = currentLabel.GetNameSize(Game1.dialogueFont);
-        Vector2 descSize = currentLabel.GetDescriptionSize(Game1.dialogueFont);
+        Vector2 nameSize = ModEntry.Instance.LabelManager.GetNameSize(this.nameFont);
+        Vector2 descSize = ModEntry.Instance.LabelManager.GetDescriptionSize(this.descFont);
 
         // Horizontal/Vertical scale for the top/left/right/bottom border part,
         // is equal to label string width - borders,
@@ -96,7 +143,7 @@ internal class LabelOverlay : Overlay
 
 
         // Draw description border
-        if (currentLabel.HasDescription())
+        if (ModEntry.Instance.LabelManager.LabelHasDescription())
         {
             Vector2 midDescY = botNameY + vy;
             Vector2 botDescY = midDescY + vy * descBarScale.Y;
@@ -119,27 +166,12 @@ internal class LabelOverlay : Overlay
         DrawMenuTexture(spriteBatch, MenuTextures["BottomLeftBorder"], cursorCoords + botBarY);
         DrawMenuTexture(spriteBatch, MenuTextures["BottomBorder"], cursorCoords + middleX + botBarY, new Vector2(xBarScale, 1f));
         DrawMenuTexture(spriteBatch, MenuTextures["BottomRightBorder"], cursorCoords + rightX + botBarY);
-
     }
 
     private void DrawMenuTexture(SpriteBatch spriteBatch, Texture2D texture, Vector2 pos, Vector2? scale=null, float? priority=null)
     {
         spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale ?? Vector2.One, SpriteEffects.None, priority ?? 0f);
     }
-
-    internal void SetCursorTile(Vector2 cursorHoverTile)
-    {
-        if (Game1.currentLocation.isObjectAtTile(cursorHoverTile))
-        {
-            currentLabel = new ObjectLabel(cursorHoverTile);
-        }
-        else if (Game1.currentLocation.isObjectAtTile(cursorHoverTile + Vector2.UnitY))
-        {
-            // If cursor is on the top tile (lower y value) of a bigcraftable
-            currentLabel = new ObjectLabel(cursorHoverTile + Vector2.UnitY);
-        }
-    }
-
 
     internal void LoadMenuTextureAssets()
     {

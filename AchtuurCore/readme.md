@@ -13,6 +13,7 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 ## 1.1.5
 * New/Changed
   * `Overlay.Enable/Disable` are now virtual methods
+  * Add Building extensions
 
 ## 1.1.4
 * New/Changed
