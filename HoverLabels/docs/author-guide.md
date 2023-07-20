@@ -6,11 +6,11 @@ In this document, a tutorial will be given on how to add your own custom labels.
 
 ## Creating your own label
 
-* step 1: Copy the `IHoverLabel` interface from [IHoverLabel.cs](../IHoverLabel.cs) into your own code.
-* step 2: Copy the `IHoverLabelApi` interface from [IHoverLabelApi.cs](../IHoverLabelApi.cs) into your own code
-* step 3: create your own label that implements the interface, make sure to check out the [IHoverLabel section](#IHoverLabel-tutorial) for more details on how to do this.
-* step 4: create an instance of the api using the SMAPI mod registry helper: `IHoverLabelApi labelApi = this.Helper.ModRegistry.GetApi<IHoverLabelApi>("Achtuur.HoverLabels")`.
-* step 5: register your label (called `yourLabel` in the example): `labelApi.Register(this.ModManifest, "yourLabelName", new yourLabel())`.
+* Step 1: Copy the `IHoverLabel` interface from [IHoverLabel.cs](../IHoverLabel.cs) into your own code.
+* Step 2: Copy the `IHoverLabelApi` interface from [IHoverLabelApi.cs](../IHoverLabelApi.cs) into your own code
+* Step 3: create your own label that implements the interface, make sure to check out the [IHoverLabel section](#IHoverLabel-tutorial) for more details on how to do this.
+* Step 4: create an instance of the api using the SMAPI mod registry helper: `IHoverLabelApi labelApi = this.Helper.ModRegistry.GetApi<IHoverLabelApi>("Achtuur.HoverLabels")`.
+* Step 5: register your label (called `yourLabel` in the example): `labelApi.Register(this.ModManifest, "yourLabelName", new yourLabel())`.
 
 
 

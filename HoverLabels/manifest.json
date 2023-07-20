@@ -9,8 +9,8 @@
     "dependencies": [
         {
             "UniqueID": "Achtuur.AchtuurCore",
-            "MinimumVersion": "1.1.4"
+            "MinimumVersion": "1.1.5"
         }
     ],
-    "UpdateKeys": [ "Nexus:xxxxx" ]
+    "UpdateKeys": [ "Nexus:17501" ]
 }
