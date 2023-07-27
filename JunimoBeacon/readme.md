@@ -11,6 +11,11 @@ This mod lets you craft the *Junimo Beacon*, which extends the range of Junimo h
 
 # Changelog
 
+# Planned
+
+* Fixes
+ [] Junimo beacon doesn't switch with seasons properly
+
 ## 1.1.0
 * New/Changed
   * Updated Beacon sprite and added seasonal variants, art made by [brightonmorris1](https://forums.nexusmods.com/index.php?/user/52800236-brightonmorris1/), very big thanks.

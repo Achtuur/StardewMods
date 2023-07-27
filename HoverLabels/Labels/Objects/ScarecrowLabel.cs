@@ -11,16 +11,16 @@ using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class ScarecrowLabel : ObjectLabel
 {
-    public ScarecrowLabel(int? priority=null) : base(priority)
+    public ScarecrowLabel(int? priority = null) : base(priority)
     {
     }
 
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        SObject sobj = ObjectLabel.GetCursorObject(cursorTile);
+        SObject sobj = GetCursorObject(cursorTile);
         return sobj is not null &&
             sobj.IsScarecrow();
     }
@@ -28,8 +28,8 @@ internal class ScarecrowLabel : ObjectLabel
     public override void GenerateLabel()
     {
         base.GenerateLabel();
-        this.Description.Add(I18n.LabelScarecrowCropsProtected(GetScarecrowCrops().Count()));
-        this.Description.Add(I18n.LabelShowrange(ModEntry.Instance.Config.ShowDetailsButton.ToString()));
+        Description.Add(I18n.LabelScarecrowCropsProtected(GetScarecrowCrops().Count()));
+        Description.Add(I18n.LabelShowrange(ModEntry.GetShowDetailButtonName()));
     }
 
     public override void DrawOnOverlay(SpriteBatch spriteBatch)

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 using StardewValley.Objects;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class MachineLabel : ObjectLabel
 {
     public MachineLabel(int? priority = null) : base(priority)
@@ -24,10 +24,11 @@ internal class MachineLabel : ObjectLabel
     /// <returns></returns>
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        SObject sobj = ObjectLabel.GetCursorObject(cursorTile);
+        SObject sobj = GetCursorObject(cursorTile);
 
-        return sobj is not null && 
-            (sobj.MinutesUntilReady > 0 || sobj.readyForHarvest.Value);
+        return sobj is not null
+            && sobj.Name != "Stone" //stone in the mines has a nonzero minutesuntilready for some godforsaken reason
+            && (sobj.MinutesUntilReady > 0 || sobj.readyForHarvest.Value);
     }
 
     /// <inheritdoc/>
@@ -43,7 +44,6 @@ internal class MachineLabel : ObjectLabel
         if (hoverObject.readyForHarvest.Value)
         {
             //display either "yx" (where y is number of items > 2) or ""
-            string amt = processingItem.Stack > 1 ? $"{processingItem.Stack}x " : string.Empty;
             if (processingItem.Stack == 1)
                 Description.Add(I18n.LabelMachineSingleItemReady(processingItem.DisplayName));
             else
@@ -54,13 +54,13 @@ internal class MachineLabel : ObjectLabel
         }
         else
         {
-            string duration = GetDurationUntilReadyString();
+            string duration = GetTimeString(hoverObject.MinutesUntilReady);
             Description.Add(I18n.LabelMachineCrafting(processingItem.DisplayName));
             Description.Add(I18n.LabelMachineReadyIn(duration));
         }
     }
 
-    private string GetQualityString(int quality)
+    internal static string GetQualityString(int quality)
     {
         switch (quality)
         {
@@ -72,28 +72,7 @@ internal class MachineLabel : ObjectLabel
         }
     }
 
-    private string GetDurationUntilReadyString()
-    {
-        if (hoverObject is Cask cask)
-        {
-            return GetCaskDurationString(cask);
-        }
-        return GetTimeString(hoverObject.MinutesUntilReady);
-    }
-
-    private string GetCaskDurationString(Cask cask)
-    {
-        // get days needed to reach next quality
-        int nextQuality = cask.GetNextQuality(cask.heldObject.Value.Quality);
-        float daysToMature = cask.daysToMature.Value - cask.GetDaysForQuality(nextQuality);
-        float aging_rate = cask.agingRate.Value;
-        int days = (int)Math.Ceiling(daysToMature / aging_rate);
-
-        string readyDate = ModEntry.GetDateAfterDays(days);
-        return $"{days}d ({readyDate})";
-    }
-
-    private string GetTimeString(int minutes)
+    internal static string GetTimeString(int minutes)
     {
         //days in stardew are 1600 minutes and not 1440 minutes. Hours from 2am to 6am are 100 minutes long for whatever reason.
         int days = minutes >= 1600 ? minutes / 1600 : 0;

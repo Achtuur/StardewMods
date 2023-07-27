@@ -126,7 +126,7 @@ public class ModEntry : Mod
 
     private void UpdateAnimationFrame()
     {
-        if (!Context.IsWorldReady)
+        if (!Context.IsWorldReady || SpeedupStatue.ID is null)
             return;
 
         foreach (SObject sobj in Game1.currentLocation.objects.Values)

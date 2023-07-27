@@ -10,17 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class ChestLabel : ObjectLabel
 {
     Chest hoverChest;
-    public ChestLabel(int? priority=null) : base(priority)
+    public ChestLabel(int? priority = null) : base(priority)
     {
     }
 
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        SObject sobj = ObjectLabel.GetCursorObject(cursorTile);
+        SObject sobj = GetCursorObject(cursorTile);
 
         return sobj is not null && sobj is Chest;
     }
@@ -29,17 +29,17 @@ internal class ChestLabel : ObjectLabel
     {
         base.GenerateLabel();
 
-        this.hoverChest = this.hoverObject as Chest;
+        hoverChest = hoverObject as Chest;
 
-        IEnumerable<string> inventoryContents = ChestLabel.ListInventoryContents(hoverChest.items, ModEntry.IsShowDetailButtonPressed());
-        this.Description = inventoryContents.ToList();
+        IEnumerable<string> inventoryContents = ListInventoryContents(hoverChest.items, ModEntry.IsShowDetailButtonPressed());
+        Description = inventoryContents.ToList();
 
-        string showAllMsg = ChestLabel.GetShowAllMessage(hoverChest.items);
+        string showAllMsg = GetShowAllMessage(hoverChest.items);
         if (showAllMsg is not null)
-            this.Description.Add(showAllMsg);
+            Description.Add(showAllMsg);
 
         if (!ModEntry.IsAlternativeSortButtonPressed() && inventoryContents.Count() > 1)
-            this.Description.Add(I18n.LabelChestAltsort(ModEntry.Instance.Config.AlternativeSortButton.ToString()));
+            Description.Add(I18n.LabelChestAltsort(ModEntry.GetAlternativeSortButtonName()));
 
     }
 
@@ -61,7 +61,7 @@ internal class ChestLabel : ObjectLabel
         {
             if (!inventoryItems.ContainsKey(item.DisplayName))
                 inventoryItems.Add(item.DisplayName, 0);
-            inventoryItems[item.DisplayName]++;
+            inventoryItems[item.DisplayName] += item.Stack;
         }
 
         // Either take entire dict, or first x entries based on button
@@ -87,7 +87,7 @@ internal class ChestLabel : ObjectLabel
         int allContentLength = ListInventoryContents(inventoryItems, showAll: true).Count();
         int inventoryCountListSizeDifference = allContentLength - ModEntry.Instance.Config.LabelListMaxSize;
         if (!ModEntry.IsShowDetailButtonPressed() && inventoryCountListSizeDifference > 0)
-            return I18n.LabelChestShowall(ModEntry.Instance.Config.ShowDetailsButton.ToString(), inventoryCountListSizeDifference);
+            return I18n.LabelPressShowmore(ModEntry.GetShowDetailButtonName(), inventoryCountListSizeDifference);
 
         return null;
     }

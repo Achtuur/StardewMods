@@ -11,16 +11,16 @@ using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class SprinklerLabel : ObjectLabel
 {
-    public SprinklerLabel(int? priority=null) : base(priority)
+    public SprinklerLabel(int? priority = null) : base(priority)
     {
     }
 
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        SObject sobj = ObjectLabel.GetCursorObject(cursorTile);
+        SObject sobj = GetCursorObject(cursorTile);
         return sobj is not null
             && sobj.IsSprinkler();
     }
@@ -29,8 +29,8 @@ internal class SprinklerLabel : ObjectLabel
     {
         base.GenerateLabel();
 
-        this.Description.Add(I18n.LabelSprinklerTilesWatered(GetWateredTileCrops().Count()));
-        this.Description.Add(I18n.LabelShowrange(ModEntry.Instance.Config.ShowDetailsButton.ToString()));
+        Description.Add(I18n.LabelSprinklerTilesWatered(GetWateredTileCrops().Count()));
+        Description.Add(I18n.LabelShowrange(ModEntry.GetShowDetailButtonName()));
     }
 
     private IEnumerable<Vector2> GetWateredTiles()
@@ -44,7 +44,7 @@ internal class SprinklerLabel : ObjectLabel
                 yield return tile;
         }
     }
-    
+
     private IEnumerable<Vector2> GetWateredTileCrops()
     {
         foreach (Vector2 tile in hoverObject.GetSprinklerTiles())

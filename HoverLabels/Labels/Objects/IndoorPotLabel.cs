@@ -11,14 +11,14 @@ using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class IndoorPotLabel : ObjectLabel
 {
     IndoorPot hoverPot;
     HoeDirt hoverHoeDirt;
     Crop hoverPotCrop;
 
-    public IndoorPotLabel(int? priority=null) : base(priority)
+    public IndoorPotLabel(int? priority = null) : base(priority)
     {
     }
 
@@ -36,29 +36,29 @@ internal class IndoorPotLabel : ObjectLabel
     {
         base.GenerateLabel();
 
-        this.hoverPot = this.hoverObject as IndoorPot;
-        this.hoverHoeDirt = this.hoverPot.hoeDirt.Value;
-        this.hoverPotCrop = this.hoverHoeDirt.crop;
+        hoverPot = hoverObject as IndoorPot;
+        hoverHoeDirt = hoverPot.hoeDirt.Value;
+        hoverPotCrop = hoverHoeDirt.crop;
 
-        this.GenerateCropLabel();
-        this.GenerateFertilizerLabel();
-        this.GenerateSoilStateLabel();
+        GenerateCropLabel();
+        GenerateFertilizerLabel();
+        GenerateSoilStateLabel();
     }
 
     private void GenerateSoilStateLabel()
     {
-        if (this.hoverPotCrop is null || CropLabel.IsCropFullyGrown(this.hoverPotCrop))
+        if (hoverPotCrop is null || CropLabel.IsCropFullyGrown(hoverPotCrop))
             return;
 
-        if (this.hoverHoeDirt.state.Value == 0 && !this.hoverPotCrop.dead.Value)
-            this.Description.Add(I18n.LabelCropsWaterNeeded());
+        if (hoverHoeDirt.state.Value == 0 && !hoverPotCrop.dead.Value)
+            Description.Add(I18n.LabelCropsWaterNeeded());
     }
 
     private void GenerateFertilizerLabel()
     {
         string fertilizerName = CropLabel.GetFertilizerName(hoverHoeDirt.fertilizer.Value);
         if (fertilizerName.Length > 0)
-            this.Description.Add(I18n.LabelCropsFertilizer(fertilizerName));
+            Description.Add(I18n.LabelCropsFertilizer(fertilizerName));
     }
 
     private void GenerateCropLabel()
@@ -69,11 +69,13 @@ internal class IndoorPotLabel : ObjectLabel
         }
 
         SObject harvestedItem = hoverPotCrop.programColored.Value ? new ColoredObject(hoverPotCrop.indexOfHarvest.Value, 1, hoverPotCrop.tintColor.Value) : new SObject(hoverPotCrop.indexOfHarvest.Value, 1, false, -1, 0);
-        this.Name += $" ({harvestedItem.DisplayName})";
+        Name += $" ({harvestedItem.DisplayName})";
 
-            if(CropLabel.IsCropFullyGrown(this.hoverPotCrop))
+        //fully grown crop
+        if (CropLabel.IsCropFullyGrown(hoverPotCrop))
         {
             Description.Add(I18n.LabelCropsReadyHarvest());
+            // check if crop can harvest variable range
             if (hoverPotCrop.minHarvest.Value == hoverPotCrop.maxHarvest.Value)
             {
                 Description.Add(I18n.LabelCropsHarvestAmount(hoverPotCrop.minHarvest.Value));
@@ -83,6 +85,7 @@ internal class IndoorPotLabel : ObjectLabel
                 Description.Add(I18n.LabelCropsHarvestRange(hoverPotCrop.minHarvest.Value, hoverPotCrop.maxHarvest.Value));
             }
         }
+        // dead crop
         else if (hoverPotCrop.dead.Value)
         {
             Description.Add(I18n.LabelCropsDead());
@@ -93,7 +96,7 @@ internal class IndoorPotLabel : ObjectLabel
             int days = CropLabel.GetDaysUntilFullyGrown(hoverPotCrop);
             string readyDate = ModEntry.GetDateAfterDays(days);
 
-            if (CropLabel.CropCanFullyGrowInTime(hoverPotCrop))
+            if (CropLabel.CropCanFullyGrowInTime(hoverPotCrop, hoverHoeDirt))
                 Description.Add(I18n.LabelCropsGrowTime(days, readyDate));
             else
                 Description.Add(I18n.LabelCropsInsufficientTime(days));

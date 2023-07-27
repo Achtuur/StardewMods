@@ -32,7 +32,7 @@ internal class TileShareRangeOverlay : AchtuurCore.Framework.Overlay
         float color_fac = ModEntry.Instance.Config.OverlayOpacity;
         Vector2 currentTile = Game1.player.getTileLocation();
 
-        Farmer[] nearbyFarmers = ModEntry.GetNearbyPlayers();
+        IEnumerable<Farmer> nearbyFarmers = ModEntry.GetNearbyPlayers();
 
         List<Vector2> nearbyFarmerTile = nearbyFarmers.Select(f => f.getTileLocation()).ToList();
 

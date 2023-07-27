@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 using StardewValley.Objects;
 
-namespace HoverLabels.Labels;
+namespace HoverLabels.Labels.Objects;
 internal class ObjectLabel : BaseLabel
 {
     protected SObject hoverObject;
@@ -20,7 +20,7 @@ internal class ObjectLabel : BaseLabel
     /// </summary>
     protected Vector2? CursorTileTop;
 
-    public ObjectLabel(int? priority) : base(priority)
+    public ObjectLabel(int? priority = null) : base(priority)
     {
     }
 
@@ -40,7 +40,7 @@ internal class ObjectLabel : BaseLabel
     /// <returns></returns>
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
-        SObject sobj = ObjectLabel.GetCursorObject(cursorTile);
+        SObject sobj = GetCursorObject(cursorTile);
         return sobj is not null;
     }
 
@@ -53,13 +53,13 @@ internal class ObjectLabel : BaseLabel
 
         if (hoverObject.TileLocation == cursorTile)
         {
-            this.CursorTile = cursorTile;
-            this.CursorTileTop = cursorTile - Vector2.UnitY;
+            CursorTile = cursorTile;
+            CursorTileTop = cursorTile - Vector2.UnitY;
         }
         else
         {
-            this.CursorTileTop = cursorTile;
-            this.CursorTile = cursorTile + Vector2.UnitY;
+            CursorTileTop = cursorTile;
+            CursorTile = cursorTile + Vector2.UnitY;
         }
     }
 
@@ -85,7 +85,7 @@ internal class ObjectLabel : BaseLabel
             if (sobj.bigCraftable.Value)
                 return sobj;
         }
-        return null;        
+        return null;
     }
 
     internal static SObject GetObjectWithId(int id)
@@ -96,7 +96,7 @@ internal class ObjectLabel : BaseLabel
     protected override void ResetLabel()
     {
         base.ResetLabel();
-        this.CursorTileTop = null;
-        this.hoverObject = null;
+        CursorTileTop = null;
+        hoverObject = null;
     }
 }

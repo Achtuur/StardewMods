@@ -96,13 +96,12 @@ internal class CropLabel : BaseLabel
         {
             Description.Add(I18n.LabelCropsDead());
         }
-        // Not fully grown yet
-        else
+        else // Not fully grown yet
         {
             int days = GetDaysUntilFullyGrown(hoverCrop);
             string readyDate = ModEntry.GetDateAfterDays(days);
 
-            if (CropCanFullyGrowInTime(hoverCrop))
+            if (CropCanFullyGrowInTime(hoverCrop, hoverHoeDirt))
                 Description.Add(I18n.LabelCropsGrowTime(days, readyDate));
             else
                 Description.Add(I18n.LabelCropsInsufficientTime(readyDate));
@@ -119,15 +118,14 @@ internal class CropLabel : BaseLabel
 
     internal static bool IsCropFullyGrown(Crop crop)
     {
-        if (crop.regrowAfterHarvest.Value != -1)
-        {
-            return crop.fullyGrown.Value && crop.dayOfCurrentPhase.Value <= 0;
-        }
-        return crop.fullyGrown.Value || crop.currentPhase.Value == crop.phaseDays.Count - 1;
+        return GetDaysUntilFullyGrown(crop) <= 0;
     }
 
     internal static SObject GetCropAsObject(Crop crop)
     {
+        if (crop is null)
+            return null;
+
         return crop.programColored.Value 
             ? new ColoredObject(crop.indexOfHarvest.Value, 1, crop.tintColor.Value) 
             : new SObject(crop.indexOfHarvest.Value, 1, false, -1, 0);
@@ -141,7 +139,7 @@ internal class CropLabel : BaseLabel
         // regrowing crops use different variable
         if (crop.fullyGrown.Value && crop.regrowAfterHarvest.Value != -1)
             return dayOfCurrentPhase;
-        // fully grown
+        // fully grown if current phase is last phase
         else if (currentPhase == crop.phaseDays.Count - 1)
             return 0;
 
@@ -157,21 +155,26 @@ internal class CropLabel : BaseLabel
     /// <param name="crop"></param>
     /// <param name="days"></param>
     /// <returns></returns>
-    internal static bool CropCanFullyGrowInTime(Crop crop)
+    internal static bool CropCanFullyGrowInTime(Crop crop, HoeDirt cropDirt)
     {
         int days = GetDaysUntilFullyGrown(crop);
 
         // growth fits within current season -> can always grow
-        if (Game1.dayOfMonth + days <= 28)
-        {
+        if (Game1.dayOfMonth + days <= 28 
+            || cropDirt.currentLocation is null 
+            || !cropDirt.currentLocation.IsOutdoors 
+            || cropDirt.currentLocation.SeedsIgnoreSeasonsHere())
             return true;
-        }
-        // Growth would only finish next season -> check if crop can surive next season
-        else
-        {
-            string next_season = ModEntry.Seasons[ModEntry.Seasons.IndexOf(Game1.currentSeason) + 1];
-            return crop.seasonsToGrowIn.Contains(next_season);
-        }
+
+        // current location overrides season -> check if crop survives current season
+        // this will (probably) always return true if seasonOverride is set
+        if (cropDirt.currentLocation.seasonOverride is not null && cropDirt.currentLocation.seasonOverride != String.Empty)
+            return crop.seasonsToGrowIn.Contains(cropDirt.currentLocation.seasonOverride);
+
+        /// Growth would only finish next season -> check if crop can surive next season
+        string location_season = cropDirt.currentLocation.GetSeasonForLocation();
+        string next_season = ModEntry.Seasons[ModEntry.Seasons.IndexOf(location_season) + 1];
+        return crop.seasonsToGrowIn.Contains(next_season);
     }
 
     internal static string ToTitleString(string s)

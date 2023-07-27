@@ -12,12 +12,13 @@ using Microsoft.Xna.Framework.Graphics;
 using AchtuurCore.Utility;
 using AchtuurCore.Framework;
 using StardewValley.Objects;
+using HoverLabels.Labels.Objects;
 
-namespace HoverLabels.Labels;
-internal class JunimoHutLabel : BaseLabel
+namespace HoverLabels.Labels.Buildings;
+internal class JunimoHutLabel : BuildingLabel
 {
     JunimoHut hoverHut;
-    public JunimoHutLabel(int? priority=null) : base(priority)
+    public JunimoHutLabel(int? priority = null) : base(priority)
     {
     }
 
@@ -38,38 +39,41 @@ internal class JunimoHutLabel : BaseLabel
 
     public override void SetCursorTile(Vector2 cursorTile)
     {
-        this.CursorTile = cursorTile;
-        this.hoverHut = Game1.getFarm().buildings
-            .Where(b => b is JunimoHut && b.GetRect().Contains(cursorTile)).First() as JunimoHut;
+        base.SetCursorTile(cursorTile);
+        this.hoverHut = this.hoverBuilding as JunimoHut;
+
+        //CursorTile = cursorTile;
+        //hoverHut = Game1.getFarm().buildings
+        //    .Where(b => b is JunimoHut && b.GetRect().Contains(cursorTile)).First() as JunimoHut;
 
     }
 
     public override void GenerateLabel()
     {
-        this.Name = "Junimo Hut";
+        base.GenerateLabel();
 
         Chest hutInventory = hoverHut.output.Value;
         IEnumerable<string> inventoryContents = ChestLabel.ListInventoryContents(hutInventory.items, ModEntry.IsShowDetailButtonPressed());
-        this.Description = inventoryContents.ToList();
+        Description = inventoryContents.ToList();
 
         string showAllMsg = ChestLabel.GetShowAllMessage(hutInventory.items);
         if (showAllMsg is not null)
-            this.Description.Add(showAllMsg);
+            Description.Add(showAllMsg);
 
         if (!ModEntry.IsAlternativeSortButtonPressed() && inventoryContents.Count() > 1)
-            this.Description.Add(I18n.LabelChestAltsort(ModEntry.Instance.Config.AlternativeSortButton.ToString()));
+            Description.Add(I18n.LabelChestAltsort(ModEntry.GetAlternativeSortButtonName()));
 
-        this.Description.Add(I18n.LabelShowrange(ModEntry.Instance.Config.ShowDetailsButton.ToString()));
+        Description.Add(I18n.LabelShowrange(ModEntry.GetShowDetailButtonName()));
     }
 
     public override void DrawOnOverlay(SpriteBatch spriteBatch)
     {
         if (!ModEntry.IsShowDetailButtonPressed())
             return;
-        
-        IEnumerable<Vector2> hutRange = GetHutRangeRect(this.hoverHut).GetTiles();
+
+        IEnumerable<Vector2> hutRange = GetHutRangeRect(hoverHut).GetTiles();
         Overlay.DrawTiles(spriteBatch, hutRange, tileTexture: Overlay.GreenTilePlacementTexture);
-        
+
     }
 
     private static Rectangle GetHutRangeRect(JunimoHut hut)
