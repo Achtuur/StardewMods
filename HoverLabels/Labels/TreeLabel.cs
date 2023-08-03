@@ -91,7 +91,7 @@ internal class TreeLabel : BaseLabel
             case 6: return "Palm Tree";
             case 7: return "Mushroom Tree";
             case 8: return "Mahogany Tree";
-            case 9: return "Palm Tree"; // 2nd variation palm tree
+            case 9: return "Palm Tree 2";
         }
         return null;
     }

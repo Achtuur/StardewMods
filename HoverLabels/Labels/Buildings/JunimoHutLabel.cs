@@ -13,7 +13,6 @@ using AchtuurCore.Utility;
 using AchtuurCore.Framework;
 using StardewValley.Objects;
 using HoverLabels.Labels.Objects;
-using SObject = StardewValley.Object;
 
 namespace HoverLabels.Labels.Buildings;
 internal class JunimoHutLabel : BuildingLabel
@@ -42,6 +41,11 @@ internal class JunimoHutLabel : BuildingLabel
     {
         base.SetCursorTile(cursorTile);
         this.hoverHut = this.hoverBuilding as JunimoHut;
+
+        //CursorTile = cursorTile;
+        //hoverHut = Game1.getFarm().buildings
+        //    .Where(b => b is JunimoHut && b.GetRect().Contains(cursorTile)).First() as JunimoHut;
+
     }
 
     public override void GenerateLabel()
@@ -49,13 +53,7 @@ internal class JunimoHutLabel : BuildingLabel
         base.GenerateLabel();
 
         Chest hutInventory = hoverHut.output.Value;
-        IEnumerable<Item> items = hutInventory.items.Where(item => item.ParentSheetIndex != SObject.prismaticShardIndex);
-
-        // If difference in length, prismatic shard was filtered out
-        if (hutInventory.items.Count != items.Count())
-            this.Name += " (Prismatic)";
-
-        IEnumerable<string> inventoryContents = ChestLabel.ListInventoryContents(items, ModEntry.IsShowDetailButtonPressed());
+        IEnumerable<string> inventoryContents = ChestLabel.ListInventoryContents(hutInventory.items, ModEntry.IsShowDetailButtonPressed());
         Description = inventoryContents.ToList();
 
         string showAllMsg = ChestLabel.GetShowAllMessage(hutInventory.items);
