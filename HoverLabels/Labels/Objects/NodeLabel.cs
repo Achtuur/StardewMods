@@ -1,4 +1,5 @@
 ﻿using AchtuurCore.Extensions;
+using AchtuurCore.Utility;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Network;
@@ -21,15 +22,19 @@ enum NodeType
 
 internal class NodeLabel : ObjectLabel
 {
-    const int JadeIndex = 64;
+    /// <summary>
+    /// ParentsheetIndex of Jade, only gem that does not have a constant in SObject class
+    /// </summary>
+    const int JadeIndex = 70;
 
     static Dictionary<int, int> NodeDroppedItemIndex = new()
     {
         { 751, SObject.copper },
+        { 849, SObject.copper }, // volcano copper ore
         { 290, SObject.iron },
         { 764, SObject.gold },
         { 765, SObject.iridium },
-        { 844, 848 }, // cinder shard
+        { 843, 848 }, // cinder shard
         { 95, 909 }, // radioactive ore
         { 2, SObject.diamondIndex },
         { 4, SObject.rubyIndex },
@@ -41,7 +46,7 @@ internal class NodeLabel : ObjectLabel
         { 75, 535 }, // normal geode
         { 76, 536 }, // frozen geode
         { 77, 537 }, // magma geode
-        { 819, 749}, // omni geode
+        { 819, 749 }, // omni geode
         { 25, 719 }, // mussel node
         { 818, 330 }, // clay node
 
@@ -52,21 +57,46 @@ internal class NodeLabel : ObjectLabel
 
     public override bool ShouldGenerateLabel(Vector2 cursorTile)
     {
+        Debug.DebugOnlyExecute(() =>
+        {
+            NodeDroppedItemIndex = new()
+            {
+                { 751, SObject.copper },
+                { 290, SObject.iron },
+                { 764, SObject.gold },
+                { 765, SObject.iridium },
+                { 849, SObject.copper }, // volcano copper ore
+                { 850, SObject.iron }, //volcano iron ore
+                { 843, 848 }, // cinder shard
+                { 95, 909 }, // radioactive ore
+                { 2, SObject.diamondIndex },
+                { 4, SObject.rubyIndex },
+                { 6, JadeIndex }, // jade
+                { 8, SObject.amethystClusterIndex},
+                { 10, SObject.topazIndex },
+                { 12, SObject.emeraldIndex },
+                { 14, SObject.aquamarineIndex },
+                { 75, 535 }, // normal geode
+                { 76, 536 }, // frozen geode
+                { 77, 537 }, // magma geode
+                { 819, 749 }, // omni geode
+                { 25, 719 }, // mussel node
+                { 818, 330 }, // clay node
+
+            };
+        });
+
+
         SObject sobj = GetCursorObject(cursorTile);
 
         return sobj is not null
+            && sobj.Name == "Stone"
             && GetNodeType(sobj.ParentSheetIndex) is not null;
     }
 
     public override void GenerateLabel()
     {
         NodeType? nodeType = GetNodeType(hoverObject.ParentSheetIndex);
-
-        if (nodeType is null)
-            return;
-
-        //nodeType = nodeType.Value;
-
         switch (nodeType)
         {
             case NodeType.NormalNode:
@@ -81,7 +111,7 @@ internal class NodeLabel : ObjectLabel
             case NodeType.BoneNode:
                 GenerateBoneNodeLabel();
                 break;
-            case null:
+            default:
                 break;
         }
 
@@ -144,6 +174,7 @@ internal class NodeLabel : ObjectLabel
                 return NodeType.MysticNode;
             case 44:
                 return NodeType.GemNode;
+            case 816:
             case 817:
                 return NodeType.BoneNode;
         }

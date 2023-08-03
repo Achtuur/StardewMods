@@ -11,6 +11,7 @@ using AchtuurCore.Integrations;
 using System.Security;
 using HoverLabels.Framework;
 using AchtuurCore.Utility;
+using System.Reflection.Emit;
 
 namespace HoverLabels
 {
@@ -26,6 +27,8 @@ namespace HoverLabels
         public SButton ShowDetailsButton { get; set; }
         public SButton AlternativeSortButton { get; set; }
 
+        public Dictionary<string, Dictionary<string, bool>> EnabledLabels { get; set; }
+
         public ModConfig()
         {
             // Initialise variables here
@@ -33,6 +36,7 @@ namespace HoverLabels
             LabelListMaxSize = 5;
             ShowDetailsButton = SButton.LeftControl;
             AlternativeSortButton = SButton.LeftShift;
+            EnabledLabels = new();
         }
 
         /// <summary>
@@ -53,7 +57,11 @@ namespace HoverLabels
             configMenu.Register(
                 mod: ModEntry.Instance.ModManifest,
                 reset: () => ModEntry.Instance.Config = new ModConfig(),
-                save: () => ModEntry.Instance.Helper.WriteConfig(ModEntry.Instance.Config)
+                save: () => {
+                    this.RegisteredLabelsToDictionary(ModEntry.Instance.LabelManager.RegisteredLabels);
+                    ModEntry.Instance.LabelManager.SetLabelEnabled(this);
+                    ModEntry.Instance.Helper.WriteConfig(ModEntry.Instance.Config);
+                }
             );
 
             registered = true;
@@ -92,9 +100,9 @@ namespace HoverLabels
                 setValue: (button) => this.AlternativeSortButton = button
             );
 
-
-            IEnumerable<RegisteredLabel> registeredLabels = LabelManager.RegisteredLabels;
-            foreach (IManifest manifest in LabelManager.GetUniqueRegisteredManifests())
+            // Add bool option for each registered label, sorted by mod
+            IEnumerable<RegisteredLabel> registeredLabels = ModEntry.Instance.LabelManager.RegisteredLabels;
+            foreach (IManifest manifest in ModEntry.Instance.LabelManager.GetUniqueRegisteredManifests())
             {
                 configMenu.AddSectionTitle(
                     mod: ModEntry.Instance.ModManifest,
@@ -117,6 +125,40 @@ namespace HoverLabels
                     );
                 }
             }
+        }
+
+        /// <summary>
+        /// Transform collection of <see cref="RegisteredLabel"/> into dictionary.
+        /// 
+        /// Each key of dictionary is a mod name, which holds all the `label name: enabled` combinations
+        /// </summary>
+        /// <param name="labels"></param>
+        /// <returns></returns>
+        public void RegisteredLabelsToDictionary(IEnumerable<RegisteredLabel> registeredLabels)
+        {
+            this.EnabledLabels = registeredLabels
+                .GroupBy(label => label.Manifest)
+                .ToDictionary(
+                    group => group.Key.Name,
+                    group => group.ToDictionary(mod_label => mod_label.Name, mod_label => mod_label.Enabled)
+                );
+        }
+
+        /// <summary>
+        /// Returns whether label from mod with manifest <paramref name="manifest"/> and name <paramref name="label_name"/> is enabled.
+        /// 
+        /// If this label didn't exist yet, returns true so new labels are always enabled by default
+        /// </summary>
+        /// <param name="manifest"></param>
+        /// <param name="label_name"></param>
+        /// <returns></returns>
+        public bool IsLabelEnabled(IManifest manifest, string label_name)
+        {
+            if (!this.EnabledLabels.ContainsKey(manifest.Name) 
+                || !this.EnabledLabels[manifest.Name].ContainsKey(label_name))
+                return true;
+
+            return this.EnabledLabels[manifest.Name][label_name];
         }
     }
 }
