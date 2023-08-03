@@ -26,17 +26,13 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
             return;
 
         this.cask_entity = this.entity as SObjectCask;
-        this.spedUp = false;
+
         this.previousState = this.automateMachine.GetState();
         this.SetActualTime();
     }
     /// <inheritdoc/>
     public override void OnDayStarted()
     {
-        if (this.actualDaysToMature > 0)
-        {
-            this.actualDaysToMature -= 1;
-        }
         this.previousState = this.automateMachine.GetState();
     }
     /// <inheritdoc/>
@@ -69,7 +65,6 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
         if (this.automateMachine.GetState() != MachineState.Processing || this.actualAgingRate <= 0)
             return;
 
-        this.spedUp = true;
         this.cask_entity.agingRate.Value = this.actualAgingRate / GetSpeedUpFactor(n_statues);
         AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"{automateMachine.MachineTypeID} at {automateMachine.Location} ({automateMachine.TileArea.X}, {automateMachine.TileArea.Y}) was sped up:\t{this.actualAgingRate} -> {this.cask_entity.agingRate.Value}\t({Formatter.FormatNStatues(this.n_statues)})");
     }
@@ -77,9 +72,7 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
     /// <inheritdoc/>
     public override void RestoreSpeed()
     {
-        //this.cask_entity.daysToMature.Value = this.actualDaysToMature;
         this.cask_entity.agingRate.Value = this.actualAgingRate;
-        this.spedUp = false;
         this.actualAgingRate = -1;
     }
 }

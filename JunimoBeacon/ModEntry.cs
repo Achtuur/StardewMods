@@ -116,7 +116,10 @@ public class ModEntry : Mod
 
     private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
     {
-        if (!e.Name.IsEquivalentTo("Tilesheets/Craftables") || JunimoBeacon.ID is null || (Context.IsSplitScreen && !Context.IsMainPlayer))
+        if (!e.Name.IsEquivalentTo("Tilesheets/Craftables") 
+            || JunimoBeacon.ID is null 
+            || !Context.IsWorldReady
+            || (Context.IsSplitScreen && !Context.IsMainPlayer))
             return;
 
         e.Edit(static asset =>
@@ -130,7 +133,8 @@ public class ModEntry : Mod
             Rectangle sourceRect = new Rectangle(0, 0, seasonalBeacon.Width, seasonalBeacon.Height);
             Rectangle targetRect = SObject.getSourceRectForBigCraftable(JunimoBeacon.ID.Value);
 
-            if (!sourceRect.Contains(targetRect))
+
+            if (targetRect.IsEmpty || !img.Data.Bounds.Contains(targetRect))
                 return;
 
             if (targetRect.Y + targetRect.Height > 4096)
@@ -156,6 +160,11 @@ public class ModEntry : Mod
                 {
                     group.Color = ColorHelper.GetUniqueColor(alpha: 230);
                 }
+            }
+            else if(e.Button.Equals(SButton.T))
+            {
+                // Force asset request of big craftable
+                Instance.Helper.GameContent.InvalidateCache("Tilesheets/Craftables");
             }
         });
     }

@@ -46,7 +46,7 @@ Types of labels:
 * labels with a duration that is longer than a day should show date
  
 
-## 1.1.2 (unreleased)
+## 1.1.2
 * New/Changed
   * Junimo hut label now shows whether hut is prismatic
 

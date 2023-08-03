@@ -230,7 +230,7 @@ internal class TileFiller
         for (int t = 0; t < nTiles; t++)
         {
             Vector2 tile = startTile + t * dir;
-            yield return new FillTile(tile, priority: t);
+            yield return new FillTile(tile, priority: nTiles-t);
         }
     }
 
