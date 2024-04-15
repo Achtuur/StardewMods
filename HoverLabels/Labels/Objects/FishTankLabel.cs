@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using HoverLabels.Drawing;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
@@ -34,11 +35,11 @@ internal class FishTankLabel : ObjectLabel
         if (fishLookup.Count() <= 0)
             return;
 
-        this.Description.Add($"Contains:");
+        AddBorder(I18n.Contains());
 
         foreach(Item f in fishLookup.Keys.OrderBy(f => f.DisplayName))
         {
-            this.Description.Add($"> {f.DisplayName}");
+            AppendLabelToBorder(new ItemLabelText(f));
         }
     }
 }

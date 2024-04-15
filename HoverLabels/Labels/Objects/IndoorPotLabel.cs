@@ -1,9 +1,11 @@
 ﻿using AchtuurCore.Extensions;
 using HarmonyLib;
+using HoverLabels.Drawing;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +42,17 @@ internal class IndoorPotLabel : ObjectLabel
         hoverHoeDirt = hoverPot.hoeDirt.Value;
         hoverPotCrop = hoverHoeDirt.crop;
 
+        if (hoverPotCrop is null || hoverObject is null)
+        {
+            return;
+        }
+
+        ResetBorders();
+        SObject harvestedItem = hoverPotCrop.programColored.Value ? new ColoredObject(hoverPotCrop.indexOfHarvest.Value, 1, hoverPotCrop.tintColor.Value) : new SObject(hoverPotCrop.indexOfHarvest.Value, 1, false, -1, 0);
+        string title = $"{hoverObject.DisplayName} ({harvestedItem.DisplayName})";
+        AddBorder(new TitleLabelText(title));
+
+        NewBorder();
         GenerateCropLabel();
         GenerateFertilizerLabel();
         GenerateSoilStateLabel();
@@ -50,45 +63,34 @@ internal class IndoorPotLabel : ObjectLabel
         if (hoverPotCrop is null || CropLabel.IsCropFullyGrown(hoverPotCrop))
             return;
 
-        if (hoverHoeDirt.state.Value == 0 && !hoverPotCrop.dead.Value)
-            Description.Add(I18n.LabelCropsWaterNeeded());
+        Item watering_can = Game1.player.Items.Where(item => item is WateringCan).FirstOrDefault();
+        if (watering_can is null)
+            watering_can = ItemRegistry.Create("(T)WateringCan");
+        if (this.hoverHoeDirt.state.Value == 0 && !this.hoverPotCrop.dead.Value)
+            //AppendLabelToBorder(I18n.LabelCropsWaterNeeded());
+            //AppendLabelToBorder(new ItemLabelText(watering_can, I18n.LabelCropsWaterNeeded()));
+            AddBorder(new ItemLabelText(watering_can, I18n.LabelCropsWaterNeeded()));
     }
 
     private void GenerateFertilizerLabel()
     {
-        string fertilizerName = CropLabel.GetFertilizerName(hoverHoeDirt.fertilizer.Value);
-        if (fertilizerName.Length > 0)
-            Description.Add(I18n.LabelCropsFertilizer(fertilizerName));
+        string fertilizerQID = CropLabel.GetFertilizerQID(hoverHoeDirt.fertilizer.Value);
+        if (fertilizerQID.Length > 0)
+            //AppendLabelToBorder(new ItemLabelText(fertilizerQID));
+            AddBorder(new ItemLabelText(fertilizerQID));
     }
 
     private void GenerateCropLabel()
     {
-        if (hoverPotCrop is null)
-        {
-            return;
-        }
-
-        SObject harvestedItem = hoverPotCrop.programColored.Value ? new ColoredObject(hoverPotCrop.indexOfHarvest.Value, 1, hoverPotCrop.tintColor.Value) : new SObject(hoverPotCrop.indexOfHarvest.Value, 1, false, -1, 0);
-        Name += $" ({harvestedItem.DisplayName})";
-
         //fully grown crop
         if (CropLabel.IsCropFullyGrown(hoverPotCrop))
         {
-            Description.Add(I18n.LabelCropsReadyHarvest());
-            // check if crop can harvest variable range
-            if (hoverPotCrop.minHarvest.Value == hoverPotCrop.maxHarvest.Value)
-            {
-                Description.Add(I18n.LabelCropsHarvestAmount(hoverPotCrop.minHarvest.Value));
-            }
-            else
-            {
-                Description.Add(I18n.LabelCropsHarvestRange(hoverPotCrop.minHarvest.Value, hoverPotCrop.maxHarvest.Value));
-            }
+            AppendLabelToBorder(I18n.LabelCropsReadyHarvest());
         }
         // dead crop
         else if (hoverPotCrop.dead.Value)
         {
-            Description.Add(I18n.LabelCropsDead());
+            AppendLabelToBorder(I18n.LabelCropsDead());
         }
         // Not fully grown yet
         else
@@ -97,9 +99,9 @@ internal class IndoorPotLabel : ObjectLabel
             string readyDate = ModEntry.GetDateAfterDays(days);
 
             if (CropLabel.CropCanFullyGrowInTime(hoverPotCrop, hoverHoeDirt))
-                Description.Add(I18n.LabelCropsGrowTime(days, readyDate));
+                AppendLabelToBorder(I18n.LabelCropsGrowTime(days, readyDate));
             else
-                Description.Add(I18n.LabelCropsInsufficientTime(days));
+                AppendLabelToBorder(I18n.LabelCropsInsufficientTime(days));
         }
     }
 }

@@ -44,7 +44,23 @@ Types of labels:
 
 * disable label during events?
 * labels with a duration that is longer than a day should show date
+
+## 1.2.2
+* New/Changed
+  * add more i18n stuff to labels
+
+
+## 1.2.1
+* Fixes
+    * Fix warning message in console
  
+## 1.2.0
+
+Updated to support Stardew Valley 1.6
+
+* New/Changed
+  * Crop label no longer shows number of harvestables
+
 
 ## 1.1.2
 * New/Changed

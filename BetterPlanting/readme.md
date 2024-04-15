@@ -15,7 +15,17 @@ This mod lets you plant faster, by letting you plant multiple seeds at once
 
 # Changelog
 
-## 1.2.2 (unreleased)
+## 1.3.0
+Updated to support Stardew Valley 1.6
+
+## 1.2.3
+* New/Changed
+  * Added Japanese translation by tikamin557
+
+## 1.2.2
+* New/Changed
+  * Added option to select default fill mode
+
 * Fixes
   * Row plant modes now prioritise seeds closer to player
 

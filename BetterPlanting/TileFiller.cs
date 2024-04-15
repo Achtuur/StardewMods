@@ -60,6 +60,10 @@ internal class TileFiller
     /// Placement range where tile filler starts doing work. Set to 1.5f (should be sqrt(2) technically) so the 8 squares around the player are counted
     /// </summary>
     internal const float PlacementRange = 1.5f;
+
+    /// <summary>
+    /// Amount of fill modes available
+    /// </summary>
     internal const int FillModeNumber = 7;
     /// <summary>
     /// Maxmimum number of tiles this filler is allowed to use
@@ -90,6 +94,12 @@ internal class TileFiller
     {
         this.FillMode = fillMode;
         this.fillModePointer = (int)fillMode;
+    }
+
+    internal void ResetFillMode()
+    {
+        this.FillMode = ModEntry.Instance.Config.DefaultFillMode;
+        this.fillModePointer = (int)this.FillMode;
     }
 
     internal void IncrementFillMode(int amount)

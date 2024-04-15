@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using StardewValley.TerrainFeatures;
 using SObject = StardewValley.Object;
 using StardewValley.Objects;
+using HoverLabels.Drawing;
+using StardewValley.Tools;
 
 namespace HoverLabels.Labels;
 internal class CropLabel : BaseLabel
@@ -29,7 +31,7 @@ internal class CropLabel : BaseLabel
         TerrainFeature terrainFeature = Game1.currentLocation.terrainFeatures[cursorTile];
         if (terrainFeature is HoeDirt hoeDirt)
         {
-            return hoeDirt.crop is not null || hoeDirt.fertilizer.Value != HoeDirt.noFertilizer;
+            return hoeDirt.crop is not null || hoeDirt.HasFertilizer();
         }
 
         return false;
@@ -47,6 +49,17 @@ internal class CropLabel : BaseLabel
 
     public override void GenerateLabel()
     {
+        if (hoverCrop is null)
+        {
+            TitleLabelText no_crop = new(I18n.LabelCropsNoCrop());
+            AddBorder(no_crop);
+            return;
+        }
+
+        SObject harvestedItem = GetCropAsObject(hoverCrop);
+        TitleLabelText crop_name = new(harvestedItem.DisplayName);
+        AddBorder(crop_name);
+        NewBorder();
         GenerateCropStateLabel();
         GenerateFertilizerStateLabel();
         GenerateSoilStateLabel();
@@ -57,44 +70,32 @@ internal class CropLabel : BaseLabel
         if (this.hoverCrop is null || IsCropFullyGrown(this.hoverCrop))
             return;
 
+        Item watering_can = Game1.player.Items.Where(item => item is WateringCan).FirstOrDefault();
+        if (watering_can is null)
+            watering_can = ItemRegistry.Create("(T)WateringCan");
         if (this.hoverHoeDirt.state.Value == 0 && !this.hoverCrop.dead.Value)
-            this.Description.Add("Needs water!");
+            //AppendLabelToBorder(I18n.LabelCropsWaterNeeded());
+            AppendLabelToBorder(new ItemLabelText(watering_can, I18n.LabelCropsWaterNeeded()));
     }
 
     private void GenerateFertilizerStateLabel()
     {
-        string fertilizerName = GetFertilizerName(hoverHoeDirt.fertilizer.Value);
-        if (fertilizerName.Length > 0)
-            this.Description.Add(I18n.LabelCropsFertilizer(fertilizerName));
+        string fertilizerQID = GetFertilizerQID(hoverHoeDirt.fertilizer.Value);
+        if (fertilizerQID.Length > 0)
+            AppendLabelToBorder(new ItemLabelText(fertilizerQID));
     }
 
     private void GenerateCropStateLabel()
     {
-        if (hoverCrop is null)
-        {
-            this.Name = I18n.LabelCropsNoCrop();
-            return;
-        }
-
-        SObject harvestedItem = GetCropAsObject(hoverCrop);
-        this.Name = harvestedItem.DisplayName;
+        
 
         if (IsCropFullyGrown(hoverCrop))
         {
-            Description.Add(I18n.LabelCropsReadyHarvest());
-
-            if (hoverCrop.minHarvest.Value == hoverCrop.maxHarvest.Value)
-            {
-                Description.Add(I18n.LabelCropsHarvestAmount(hoverCrop.minHarvest.Value));
-            }
-            else
-            {
-                Description.Add(I18n.LabelCropsHarvestRange(hoverCrop.minHarvest.Value, hoverCrop.maxHarvest.Value));
-            }
+            AppendLabelToBorder(I18n.LabelCropsReadyHarvest());
         }
         else if (hoverCrop.dead.Value)
         {
-            Description.Add(I18n.LabelCropsDead());
+            AppendLabelToBorder(I18n.LabelCropsDead());
         }
         else // Not fully grown yet
         {
@@ -102,18 +103,22 @@ internal class CropLabel : BaseLabel
             string readyDate = ModEntry.GetDateAfterDays(days);
 
             if (CropCanFullyGrowInTime(hoverCrop, hoverHoeDirt))
-                Description.Add(I18n.LabelCropsGrowTime(days, readyDate));
+                AppendLabelToBorder(I18n.LabelCropsGrowTime(days, readyDate));
             else
-                Description.Add(I18n.LabelCropsInsufficientTime(readyDate));
+                AppendLabelToBorder(I18n.LabelCropsInsufficientTime(readyDate));
         }
     }
 
-    internal static string GetFertilizerName(int id)
+    internal static string GetFertilizerQID(string qualified_id)
     {
-        SObject sobj = ModEntry.GetObjectWithId(id);
-        if (!sobj.DisplayName.ToLowerInvariant().Contains("weeds"))
-            return sobj.displayName;
-        return "";
+        if (qualified_id is null || qualified_id.Length == 0)
+            return "";
+
+        Item fertilizer_item = ItemRegistry.Create(qualified_id);
+        if (fertilizer_item.DisplayName.ToLowerInvariant().Contains("weeds"))
+            return "";
+
+        return fertilizer_item.QualifiedItemId;
     }
 
     internal static bool IsCropFullyGrown(Crop crop)
@@ -137,7 +142,7 @@ internal class CropLabel : BaseLabel
         int dayOfCurrentPhase = crop.dayOfCurrentPhase.Value;
 
         // regrowing crops use different variable
-        if (crop.fullyGrown.Value && crop.regrowAfterHarvest.Value != -1)
+        if (crop.fullyGrown.Value && crop.RegrowsAfterHarvest())
             return dayOfCurrentPhase;
         // fully grown if current phase is last phase
         else if (currentPhase == crop.phaseDays.Count - 1)
@@ -161,20 +166,22 @@ internal class CropLabel : BaseLabel
 
         // growth fits within current season -> can always grow
         if (Game1.dayOfMonth + days <= 28 
-            || cropDirt.currentLocation is null 
-            || !cropDirt.currentLocation.IsOutdoors 
-            || cropDirt.currentLocation.SeedsIgnoreSeasonsHere())
+            || cropDirt.Location is null 
+            || !cropDirt.Location.IsOutdoors 
+            || cropDirt.Location.SeedsIgnoreSeasonsHere())
             return true;
 
         // current location overrides season -> check if crop survives current season
         // this will (probably) always return true if seasonOverride is set
-        if (cropDirt.currentLocation.seasonOverride is not null && cropDirt.currentLocation.seasonOverride != String.Empty)
-            return crop.seasonsToGrowIn.Contains(cropDirt.currentLocation.seasonOverride);
-
+        if (cropDirt.Location.SeedsIgnoreSeasonsHere())
+        {
+            return crop.IsInSeason(cropDirt.Location);
+        }
         /// Growth would only finish next season -> check if crop can surive next season
-        string location_season = cropDirt.currentLocation.GetSeasonForLocation();
-        string next_season = ModEntry.Seasons[ModEntry.Seasons.IndexOf(location_season) + 1];
-        return crop.seasonsToGrowIn.Contains(next_season);
+        Season location_season = cropDirt.Location.GetSeason();
+        int idx = (ModEntry.Seasons.IndexOf(location_season) + 1) % ModEntry.Seasons.Count;
+        Season next_season = ModEntry.Seasons[idx];
+        return crop.GetData().Seasons.Contains(next_season);
     }
 
     internal static string ToTitleString(string s)

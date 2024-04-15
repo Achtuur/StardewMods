@@ -26,14 +26,13 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
             return;
 
         this.cask_entity = this.entity as SObjectCask;
-
         this.previousState = this.automateMachine.GetState();
-        this.SetActualTime();
     }
     /// <inheritdoc/>
     public override void OnDayStarted()
     {
         this.previousState = this.automateMachine.GetState();
+        this.SetActualTime();
     }
     /// <inheritdoc/>
     public override void OnTimeChanged()
@@ -42,7 +41,7 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
 
     protected override void SetActualTime()
     {
-        this.actualAgingRate = this.cask_entity.agingRate.Value;
+        this.actualAgingRate = cask_entity.agingRate.Value;
     }
 
     /// <inheritdoc/>
@@ -51,9 +50,8 @@ internal class SpedUpCaskWrapper : GenericSpedUpMachineWrapper
         if (this.automateMachine.GetState() != MachineState.Processing || this.n_statues < 1)
             return false;
 
-        if (this.previousState != MachineState.Processing || // wasn't processing before, but is processing now
-            this.actualAgingRate == this.cask_entity.agingRate.Value || // isn't sped up
-            this.actualAgingRate == -1) // speed has been restored
+        if (this.actualAgingRate == this.cask_entity.agingRate.Value || // isn't sped up
+            this.actualAgingRate <= 0) // speed has been restored
             return true;
 
         return false;

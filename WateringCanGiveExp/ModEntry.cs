@@ -1,4 +1,5 @@
-﻿using AchtuurCore.Events;
+﻿using AchtuurCore;
+using AchtuurCore.Events;
 using AchtuurCore.Patches;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -51,6 +52,9 @@ public class ModEntry : Mod
         // Get integer part of total watering exp to not 'lose' exp due to rounding
         this.wateringExpTotal.Value += this.Config.ExpforWateringSoil;
         int floored_total = (int)Math.Floor(wateringExpTotal.Value);
+
+
+        Logger.DebugLog(ModEntry.Instance.Monitor, $"{this.wateringExpTotal.Value}");
 
         // Add integer part to farmer
         e.farmer.gainExperience(FarmingSkillID, floored_total);

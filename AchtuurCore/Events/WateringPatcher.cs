@@ -31,7 +31,7 @@ internal class WateringPatcher : GenericPatcher
             __state.soilStateBefore = __instance.state.Value;
             __state.toolUsed = t;
             __state.toolHeld = Game1.player.CurrentTool;
-            __state.location = __instance.currentLocation;
+            __state.location = __instance.Location;
         }
         catch (Exception e)
         {

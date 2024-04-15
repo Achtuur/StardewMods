@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 using StardewValley.Objects;
+using HoverLabels.Drawing;
 
 namespace HoverLabels.Labels.Objects;
 internal class ObjectLabel : BaseLabel
@@ -30,7 +31,7 @@ internal class ObjectLabel : BaseLabel
         if (hoverObject is null)
             return;
 
-        GenerateObjectLabel();
+        AddBorder(new TitleLabelText(hoverObject.DisplayName));
     }
 
     /// <summary>
@@ -51,6 +52,7 @@ internal class ObjectLabel : BaseLabel
         if (hoverObject is null)
             return;
 
+        // big craftables have 2 tiles, so we need to check if the cursor is on the top or bottom tile
         if (hoverObject.TileLocation == cursorTile)
         {
             CursorTile = cursorTile;
@@ -61,14 +63,6 @@ internal class ObjectLabel : BaseLabel
             CursorTileTop = cursorTile;
             CursorTile = cursorTile + Vector2.UnitY;
         }
-    }
-
-    /// <summary>
-    /// Generate label for generic object, 
-    /// </summary>
-    private void GenerateObjectLabel()
-    {
-        Name = hoverObject.DisplayName;
     }
 
     protected static SObject GetCursorObject(Vector2 cursorTile)
@@ -88,15 +82,8 @@ internal class ObjectLabel : BaseLabel
         return null;
     }
 
-    internal static SObject GetObjectWithId(int id)
+    internal static SObject GetObjectWithId(string item_id)
     {
-        return new SObject(id, 1, false, -1, 0);
-    }
-
-    protected override void ResetLabel()
-    {
-        base.ResetLabel();
-        CursorTileTop = null;
-        hoverObject = null;
+        return new SObject(item_id, 1);
     }
 }

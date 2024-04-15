@@ -1,5 +1,6 @@
 ﻿using AchtuurCore.Extensions;
 using HarmonyLib;
+using HoverLabels.Drawing;
 using HoverLabels.Framework;
 using Microsoft.Xna.Framework;
 using StardewValley;
@@ -35,11 +36,14 @@ internal class BuildingLabel : BaseLabel
         if (hoverBuilding is null)
             return;
 
-        Name = hoverBuilding.buildingType.Value;
+        AddBorder(new TitleLabelText(hoverBuilding.buildingType.Value));
 
         int daysLeft = hoverBuilding.daysOfConstructionLeft.Value; // alias for easier to read code here
         if (daysLeft > 0)
-            Description.Add($"Finished in {daysLeft} days ({ModEntry.GetDateAfterDays(daysLeft)})");
+        {
+            string text = I18n.LabelBuildingFinishedIn(daysLeft, ModEntry.GetDateAfterDays(daysLeft));
+            AddBorder(new LabelText(text));
+        }
 
     }
 
