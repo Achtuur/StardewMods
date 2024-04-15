@@ -5,7 +5,7 @@
     "Description": "Adds a new travel skill that makes all the moving you do more rewarding.",
     "UniqueID": "Achtuur.StardewTravelSkill",
     "EntryDll": "StardewTravelSkill.dll",
-    "MinimumApiVersion": "3.0.0",
+    "MinimumApiVersion": "4.0.0",
     "dependencies": [
         {
             "UniqueID": "spacechase0.SpaceCore",

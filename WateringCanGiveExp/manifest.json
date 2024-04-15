@@ -5,7 +5,7 @@
     "Description": "Rebalances Farming Exp such that other farming actions also give exp.",
     "UniqueID": "Achtuur.WateringCanGiveExp",
     "EntryDll": "WateringCanGiveExp.dll",
-    "MinimumApiVersion": "3.0.0",
+    "MinimumApiVersion": "4.0.0",
     "dependencies": [
         {
             "UniqueID": "Achtuur.AchtuurCore",

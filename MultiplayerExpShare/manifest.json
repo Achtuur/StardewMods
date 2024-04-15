@@ -5,7 +5,7 @@
     "Description": "Lets you share experience with nearby players in multiplayer!",
     "UniqueID": "Achtuur.MultiplayerExpShare",
     "EntryDll": "MultiplayerExpShare.dll",
-    "MinimumApiVersion": "3.0.0",
+    "MinimumApiVersion": "4.0.0",
     "dependencies": [
         {
             "UniqueID": "Achtuur.AchtuurCore",

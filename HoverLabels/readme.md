@@ -45,6 +45,16 @@ Types of labels:
 * disable label during events?
 * labels with a duration that is longer than a day should show date
 
+## 2.0.0
+* New/Changed
+    * Reworked how labels are drawn, pretty much breaks all existing labels using the API
+    * New types of labels:
+        * Item label (item icon with optional text)
+        * Inventory label (items in a grid to show an inventory)
+    * Added a lot more text to the I18n file so it can be translated
+
+
+
 ## 1.2.2
 * New/Changed
   * add more i18n stuff to labels
