@@ -8,6 +8,10 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 
 # Changelog
+## 1.2.3
+* New/Changed
+  * Added borders from Hoverlabels here
+
 ## 1.2.2
 * Fixes
  * Fix Vector2.ContainsObject() to work with qualified id
