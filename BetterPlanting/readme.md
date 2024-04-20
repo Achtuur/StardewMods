@@ -15,6 +15,10 @@ This mod lets you plant faster, by letting you plant multiple seeds at once
 
 # Changelog
 
+## 1.3.1
+* Fixes
+  * Fixed a bug where cursor tile was counted twice, so you place 1 less seed than you should have if cursor tile cannot be planted
+
 ## 1.3.0
 Updated to support Stardew Valley 1.6
 

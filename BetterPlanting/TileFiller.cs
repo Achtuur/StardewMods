@@ -191,7 +191,10 @@ internal class TileFiller
         }
 
         // Sort tiles based on approximity to player, useful when number of seeds < tiles in fill mode
-        fillModeTiles = fillModeTiles.OrderByDescending(t => t.Priority).ThenBy(t => t.State == TileState.Plantable);
+        fillModeTiles = fillModeTiles
+            .Where(tile => tile.Location != Game1.currentCursorTile)
+            .OrderByDescending(t => t.Priority).ThenBy(t => t.State == TileState.Plantable);
+
 
         // Track number of seeds farmer has
         int tile_count = 0;
