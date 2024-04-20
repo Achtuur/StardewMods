@@ -32,7 +32,7 @@ internal class FishPondLabel : BuildingLabel
     {
         base.GenerateLabel();
         // add fish name to label name
-        if (hoverPond.fishType.Value.Length == 0)
+        if (hoverPond.fishType is null || hoverPond.fishType.Value.Length == 0)
             return;
 
         SObject fish = new(hoverPond.fishType.Value, 1);

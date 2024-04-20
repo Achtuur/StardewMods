@@ -100,6 +100,8 @@ public class Border
 
     public void AddLabelText(LabelText label_text)
     {
+        if (label_text is null)
+            return;
         // height is current height, plus an additional margin for the new label
         float height;
         if (LabelPositions.Count == 0)

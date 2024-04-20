@@ -53,7 +53,9 @@ internal class LabelOverlay : Overlay
     {
         // add labels to border drawer
         borderDrawer.Reset();
-        borderDrawer.AddBorder(ModEntry.Instance.LabelManager.GetLabelContents());
+        List<Border> nonEmptyBorders = ModEntry.Instance.LabelManager.GetLabelContents()
+            .Where(b => !b.IsEmpty).ToList();
+        borderDrawer.AddBorder(nonEmptyBorders);
 
         // Get coordinates of cursor on screen
         Vector2 offset = GetOffset(cursorPos);

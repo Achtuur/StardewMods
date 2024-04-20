@@ -1,0 +1,16 @@
+{
+    "Name": "FishCatalogue",
+    "Author": "Achtuur",
+    "Version": "1.0.0",
+    "Description": "Adds a catalogue to see what fish you have caught and what fish you can catch",
+    "UniqueID": "Achtuur.FishCatalogue",
+    "EntryDll": "FishCatalogue.dll",
+    "MinimumApiVersion": "4.0.0",
+    "dependencies": [
+        {
+            "UniqueID": "Achtuur.AchtuurCore",
+            "MinimumVersion": "1.2.3"
+        }
+    ],
+    "UpdateKeys": [ "Nexus:22833" ]
+}

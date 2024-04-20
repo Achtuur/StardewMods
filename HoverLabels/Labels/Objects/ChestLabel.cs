@@ -60,13 +60,14 @@ internal class ChestLabel : ObjectLabel
         // Either take entire dict, or first x entries based on button
         int listSize = showAll ? inventory.Count() : ModEntry.Instance.Config.LabelListMaxSize;
 
-        IOrderedEnumerable<Item> orderedItems;
-        if (ModEntry.IsAlternativeSortButtonPressed())
-            orderedItems = inventory.OrderByDescending(item => item.Stack).ThenBy(item => item.DisplayName);
-        else // default game sorting
-            orderedItems = inventory.OrderBy(item => item.Category).ThenBy(item => item.Name);
+        // this will show the items as they are in the chest
+        if (!ModEntry.IsAlternativeSortButtonPressed())
+            return new InventoryLabelText(inventory.Take(listSize));
 
-        orderedItems = orderedItems.ThenByDescending(item => item.quality.Value);
+        IOrderedEnumerable<Item> orderedItems = inventory
+            .OrderByDescending(item => item.Stack)
+            .ThenBy(item => item.DisplayName)
+            .ThenByDescending(item => item.quality.Value);
 
         // Loop through items dictionary sorted by name
         return new InventoryLabelText(orderedItems.Take(listSize));
