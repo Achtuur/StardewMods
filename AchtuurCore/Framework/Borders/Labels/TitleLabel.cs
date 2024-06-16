@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HoverLabels.Drawing;
-internal class TitleLabelText : LabelText
+namespace AchtuurCore.Framework.Borders;
+
+public class TitleLabel : Label
 {
-    public TitleLabelText(string text) : base(text)
+    public TitleLabel(string text) : base(text)
     {
         this.Font = Game1.dialogueFont;
     }

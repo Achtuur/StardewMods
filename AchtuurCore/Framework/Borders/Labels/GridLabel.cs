@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace AchtuurCore.Framework.Borders;
 public class GridLabel : Label
 {
     private float Scale => 1f;
-    private int ItemsPerRow => (num_columns is null) ? Math.Max(3, (int)Math.Sqrt(labels.Count)) : num_columns.Value;
+    private int ItemsPerRow => (num_columns is null) ? Math.Max(6, (int)Math.Sqrt(labels.Count)) : num_columns.Value;
 
     public override Vector2 DrawSize => CalculateDrawSize();
 
@@ -24,8 +25,8 @@ public class GridLabel : Label
 
     private float GridMargin => Margin() * 0.5f;
 
-    private bool FixedWidth;
-    private bool FixedHeight;
+    private float? FixedWidth;
+    private float? FixedHeight;
 
     List<Label> labels;
     int? num_columns;
@@ -35,6 +36,10 @@ public class GridLabel : Label
     /// Max dimensions of a label in the grid, cached after calculation
     /// </summary>
     private Vector2? cachedMaxDimensions = null;
+
+    public GridLabel(IEnumerable<Item> items) : this(items.Select(item => new ItemLabel(item, "")))
+    {
+    }
     public GridLabel(IEnumerable<Label> labels) : base(string.Empty)
     {
         this.labels = labels.ToList();
@@ -54,12 +59,12 @@ public class GridLabel : Label
         this.num_columns = columns;
     }
 
-    public void SetFixedWidth(bool fixed_width) 
+    public void SetFixedWidth(float fixed_width) 
     {
         this.FixedWidth = fixed_width;
     }
 
-    public void SetFixedHeight(bool fixed_height)
+    public void SetFixedHeight(float fixed_height)
     {
         this.FixedHeight = fixed_height;
     }
@@ -99,8 +104,8 @@ public class GridLabel : Label
 
     private float GetWidthForColumn(int col)
     {
-        if (FixedWidth)
-            return cachedMaxDimensions.Value.X;
+        if (FixedWidth is float w)
+            return w + GridMargin;
         // width of column is max font x + sprite x of all names in that column
         // items in column are items at col + items_per_row * i
         float max_width = 0;
@@ -113,8 +118,8 @@ public class GridLabel : Label
 
     private float GetHeightForRow(int row)
     {
-        if (FixedHeight)
-            return cachedMaxDimensions.Value.Y;
+        if (FixedHeight is float h)
+            return h + GridMargin;
         // height of row is Max(font.y, spritedim.y) of that row
         // items in row are items at row * items_per_row + i
         float max_height = 0;

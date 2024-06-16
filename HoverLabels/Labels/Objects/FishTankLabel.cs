@@ -1,5 +1,5 @@
-﻿using HarmonyLib;
-using HoverLabels.Drawing;
+﻿using AchtuurCore.Framework.Borders;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
@@ -39,7 +39,7 @@ internal class FishTankLabel : ObjectLabel
 
         foreach(Item f in fishLookup.Keys.OrderBy(f => f.DisplayName))
         {
-            AppendLabelToBorder(new ItemLabelText(f));
+            AppendLabelToBorder(new ItemLabel(f));
         }
     }
 }

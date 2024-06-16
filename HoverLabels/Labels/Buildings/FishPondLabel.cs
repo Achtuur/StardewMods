@@ -1,5 +1,5 @@
 ﻿using AchtuurCore.Extensions;
-using HoverLabels.Drawing;
+using AchtuurCore.Framework.Borders;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Buildings;
@@ -32,13 +32,13 @@ internal class FishPondLabel : BuildingLabel
     {
         base.GenerateLabel();
         // add fish name to label name
-        if (hoverPond.fishType is null || hoverPond.fishType.Value.Length == 0)
+        if (hoverPond.fishType is null || hoverPond.fishType.Value is null || hoverPond.fishType.Value.Length == 0)
             return;
 
         SObject fish = new(hoverPond.fishType.Value, 1);
         //this.Name += $" ({fish.DisplayName})";
         ResetBorders();
-        AddBorder(new ItemLabelText(fish.QualifiedItemId, "Fish Pond"));
+        AddBorder(new ItemLabel(fish.QualifiedItemId, "Fish Pond"));
 
         AddBorder($"Occupancy: {hoverPond.currentOccupants}/{hoverPond.maxOccupants}");
 

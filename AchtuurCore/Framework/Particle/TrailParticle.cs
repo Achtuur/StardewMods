@@ -2,10 +2,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
+using StardewValley;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AchtuurCore.Framework;
+namespace AchtuurCore.Framework.Particle;
 
 public class TrailParticle : Particle
 {
@@ -46,36 +47,46 @@ public class TrailParticle : Particle
         Color.Magenta
     };
 
+    public List<LightSource> LightSources = new List<LightSource>();
 
-    public TrailParticle(Vector2 position, Vector2 targetPosition, int trailLength, Color color, Vector2 size) : base(position, targetPosition, color, size)
+
+    public TrailParticle(int trailLength, Color color, Vector2 size) : base(color, size)
     {
-        this.TrailLength = trailLength;
+        TrailLength = trailLength;
 
         // by default, return sizes that halve in size every particle
         // start at 1 to not divide by zero
-        this.TrailSizes = Enumerable.Range(1, trailLength + 1).Select(i => this.size / (i + 1)).ToList();
+        TrailSizes = Enumerable.Range(1, trailLength + 1).Select(i => this.size / (i + 1)).ToList();
 
         // Default color to white trail
-        this.TrailColors = new List<Color>() { Color.White };
+        TrailColors = new List<Color>() { Color.White };
 
         // Initialize previouspositions with start position
         ResetTrailPositions();
     }
 
+    public TrailParticle(TrailParticle particle) : base(particle.color, particle.size)
+    {
+        TrailLength = particle.TrailLength;
+        TrailSizes = particle.TrailSizes;
+        TrailColors = particle.TrailColors;
+        ResetTrailPositions();
+    }
+
     public void SetTrailColors(List<Color> colors)
     {
-        this.TrailColors = colors;
+        TrailColors = colors;
     }
 
     public override void SetSize(Vector2 size)
     {
         base.SetSize(size);
-        this.TrailSizes = Enumerable.Range(1, this.TrailLength + 1).Select(i => this.size / (i + 1)).ToList();
+        TrailSizes = Enumerable.Range(1, TrailLength + 1).Select(i => this.size / (i + 1)).ToList();
     }
 
     public void SetTrailSizes(List<Vector2> sizes)
     {
-        this.TrailSizes = sizes;
+        TrailSizes = sizes;
     }
 
     public override void Start()
@@ -92,9 +103,9 @@ public class TrailParticle : Particle
 
     private void ResetTrailPositions()
     {
-        this.previousPositions = new List<Vector2>(TrailLength + 1);
+        previousPositions = new List<Vector2>(TrailLength + 1);
         for (int i = 0; i < TrailLength; i++)
-            this.previousPositions.Add(intialPosition);
+            previousPositions.Add(m_StateController.Position);
     }
 
     protected override void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
@@ -108,7 +119,7 @@ public class TrailParticle : Particle
 
     public override void DrawToScreen(SpriteBatch spriteBatch)
     {
-        if (this.ReachedTarget || !this.Started)
+        if (!ShouldDraw)
             return;
 
         base.DrawToScreen(spriteBatch);
@@ -117,7 +128,7 @@ public class TrailParticle : Particle
         {
             // calculate i / traillength -> 'percentage' of how far we are along the trail
             // percentage * TrailColors.Count or percentage * TrailSize.Count is the index
-            float percentage_of_trail = (float)i / (float)TrailLength;
+            float percentage_of_trail = i / (float)TrailLength;
 
             int color_index = (int)(percentage_of_trail * TrailColors.Count);
             Color trail_color = TrailColors[color_index];
@@ -125,11 +136,11 @@ public class TrailParticle : Particle
             int size_index = (int)(percentage_of_trail * TrailSizes.Count);
             Vector2 trail_size = TrailSizes[size_index];
 
-            Vector2 position = this.previousPositions[i];
+            Vector2 position = previousPositions[i];
             Vector2 screenCoords = Drawing.GetPositionScreenCoords(position);
 
-            Drawing.DrawLine(spriteBatch, screenCoords, trail_size, trail_color * particleColorOpacity);
-            Drawing.DrawBorder(spriteBatch, screenCoords, trail_size, trail_color, bordersize: 1);
+            spriteBatch.DrawRect(screenCoords, trail_size, trail_color * particleColorOpacity);
+            spriteBatch.DrawBorder(screenCoords, trail_size, trail_color, bordersize: 1);
         }
     }
 
@@ -139,10 +150,10 @@ public class TrailParticle : Particle
             return;
 
         // Add current position to front, which moves everything else back
-        this.previousPositions.Insert(0, this.Position);
+        previousPositions.Insert(0, m_StateController.Position);
 
         // Remove positions that are larger than trail length
-        while (this.previousPositions.Count > TrailLength)
-            this.previousPositions.RemoveAt(TrailLength);
+        while (previousPositions.Count > TrailLength)
+            previousPositions.RemoveAt(TrailLength);
     }
 }

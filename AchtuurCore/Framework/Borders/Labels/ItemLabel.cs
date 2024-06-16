@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using AchtuurCore.Utility;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
@@ -14,12 +15,12 @@ public class ItemLabel: Label
 {
     private float Scale => 1f;
     private Vector2 SpriteDim => new Vector2(64, 64) * Scale;
-    
+
     /// <summary>
     /// Width of the **drawn** label. 
     /// <c>Margin()</c> is added here since that is the distance between the sprite and the text.
     /// </summary>
-    public override float Width => SpriteDim.X + textDim.X + Margin(); 
+    public override float Width => SpriteDim.X + textDim.X;
 
     /// <summary>
     /// Height of the **drawn** label. Text is moved to be centered, which is why some calculations are performed there.
@@ -74,6 +75,7 @@ public class ItemLabel: Label
     public void SetItemNameAsDescription()
     {
         this.Text = string.Join("\n", Item.DisplayName.Split(' '));
+        //this.Text = Item.DisplayName;
     }
 
     public void HideDescription()
@@ -84,7 +86,7 @@ public class ItemLabel: Label
     public override void Draw(SpriteBatch sb, Vector2 position)
     {
         // draw item icon
-        Vector2 item_pos = position - Label.MarginSize * 0.25f/Scale;
+        Vector2 item_pos = position - Label.MarginSize * 0.5f/Scale;
         Vector2 text_offset = new Vector2(SpriteDim.X + Margin()/2, SpriteDim.Y/2 - textDim.Y / 2f);
         if (text_offset.Y < 0)
         {
@@ -93,9 +95,9 @@ public class ItemLabel: Label
         }
 
         Item.drawInMenu(sb, item_pos, Scale, 1f, 1, StackDrawType.Draw, SpriteColor, drawShadow: false);
-        base.Draw(sb, position + text_offset);
+        base.Draw(sb, item_pos + text_offset);
 
-        // debug
-        base.DebugDraw(sb, position);
+        //sb.DrawBorder(item_pos, SpriteDim, color: Color.Magenta);
+        //sb.DrawBorder(item_pos + text_offset, textDim, color: Color.Green);
     }
 }

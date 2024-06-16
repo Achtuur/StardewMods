@@ -1,11 +1,11 @@
-﻿using AchtuurCore.Patches;
+﻿using AchtuurCore.Events;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.TerrainFeatures;
 using System;
 
-namespace AchtuurCore.Events;
+namespace AchtuurCore.Patches;
 
 internal class WateringPatcher : GenericPatcher
 {
@@ -13,14 +13,14 @@ internal class WateringPatcher : GenericPatcher
     {
         // Prefix patch
         harmony.Patch(
-            original: this.GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
-            prefix: this.GetHarmonyMethod(nameof(this.prefix_performToolAction))
+            original: GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
+            prefix: GetHarmonyMethod(nameof(this.prefix_performToolAction))
         );
 
         // Postfix patch
         harmony.Patch(
-            original: this.GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
-            postfix: this.GetHarmonyMethod(nameof(this.postfix_performToolAction))
+            original: GetOriginalMethod<HoeDirt>(nameof(HoeDirt.performToolAction)),
+            postfix: GetHarmonyMethod(nameof(this.postfix_performToolAction))
         );
     }
     private static void prefix_performToolAction(Tool t, HoeDirt __instance, out WateringInfo __state)
@@ -48,7 +48,7 @@ internal class WateringPatcher : GenericPatcher
                 return;
 
             // If some other mod tries to fake watering by acting as if a watering can was used, return
-            if ((__state.toolHeld is not null && __state.toolHeld.Name != __state.toolUsed.Name) ||
+            if (__state.toolHeld is not null && __state.toolHeld.Name != __state.toolUsed.Name ||
                 __state.location != Game1.player.currentLocation)
                 return;
 
@@ -58,12 +58,12 @@ internal class WateringPatcher : GenericPatcher
             {
                 Farmer lastUser = __state.toolUsed.getLastFarmerToUse();
                 WateringFinishedArgs args = new WateringFinishedArgs(lastUser, __instance);
-                EventPublisher.InvokeFinishedWateringSoil(null, args);
+                ModEntry.EventManager.FinishedWateringSoil.Invoke(null, args);
             }
         }
         catch (Exception e)
         {
-            AchtuurCore.Logger.ErrorLog(ModEntry.Instance.Monitor, $"Something went wrong when postfix patching performToolAction (WateringPatcher):\n{e}");
+            Logger.ErrorLog(ModEntry.Instance.Monitor, $"Something went wrong when postfix patching performToolAction (WateringPatcher):\n{e}");
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using HarmonyLib;
-using HoverLabels.Drawing;
+﻿using AchtuurCore.Framework.Borders;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

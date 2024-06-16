@@ -224,7 +224,7 @@ namespace HoverLabels
         {
             // misc labels
             this.HoverLabelApi.RegisterLabel(this.ModManifest, "Crops", new CropLabel());
-            this.HoverLabelApi.RegisterLabel(this.ModManifest, "Trees", new TreeLabel());
+            this.HoverLabelApi.RegisterLabel(this.ModManifest, "Trees", new TreeLabel(-2));
             this.HoverLabelApi.RegisterLabel(this.ModManifest, "Fruit Trees", new FruittreeLabel());
 
             // object labels

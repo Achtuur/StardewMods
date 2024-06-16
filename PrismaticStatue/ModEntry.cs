@@ -76,7 +76,7 @@ public class ModEntry : Mod
         ModEntry.Instance = this;
 
         HarmonyPatcher.ApplyPatches(this,
-            new PerformToolActionPatch(),
+            //new PerformToolActionPatch(),
             new MachineGroupAutomatePatch()
         );
 
@@ -90,10 +90,10 @@ public class ModEntry : Mod
         helper.Events.GameLoop.SaveLoaded += this.OnSaveLoad;
         helper.Events.GameLoop.TimeChanged += this.OnTimeChanged;
         helper.Events.GameLoop.DayStarted += this.OnDayStarted;
-        helper.Events.GameLoop.OneSecondUpdateTicked += this.OnOneSecondUpdateTicked;
         helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
         helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
         helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+        //helper.Events.GameLoop.OneSecondUpdateTicked += this.OnOneSecondUpdateTicked;
 
         // Animation stuff
         helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
@@ -134,8 +134,7 @@ public class ModEntry : Mod
 
         //foreach (SObject sobj in prismatic_statues)
         //{
-        //    //sobj.ParentSheetIndex++;
-        //    sobj.showNextIndex.Value = true;
+        //    sobj.ParentSheetIndex++;
         //    if (sobj.ParentSheetIndex >= ModEntry.AnimationFrames)
         //        sobj.ParentSheetIndex = 0;
         //}

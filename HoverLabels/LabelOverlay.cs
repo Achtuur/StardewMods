@@ -1,7 +1,7 @@
 ﻿using AchtuurCore.Extensions;
 using AchtuurCore.Framework;
 using AchtuurCore.Utility;
-using HoverLabels.Drawing;
+using AchtuurCore.Framework.Borders;
 using HoverLabels.Framework;
 using HoverLabels.Labels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -53,9 +53,26 @@ internal class LabelOverlay : Overlay
     {
         // add labels to border drawer
         borderDrawer.Reset();
-        List<Border> nonEmptyBorders = ModEntry.Instance.LabelManager.GetLabelContents()
-            .Where(b => !b.IsEmpty).ToList();
+        IEnumerable<Border> nonEmptyBorders = ModEntry.Instance.LabelManager.GetLabelContents()
+            .Where(b => !b.IsEmpty);
         borderDrawer.AddBorder(nonEmptyBorders);
+
+        //var labels = new List<Label>()
+        //{
+        //    new ItemLabel("(H)2"),
+        //    //new ItemLabel("(H)3"),
+        //    new ItemLabel("(H)4"),
+        //    new ItemLabel("(H)5"),
+        //    new ItemLabel("(H)6"),
+        //};
+        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
+        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
+        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
+        ////borderDrawer.AddBorder(labels);
+        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
+        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
+        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
+        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
 
         // Get coordinates of cursor on screen
         Vector2 offset = GetOffset(cursorPos);

@@ -23,11 +23,11 @@ public class Label
     /// <summary>
     /// Width of the **drawn** label. Equal to <c>DrawSize.X</c>
     /// </summary>
-    public virtual float Width => TextSize.X + 2*Margin();
+    public virtual float Width => TextSize.X;
     /// <summary>
     /// Height of the **drawn** label. Equal to <c>DrawSize.Y</c>
     /// </summary>
-    public virtual float Height => TextSize.Y + 2*Margin();
+    public virtual float Height => TextSize.Y;
 
     private Vector2 TextSize => Font.MeasureString(Text);
 
@@ -51,6 +51,9 @@ public class Label
     public virtual void Draw(SpriteBatch spriteBatch, Vector2 position)
     {
         DrawText(spriteBatch, Text, position);
+
+        // debug
+        DebugDraw(spriteBatch, position);
     }
 
     protected void DrawText(SpriteBatch spriteBatch, string text, Vector2 position)
@@ -63,6 +66,8 @@ public class Label
     {
         AchtuurCore.Utility.Debug.DebugOnlyExecute(() =>
         {
+            if (!ModEntry.DebugDraw)
+                return;
             int seed = (int) (position.X + position.Y);
             sb.DrawBorder(position, DrawSize, color: AchtuurCore.Utility.ColorHelper.GetRandomColor(255, seed));
         });

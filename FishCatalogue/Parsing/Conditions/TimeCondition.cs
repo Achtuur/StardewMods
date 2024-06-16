@@ -20,7 +20,7 @@ internal class TimeCondition : BaseCondition
 
     public override string Description()
     {
-        IEnumerable<string> time_strings = times.Select(time => $"{TimeToText(time.Item1)}-{TimeToText(time.Item2)}");
+        IEnumerable<string> time_strings = times.Select(time => $"{TimeToText(time.Item1)} - {TimeToText(time.Item2)}");
         return string.Join("\n", time_strings);
     }
 

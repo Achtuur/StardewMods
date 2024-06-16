@@ -1,5 +1,5 @@
 ﻿using AchtuurCore.Extensions;
-using HoverLabels.Drawing;
+using AchtuurCore.Framework.Borders;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using System;
@@ -26,6 +26,6 @@ internal class SiloLabel : BuildingLabel
             return true;
         });
         Item hay = ItemRegistry.Create("178", amount: Game1.getFarm().piecesOfHay.Value);
-        AddBorder(new ItemLabelText(hay, I18n.LabelSiloMaxHay(maxHay)));
+        AddBorder(new ItemLabel(hay, I18n.LabelSiloMaxHay(maxHay)));
     }
 }
