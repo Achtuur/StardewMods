@@ -57,27 +57,10 @@ internal class LabelOverlay : Overlay
             .Where(b => !b.IsEmpty);
         borderDrawer.AddBorder(nonEmptyBorders);
 
-        //var labels = new List<Label>()
-        //{
-        //    new ItemLabel("(H)2"),
-        //    //new ItemLabel("(H)3"),
-        //    new ItemLabel("(H)4"),
-        //    new ItemLabel("(H)5"),
-        //    new ItemLabel("(H)6"),
-        //};
-        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
-        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
-        //borderDrawer.AddBorder(new ItemLabel("(H)1"));
-        ////borderDrawer.AddBorder(labels);
-        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
-        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
-        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
-        //borderDrawer.AddBorder(new TitleLabel("ur mom"));
-
         // Get coordinates of cursor on screen
         Vector2 offset = GetOffset(cursorPos);
         Vector2 cursorCoords = AchtuurCore.Utility.Drawing.GetPositionScreenCoords(cursorPos) + offset;
-        cursorCoords -= new Vector2(64); // displace by tile size to look a bit nicer
+        cursorCoords -= new Vector2(Game1.tileSize); // displace by tile size to look a bit nicer
 
         // draw border
         borderDrawer.Draw(spriteBatch, cursorCoords);

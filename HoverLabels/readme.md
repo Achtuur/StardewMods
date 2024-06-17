@@ -43,6 +43,9 @@ Types of labels:
 * disable label during events?
 * labels with a duration that is longer than a day should show date
 
+## 2.1.1
+* New/Changed updated to support Achtuurcore 1.3.0
+
 ## 2.1.0
 * New/Changed
     *  Now uses AchtuurCore borders (need at least AchtuurCore 1.2.3)

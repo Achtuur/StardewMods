@@ -188,21 +188,21 @@ namespace HoverLabels
 
             // Create label when tick count is larger than delay and no label exists yet
             cursorHoverCount++;
-            if (cursorHoverCount >= Config.LabelPopupDelayTicks)
+            if (cursorHoverCount < Config.LabelPopupDelayTicks)
+                return;
+
+            LabelManager.TrySetLabel(cursorTile);
+            if (LabelManager.HasLabel())
             {
-                LabelManager.TrySetLabel(cursorTile);
-                if (LabelManager.HasLabel())
-                {
-                    LabelManager.CurrentLabel.UpdateCursorTile(cursorTile);
-                    Overlay.Enable();
-                }
-                // If label creation failed, nothing is being hovered over -> reset state
-                // This is done here so there will be no downtime when
-                // hovering over adjacent tiles that should generate labels
-                else
-                {
-                    this.ResetCursorHoverState();
-                }
+                LabelManager.CurrentLabel.UpdateCursorTile(cursorTile);
+                Overlay.Enable();
+            }
+            // If label creation failed, nothing is being hovered over -> reset state
+            // This is done here so there will be no downtime when
+            // hovering over adjacent tiles that should generate labels
+            else
+            {
+                this.ResetCursorHoverState();
             }
         }
 
