@@ -9,6 +9,9 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.3.1
+* Mark Overlay.Toggle as virtual
+
 ## 1.3.0
 * Internal rework of particles
 

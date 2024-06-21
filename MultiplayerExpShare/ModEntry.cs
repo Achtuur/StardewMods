@@ -21,6 +21,8 @@ namespace MultiplayerExpShare;
 
 internal class ModEntry : Mod
 {
+    internal static string ExpShareMessage = "ShareExpMessage";
+
     /// <summary>
     /// Color used for Farming exp particle, green
     /// </summary>
@@ -56,40 +58,31 @@ internal class ModEntry : Mod
     public ModConfig Config;
     public ISpaceCoreApi SpaceCoreAPI;
 
-    internal TileShareRangeOverlay TileUIOverlay;
+    internal TileShareRangeOverlay TileUIOverlay = new();
 
-    internal PerScreen<Dictionary<string, int>> skillMaxLevels;
+    internal PerScreen<Dictionary<string, int>> SkillMaxLevels = new();
 
-    internal static Dictionary<string, TrailParticle> ShareTrailParticles;
+    internal static Dictionary<string, TrailParticle> ShareTrailParticles = new();
 
-
-    public static bool PlayerHasMastery()
-    {
-        return FarmerHasMastery(Game1.player);
-    }
-
-    public static bool FarmerHasMastery(Farmer farmer)
-    {
-        return farmer.Level >= 25 && MasteryTrackerMenu.getCurrentMasteryLevel() < 5; // this is used in base game code?
-    }
+    internal Dictionary<string, bool> EnabledSkills = new();
 
     public static Farmer GetFarmerFromMultiplayerID(long id)
     {
         return Game1.getOnlineFarmers().ToList().Find(farmer => farmer.UniqueMultiplayerID == id);
     }
 
-    public static void ShareExpWithFarmers(Farmer[] nearbyFarmers, string skill_id, int amount, string messageName)
+    public static IEnumerable<Farmer> GetNearbyPlayers()
     {
-        // Send message about exp sharing
-        long[] nearbyFarmerIds = nearbyFarmers.Select(f => f.UniqueMultiplayerID).ToArray();
-        ExpGainData expdata = new ExpGainData(Game1.player.UniqueMultiplayerID, nearbyFarmerIds, skill_id, amount);
-        ModEntry.Instance.Helper.Multiplayer.SendMessage<ExpGainData>(expdata, messageName, modIDs: new[] { ModEntry.Instance.ModManifest.UniqueID });
+        return Game1.getOnlineFarmers().Where(FarmerIsNearby);
+    }
 
-        // Spawn particles to farmers you share exp with
-        foreach (Farmer target in nearbyFarmers)
-        {
-            SpawnParticles(Game1.player, target, skill_id, amount);
-        }
+    public static bool IsSharingForSkillEnabled(string skill_id)
+    {
+        int vanilla_id = AchtuurCore.Utility.Skills.GetSkillIdFromName(skill_id);
+        if (vanilla_id != -1)
+            return Instance.Config.VanillaSkillEnabled[vanilla_id];
+        
+        return Instance.Config.SpaceCoreSkillEnabled.GetValueSafe(skill_id);
     }
 
     /// <summary>
@@ -101,7 +94,6 @@ internal class ModEntry : Mod
     /// <param name="amount"></param>
     public static void SpawnParticles(Farmer origin, Farmer target, string skill_id, int amount)
     {
-        // If skill has no valid particle or origin/target not in same location, do not spawn
         if (!ShareTrailParticles.ContainsKey(skill_id))
             return;
 
@@ -204,45 +196,12 @@ internal class ModEntry : Mod
         return dx * dx + dy * dy <= Instance.Config.NearbyPlayerTileRange * Instance.Config.NearbyPlayerTileRange;
     }
 
-    public static IEnumerable<Farmer> GetNearbyPlayers()
-    {
-        // return all players that are close to the main player
-        foreach (Farmer online_farmer in Game1.getOnlineFarmers())
-        {
-            // Add other player to list if they are close enough to main player
-            if (FarmerIsNearby(online_farmer))
-            {
-                yield return online_farmer;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Get exp percentage for actor based on settings and skill level (if setting enabled)
-    /// </summary>
-    /// <param name="level">Optional, skill level of current skill being evaluated for exp</param>
-    /// <returns></returns>
-    public static float GetActorExpPercentage(Farmer actor, int level, string skill_id)
-    {
-        if (Instance.Config.ShareAllExpAtMaxLevel && level >= Instance.skillMaxLevels.Value[skill_id] && !FarmerHasMastery(actor))
-        {
-            return 0f;
-        }
-
-        return Instance.Config.ExpPercentageToActor;
-    }
-
-    public static float GetSharedExpPercentage(Farmer actor, int actor_level, string skill_id)
-    {
-        return 1f - GetActorExpPercentage(actor, actor_level, skill_id);
-    }
-
     /// <summary>
     /// Get max level for vanilla skills
     /// </summary>
     /// <param name="skill_id"></param>
     /// <returns></returns>
-    public static int GetMaxLevelVanilla(int skill_id)
+    public static int GetMaxLevelVanilla(string skill_name)
     {
         if (!Instance.Helper.ModRegistry.IsLoaded("DaLion.Overhaul"))
             return 10;
@@ -251,9 +210,8 @@ internal class ModEntry : Mod
         {
             // Get instance of MARGO skill for this skill id
             Type MargoSkill = AccessTools.TypeByName("DaLion.Overhaul.Modules.Professions.Skill");
-            string SkillName = AchtuurCore.Utility.Skills.GetSkillNameFromId(skill_id);
             // GetValue with null since the field is static
-            var SkillInstance = AccessTools.Field(MargoSkill, SkillName).GetValue(null);
+            var SkillInstance = AccessTools.Field(MargoSkill, skill_name).GetValue(null);
 
             // Return max level property
             return (int)AccessTools.Property(MargoSkill, "MaxLevel").GetValue(SkillInstance);
@@ -312,15 +270,15 @@ internal class ModEntry : Mod
         if (!Context.IsWorldReady)
             return;
 
-        if (this.skillMaxLevels.Value is null)
-            this.skillMaxLevels.Value = new Dictionary<string, int>();
+        if (this.SkillMaxLevels.Value is null)
+            this.SkillMaxLevels.Value = new Dictionary<string, int>();
 
         // Update vanilla skill max levels
         for (int i = 0; i <= 5; i++)
         {
-            int maxLevel = GetMaxLevelVanilla(i);
-            string skillName = AchtuurCore.Utility.Skills.GetSkillNameFromId(i);
-            this.skillMaxLevels.Value[skillName] = maxLevel;
+            string skill_name = AchtuurCore.Utility.Skills.GetSkillNameFromId(i);
+            int maxLevel = GetMaxLevelVanilla(skill_name);
+            this.SkillMaxLevels.Value[skill_name] = maxLevel;
         }
 
         // Update spacecore skill max levels
@@ -329,7 +287,9 @@ internal class ModEntry : Mod
             foreach (string skill_id in SpaceCoreAPI.GetCustomSkills())
             {
                 int maxLevel = GetMaxLevelSpaceCore(skill_id);
-                this.skillMaxLevels.Value[skill_id] = maxLevel;
+                this.SkillMaxLevels.Value[skill_id] = maxLevel;
+                ShareTrailParticles[skill_id] = new TrailParticle(ParticleTrailLength, Color.White, ParticleSize);
+                ShareTrailParticles[skill_id].SetTrailColors(new List<Color> { Color.Magenta, Color.WhiteSmoke, Color.WhiteSmoke });
             }
         }
     }
@@ -347,7 +307,7 @@ internal class ModEntry : Mod
         this.Config = helper.ReadConfig<ModConfig>();
 
         this.TileUIOverlay = new TileShareRangeOverlay();
-        this.skillMaxLevels = new PerScreen<Dictionary<string, int>>();
+        this.SkillMaxLevels = new PerScreen<Dictionary<string, int>>();
 
         IntializeVanillaTrailParticles();
 
@@ -448,42 +408,48 @@ internal class ModEntry : Mod
 
     private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
-        if (e.FromModID == this.ModManifest.UniqueID && (e.Type == "SharedExpGained" || e.Type == "SharedExpGainedSpaceCore"))
-        {
-            ExpGainData msg_expdata = e.ReadAs<ExpGainData>();
-            // if the source is self or self was not nearby, don't add exp
-            if (msg_expdata.actor_multiplayerid == Game1.player.UniqueMultiplayerID || !msg_expdata.nearby_farmer_ids.Contains(Game1.player.UniqueMultiplayerID))
-                return;
+        if (e.FromModID != this.ModManifest.UniqueID || e.Type != ExpShareMessage)
+            return;
 
-            Farmer nearby_actor = GetFarmerFromMultiplayerID(msg_expdata.actor_multiplayerid);
-            SpawnParticles(nearby_actor, Game1.player, msg_expdata.skill_id, msg_expdata.amount);
-
-            AchtuurCore.Logger.DebugLog(Instance.Monitor, $"Received {msg_expdata.amount} exp in {msg_expdata.skill_id} from ({nearby_actor.Name})!");
-
-            if (e.Type == "SharedExpGained")
-                GainExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata);
-            else if (e.Type == "SharedExpGainedSpaceCore")
-                SpaceCoreExperiencePatch.InvokeGainExperience(Game1.player, msg_expdata);
-        }
+        ExpGainData msg_expdata = e.ReadAs<ExpGainData>();
+        ExpShare.ReceiveExp(msg_expdata);
+        
     }
 
     private void OnGameLaunch(object sender, GameLaunchedEventArgs e)
     {
         this.SpaceCoreAPI = Instance.Helper.ModRegistry.GetApi<Integrations.ISpaceCoreApi>("spacechase0.SpaceCore");
-
-        this.Config.createMenu();
+        Initialise();
     }
     private void OnSaveLoad(object sender, SaveLoadedEventArgs e)
     {
-        // Create config menu again, in case some Spacecore based mods are loaded after this mod
-        this.Config.createMenu();
-        UpdateMaxLevels();
+        Initialise();
     }
 
     private void OnSaveCreate(object sender, SaveCreatedEventArgs e)
     {
+        Initialise();
+    }
+
+    private void Initialise()
+    {
         // Create config menu again, in case some Spacecore based mods are loaded after this mod
         this.Config.createMenu();
         UpdateMaxLevels();
+        UpdateEnabledSkills();
+    }
+
+    private void UpdateEnabledSkills()
+    {
+        for(int i = 0; i < Config.VanillaSkillEnabled.Length; i++)
+        {
+            string skill_name = AchtuurCore.Utility.Skills.GetSkillNameFromId(i);
+            EnabledSkills[skill_name] = Config.VanillaSkillEnabled[i];
+        }
+
+        foreach(KeyValuePair<string, bool> entry in Config.SpaceCoreSkillEnabled)
+        {
+            EnabledSkills[entry.Key] = entry.Value;
+        }
     }
 }

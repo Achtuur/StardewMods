@@ -129,7 +129,7 @@ internal class GameAssetLoader
 /// <param name="tileX"></param>
 /// <param name="tileY"></param>
 /// <param name="name"></param>
-internal record class AssetColors(string name, int tileX, int tileY, int tileSize)
+internal record class AssetColors(string name, int tileX, int tileY, int tileSize, bool grayscale = false)
 {
     public Color[] Colors { get; set; } = new Color[tileSize * tileSize];
     public bool ColorsExtracted = false;
@@ -147,6 +147,9 @@ internal record class AssetColors(string name, int tileX, int tileY, int tileSiz
 
     public void SetColors(in Color[] colors)
     {
-        Colors = colors;
+        if (grayscale)
+            Colors = colors.ToGrayScale();
+        else 
+            Colors = colors;
     }
 }

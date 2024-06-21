@@ -9,19 +9,19 @@ namespace AchtuurCore.Framework;
 
 public abstract class Overlay
 {
-
+    private static Dictionary<string, Texture2D> TilePlacementTextures;
     /// <summary>
     /// Green tile placement texture, same one that is used when player is trying to place objects or charges up tools
     /// </summary>
-    public static Texture2D GreenTilePlacementTexture;
+    public static Texture2D GreenTilePlacementTexture => TilePlacementTextures["green"];
     /// <summary>
     /// Red tile placement texture, same on that is used when player is trying to place object but is unable to
     /// </summary>
-    public static Texture2D RedTilePlacementTexture;
+    public static Texture2D RedTilePlacementTexture => TilePlacementTextures["red"];
     /// <summary>
     /// Grayscale version of green tile placement texture.
     /// </summary>
-    public static Texture2D TilePlacementTexture;
+    public static Texture2D TilePlacementTexture => TilePlacementTextures["grayscale"];
 
     /// <summary>
     /// Size of each tile (in pixels?)
@@ -54,7 +54,7 @@ public abstract class Overlay
         this.Enabled = false;
     }
 
-    public void Toggle()
+    public virtual void Toggle()
     {
         this.Enabled = !this.Enabled;
     }
@@ -240,32 +240,46 @@ public abstract class Overlay
 
     internal static void LoadPlacementTileTexture()
     {
-        // Full asset is five 64x64 pixel tiles in a row, we only want the leftmost one of these tiles
-        Texture2D fullAsset = ModEntry.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
+        if (TilePlacementTextures is not null)
+            return;
 
-        // Get color data of entire asset
-        Color[] fullAssetColors = new Color[fullAsset.Width * fullAsset.Height];
-        fullAsset.GetData<Color>(fullAssetColors);
+        GameAssetLoader assetLoader = new("LooseSprites/buildingPlacementTiles");
 
-        // Copy only leftmost tile to smaller array
-        Color[] greenSliceAssetColors = new Color[64 * fullAsset.Height];
-        Color[] redSliceAssetColors = new Color[64 * fullAsset.Height];
-        Color[] grayScaleAssetColors = new Color[64 * fullAsset.Height];
-
-        for (int y = 0; y < 64; y++)
+        AssetColors[] assetColors = new[]
         {
-            for (int x = 0; x < 64; x++)
-            {
-                greenSliceAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width];
-                redSliceAssetColors[x + y * 64] = fullAssetColors[(64 + x) + y * fullAsset.Width];
-                grayScaleAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width].ToGrayScale();
-            }
-        }
+            new AssetColors("green", 0, 0, tileSize: 64),
+            new AssetColors("grayscale", 0, 0, tileSize: 64, grayscale: true),
+            new AssetColors("red", 1, 0, tileSize: 64),
+        };
+        assetLoader.AddAssetColor(assetColors);
+        TilePlacementTextures = assetLoader.GetAssetTextures();
 
-        GreenTilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
-        GreenTilePlacementTexture.SetData<Color>(greenSliceAssetColors);
+        //// Full asset is five 64x64 pixel tiles in a row, we only want the leftmost one of these tiles
+        //Texture2D fullAsset = ModEntry.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
 
-        TilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
-        TilePlacementTexture.SetData<Color>(grayScaleAssetColors);
+        //// Get color data of entire asset
+        //Color[] fullAssetColors = new Color[fullAsset.Width * fullAsset.Height];
+        //fullAsset.GetData<Color>(fullAssetColors);
+
+        //// Copy only leftmost tile to smaller array
+        //Color[] greenSliceAssetColors = new Color[64 * fullAsset.Height];
+        //Color[] redSliceAssetColors = new Color[64 * fullAsset.Height];
+        //Color[] grayScaleAssetColors = new Color[64 * fullAsset.Height];
+
+        //for (int y = 0; y < 64; y++)
+        //{
+        //    for (int x = 0; x < 64; x++)
+        //    {
+        //        greenSliceAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width];
+        //        redSliceAssetColors[x + y * 64] = fullAssetColors[(64 + x) + y * fullAsset.Width];
+        //        grayScaleAssetColors[x + y * 64] = fullAssetColors[x + y * fullAsset.Width].ToGrayScale();
+        //    }
+        //}
+
+        //GreenTilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
+        //GreenTilePlacementTexture.SetData<Color>(greenSliceAssetColors);
+
+        //TilePlacementTexture = new Texture2D(Game1.graphics.GraphicsDevice, 64, 64);
+        //TilePlacementTexture.SetData<Color>(grayScaleAssetColors);
     }
 }

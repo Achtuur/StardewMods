@@ -30,9 +30,7 @@ public class GainExperiencePatch : BaseExpPatcher
     public static void InvokeGainExperience(Farmer farmer, ExpGainData exp_data)
     {
         isProcessingSharedExp = true;
-
         int skill = AchtuurCore.Utility.Skills.GetSkillIdFromName(exp_data.skill_id);
-
         farmer.gainExperience(skill, exp_data.amount);
     }
 
@@ -41,50 +39,7 @@ public class GainExperiencePatch : BaseExpPatcher
         if (!CanExpBeShared())
             return;
 
-        string skillName = AchtuurCore.Utility.Skills.GetSkillNameFromId(which);
-
-        // Skip sharing if its disabled for that skill
-        if (!ExpShareEnabledForSkill(which))
-            return;
-
-        // Get nearby farmer id's
-        Farmer[] nearbyFarmers = ModEntry.GetNearbyPlayers()
-            .Where(f => ModEntry.GetActorExpPercentage(f, f.GetSkillLevel(which), skillName) != 0f) // get all players that would actually receive exp
-            .Where(f => f.UniqueMultiplayerID != __instance.UniqueMultiplayerID)
-            .ToArray();
-
-        // If no farmers nearby to share exp with, actor gets all
-        if (nearbyFarmers.Length == 0)
-            return;
-
-        int level = __instance.GetSkillLevel(which);
-        int actor_exp = GetActorExp(__instance, howMuch, level, skillName);
-        // Calculate shared exp, with rounding
-        int shared_exp = (int)Math.Round(howMuch * ModEntry.GetSharedExpPercentage(__instance, level, skillName) / nearbyFarmers.Length);
-
-        // Send message of this instance of shared exp
-        if (shared_exp > 0)
-        {
-            ModEntry.ShareExpWithFarmers(nearbyFarmers, skillName, shared_exp, "SharedExpGained");
-        }
-
-        AchtuurCore.Logger.DebugLog(ModEntry.Instance.Monitor, $"({Game1.player.Name}) is sharing exp with {nearbyFarmers.Length} farmer(s): {howMuch} -> {actor_exp} / {shared_exp}");
-
-        howMuch = actor_exp;
-    }
-
-    /// <summary>
-    /// Returns true if exp sharing is enabled for skill with skill_id <paramref name="skill_id"/>.
-    /// 
-    /// <para>Only works for vanilla Stardew skills, where id's are the same as in vanilla (0 = farming, 1 = fishing, 2 = foraging, 3 = mining, 4 = combat)</para>. Does not work with skill_id 5 (luck)
-    /// </summary>
-    /// <param name="skill_id"></param>
-    /// <returns></returns>
-    private static bool ExpShareEnabledForSkill(int skill_id)
-    {
-        if (skill_id < 0 || skill_id > 4)
-            return false;
-
-        return ModEntry.Instance.Config.VanillaSkillEnabled[skill_id];
+        string skill_name = AchtuurCore.Utility.Skills.GetSkillNameFromId(which);
+        howMuch = BaseExpPatcher.ShareExpWithOnlinePlayers(skill_name, howMuch);
     }
 }

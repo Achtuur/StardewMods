@@ -1,0 +1,16 @@
+{
+    "Name": "Search Around",
+    "Author": "Achtuur",
+    "Version": "1.0.0",
+    "Description": "Lets you search around you for stuff",
+    "UniqueID": "Achtuur.SearchAround",
+    "EntryDll": "SearchAround.dll",
+    "MinimumApiVersion": "4.0.0",
+    "dependencies": [
+        {
+            "UniqueID": "Achtuur.AchtuurCore",
+            "MinimumVersion": "1.3.0"
+        }
+    ],
+    "UpdateKeys": [ "Nexus:xxxxx" ]
+}

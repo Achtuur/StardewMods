@@ -35,6 +35,7 @@ public class Border
     public BorderType BottomBorder = BorderType.TSection;
     public Vector2 Position;
     public float? FixedWidth;
+    public float? FixedHeight;
 
     public bool IsEmpty => Labels.Count == 0;
     public int LabelCount => Labels.Count;
@@ -53,7 +54,7 @@ public class Border
     /// <summary>
     /// Height of the border without taking into account the outside borders. This is the height of the 'inside' part.
     /// </summary>
-    private float Height => Labels.Sum(lab => lab.DrawSize.Y + Label.Margin()) + BonusHeight;
+    private float Height => Math.Max(FixedHeight ?? 0, Labels.Sum(lab => lab.DrawSize.Y + Label.Margin()) + BonusHeight);
 
     private float BonusHeight => (TopBorder == BorderType.TSection || BottomBorder == BorderType.TSection) ? Label.Margin() : 0;
     /// <summary>

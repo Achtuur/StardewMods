@@ -74,7 +74,7 @@ internal class ModConfig
 
         this.VanillaSkillEnabled = new[] {
             true,  // Farming
-            false, // Fishing
+            true, // Fishing
             true,  // Foraging
             true,  // Mining
             true,  // Combat

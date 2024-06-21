@@ -55,6 +55,11 @@ public static class ColorHelper
         return new Color(gs, gs, gs, color.A);
     }
 
+    public static Color[] ToGrayScale(this Color[] color)
+    {
+        return Array.ConvertAll(color, c => c.ToGrayScale());
+    }
+
     public static Color GetRandomColor(int alpha = 255)
     {
         Random r = new Random();

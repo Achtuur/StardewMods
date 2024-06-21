@@ -24,6 +24,11 @@ public class BorderDrawer
         this.borders = borders.ToList();
     }
 
+    public void SetBorder(Border border)
+    {
+        this.borders = new List<Border>() { border };
+    }
+
     public void SetBorder(IEnumerable<Border> borders)
     {
         this.borders = borders.ToList();
@@ -84,7 +89,11 @@ public class BorderDrawer
             {
                 borders[i].BottomBorder = BorderType.Bottom;
             }
+
+            float height = fixed_height ?? borders[i].TotalHeight;
+
             borders[i].FixedWidth = width;
+            borders[i].FixedHeight = height;
             borders[i].Draw(spriteBatch, total_offset);
             
             // debug draw
