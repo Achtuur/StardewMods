@@ -59,7 +59,7 @@ public class Particle : ICloneable
         if (Context.IsWorldReady)
             id = Game1.player.UniqueMultiplayerID;
 
-        lightSource = new LightSource(10, Vector2.Zero, this.size.LengthSquared() * lightRadius, this.color, LightSource.LightContext.None, id);
+        lightSource = new LightSource("particleLight", 10, Vector2.Zero, this.size.LengthSquared() * lightRadius, this.color, LightSource.LightContext.None, id);
     }
 
     public void AddState<S>(S state)
