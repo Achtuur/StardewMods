@@ -31,7 +31,7 @@ internal class TreeLabel : BaseLabel
     }
     public override void GenerateLabel()
     {
-        string tree_name = GetTreeName(Int32.Parse(hoverTree.treeType.Value)) ?? "Tree";
+        string tree_name = GetTreeName(GetTreeType(hoverTree.treeType.Value)) ?? "Tree";
         AddBorder(new TitleLabel(tree_name));
         List<Label> description = new();
         // not fully grown
@@ -98,5 +98,14 @@ internal class TreeLabel : BaseLabel
             case 9: return "Palm Tree"; // 2nd variation palm tree
         }
         return null;
+    }
+
+    private int GetTreeType(string treeTypeValue) 
+    {
+        if(int.TryParse(treeTypeValue, out int value))
+        {
+            return value;
+        }
+        return 0;
     }
 }
