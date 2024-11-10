@@ -66,6 +66,13 @@ internal class ModEntry : Mod
 
     internal Dictionary<string, bool> EnabledSkills = new();
 
+    public static bool IsVanillaSkill(string skill_id)
+    {
+        int vanilla_id = AchtuurCore.Utility.Skills.GetSkillIdFromName(skill_id);
+        return vanilla_id >= 0 && vanilla_id < 5;
+    }
+
+
     public static Farmer GetFarmerFromMultiplayerID(long id)
     {
         return Game1.getOnlineFarmers().ToList().Find(farmer => farmer.UniqueMultiplayerID == id);
@@ -78,11 +85,11 @@ internal class ModEntry : Mod
 
     public static bool IsSharingForSkillEnabled(string skill_id)
     {
+        if (!IsVanillaSkill(skill_id))
+            return Instance.Config.SpaceCoreSkillEnabled.GetValueSafe(skill_id);
+
         int vanilla_id = AchtuurCore.Utility.Skills.GetSkillIdFromName(skill_id);
-        if (vanilla_id != -1)
-            return Instance.Config.VanillaSkillEnabled[vanilla_id];
-        
-        return Instance.Config.SpaceCoreSkillEnabled.GetValueSafe(skill_id);
+        return Instance.Config.VanillaSkillEnabled[vanilla_id];   
     }
 
     /// <summary>
@@ -288,7 +295,7 @@ internal class ModEntry : Mod
             {
                 int maxLevel = GetMaxLevelSpaceCore(skill_id);
                 this.SkillMaxLevels.Value[skill_id] = maxLevel;
-                ShareTrailParticles[skill_id] = new TrailParticle(ParticleTrailLength, Color.White, ParticleSize);
+                ShareTrailParticles[skill_id] = new TrailParticle(ParticleTrailLength, Color.Magenta, ParticleSize);
                 ShareTrailParticles[skill_id].SetTrailColors(new List<Color> { Color.Magenta, Color.WhiteSmoke, Color.WhiteSmoke });
             }
         }
@@ -413,7 +420,6 @@ internal class ModEntry : Mod
 
         ExpGainData msg_expdata = e.ReadAs<ExpGainData>();
         ExpShare.ReceiveExp(msg_expdata);
-        
     }
 
     private void OnGameLaunch(object sender, GameLaunchedEventArgs e)

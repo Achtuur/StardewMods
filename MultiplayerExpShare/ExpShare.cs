@@ -48,8 +48,14 @@ internal class ExpShare
         );
 
 
-        if (receiver.UniqueMultiplayerID == Game1.player.UniqueMultiplayerID)
+        if (receiver.UniqueMultiplayerID != Game1.player.UniqueMultiplayerID)
+            return;
+
+
+        if (ModEntry.IsVanillaSkill(data.skill_id))
             GainExperiencePatch.InvokeGainExperience(Game1.player, data);
+        else
+            SpaceCoreExperiencePatch.InvokeGainExperience(Game1.player, data);
     }
 
     public void SetTargets(IEnumerable<Farmer> farmers)

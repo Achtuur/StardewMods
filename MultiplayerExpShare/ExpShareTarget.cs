@@ -1,6 +1,7 @@
 ﻿using MultiplayerExpShare.Patches;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +34,22 @@ internal class ExpShareTarget
         return new ExpShareTarget(Game1.player, SharerType.Actor).HasMastery();
     }
 
+    public static int GetFarmerMasteryLevel(Farmer f)
+    {
+        uint mastery_exp = f.stats.Get("MasteryExp");
+        int level = 0;
+        for(int i = 1; i <= 5; i++)
+        {
+            if (mastery_exp >= MasteryTrackerMenu.getMasteryExpNeededForLevel(i))
+                level++;
+        }
+        return level;
+
+    }
+
     public static bool FarmerHasMastery(Farmer f)
     {
-        return f.Level >= 25 && MasteryTrackerMenu.getCurrentMasteryLevel() < 5; // this is used in base game code?
+        return f.Level >= 25 && GetFarmerMasteryLevel(f) < 5; // this is used in base game code?
     }
 
     public bool HasMastery()
@@ -43,36 +57,46 @@ internal class ExpShareTarget
         return FarmerHasMastery(m_Farmer);
     }
 
-    public int GetSkillLevel(string skill_name)
+    public int GetSkillLevel(string skill_id)
     {
-        int vanilla_id = AchtuurCore.Utility.Skills.GetSkillIdFromName(skill_name);
-        if (vanilla_id != -1)
-            return m_Farmer.GetSkillLevel(vanilla_id);
-        return ModEntry.Instance.SpaceCoreAPI.GetLevelForCustomSkill(m_Farmer, skill_name);
+        if (!ModEntry.IsVanillaSkill(skill_id))
+            return ModEntry.Instance.SpaceCoreAPI.GetLevelForCustomSkill(m_Farmer, skill_id);
+
+        int vanilla_id = AchtuurCore.Utility.Skills.GetSkillIdFromName(skill_id);
+        return m_Farmer.GetSkillLevel(vanilla_id);
     }
 
-    public bool CanReceiveExp(string skill_name)
+    public bool CanReceiveExp(string skill_id)
     {
         switch (m_Type)
         {
             case SharerType.Actor:
-                return true;
             case SharerType.Receiver:
-                return GetSkillLevel(skill_name) < ModEntry.Instance.SkillMaxLevels.Value[skill_name] || HasMastery();
+                return GetSkillLevel(skill_id) < ModEntry.Instance.SkillMaxLevels.Value[skill_id] || HasMastery();
             default:
                 return false;
         }
     }
 
-    public bool CanReceiveExpFrom(string skill_name, ExpShareTarget sharer)
+    public bool IsMaxLevel(string skill_id)
+    {
+        return GetSkillLevel(skill_id) >= ModEntry.Instance.SkillMaxLevels.Value[skill_id] && MasteryTrackerMenu.getCurrentMasteryLevel() == 5;
+    }
+
+    public bool CanReceiveExpFrom(string skill_name, ExpShareTarget actor)
     {
         // can only get exp from actors
-        if (sharer.m_Type != SharerType.Actor || sharer.MultiplayerID == this.MultiplayerID)
+        if (actor.m_Type != SharerType.Actor || actor.MultiplayerID == this.MultiplayerID)
             return false;
 
-        // if you have mastery, and other doesn't you dont get exp from them
-        if (HasMastery() && !sharer.HasMastery())
-            return false;
+        // if actor is max level, always share if receiver can take it
+        if (actor.IsMaxLevel(skill_name))
+            return CanReceiveExp(skill_name);
+
+        // if actor has no mastery and receiver does, only share if actor cant get exp
+        if (HasMastery() && !actor.HasMastery())
+            return !actor.CanReceiveExp(skill_name) && CanReceiveExp(skill_name);
+
 
         return CanReceiveExp(skill_name);
     }

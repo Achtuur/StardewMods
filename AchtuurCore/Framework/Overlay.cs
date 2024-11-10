@@ -243,13 +243,16 @@ public abstract class Overlay
         if (TilePlacementTextures is not null)
             return;
 
-        GameAssetLoader assetLoader = new("LooseSprites/buildingPlacementTiles");
+        GameAssetLoader assetLoader = new("LooseSprites/Cursors");
 
         AssetColors[] assetColors = new[]
-        {
-            new AssetColors("green", 0, 0, tileSize: 64),
-            new AssetColors("grayscale", 0, 0, tileSize: 64, grayscale: true),
-            new AssetColors("red", 1, 0, tileSize: 64),
+        {   
+             //194, 388
+            new AssetColors("green", 0, 0, tileSize: 16, topLeftX: 194, topLeftY: 388),
+            // 194, 388
+            new AssetColors("grayscale", 0, 0, tileSize: 16, grayscale: true, topLeftX: 194, topLeftY: 388),
+            // 210, 388
+            new AssetColors("red", 1, 0, tileSize: 16, topLeftX: 194, topLeftY: 388),
         };
         assetLoader.AddAssetColor(assetColors);
         TilePlacementTextures = assetLoader.GetAssetTextures();

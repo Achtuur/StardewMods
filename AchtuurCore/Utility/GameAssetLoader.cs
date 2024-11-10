@@ -101,7 +101,7 @@ internal class GameAssetLoader
             return;
         int columns = sourceTexture.Width / assetColor.TileSize;
         // top left corner of tile on the sheet
-        int baseIndex = assetColor.SheetBaseIndex(columns);
+        int baseIndex = assetColor.SheetBaseIndex(sourceTexture.Width, columns);
         for(int y = 0; y < assetColor.TileSize; y++)
         {
             for(int x = 0; x < assetColor.TileSize; x++)
@@ -129,7 +129,7 @@ internal class GameAssetLoader
 /// <param name="tileX"></param>
 /// <param name="tileY"></param>
 /// <param name="name"></param>
-internal record class AssetColors(string name, int tileX, int tileY, int tileSize, bool grayscale = false)
+internal record class AssetColors(string name, int tileX, int tileY, int tileSize, bool grayscale = false, int topLeftX=0, int topLeftY=0)
 {
     public Color[] Colors { get; set; } = new Color[tileSize * tileSize];
     public bool ColorsExtracted = false;
@@ -139,7 +139,7 @@ internal record class AssetColors(string name, int tileX, int tileY, int tileSiz
     /// <summary>
     /// Top left corner of this tile on the tilesheet, given that it has <c>columns</c> columns of <c>tileSize</c> pixels.
     /// </summary>
-    public int SheetBaseIndex(int columns) => tileX * tileSize + tileY * tileSize * (tileSize * columns);
+    public int SheetBaseIndex(int width, int tile_width) => topLeftX + topLeftY * width + tileX * tileSize + tileY * tileSize * (tileSize * tile_width);
 
     public void SetExtracted() => ColorsExtracted = true;
 

@@ -31,6 +31,8 @@ public class GainExperiencePatch : BaseExpPatcher
     {
         isProcessingSharedExp = true;
         int skill = AchtuurCore.Utility.Skills.GetSkillIdFromName(exp_data.skill_id);
+        if (skill < 0 || skill > 5)
+            return;
         farmer.gainExperience(skill, exp_data.amount);
     }
 

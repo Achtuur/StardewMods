@@ -9,6 +9,10 @@ Core mod required for most of my other mods, available on [Nexus Mods](https://w
 
 # Changelog
 
+## 1.3.2
+* Fixed loading of placement tile texture.
+  * LooseSprites/buildingPlacementTiles was removed, now reads from LooseSprites/Cursors
+
 ## 1.3.1
 * Mark Overlay.Toggle as virtual
 

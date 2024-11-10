@@ -18,6 +18,10 @@ This mod relies on the base game's exp and levelling system. Any mod that change
 
 ## Planne1d
 * Change config to use the host's options
+* 
+
+# 1.2.2
+* fixed bug where player with max level mastery doesn't share exp
 
 ## 1.2.1
 * Works with mastery now
